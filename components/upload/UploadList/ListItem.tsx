@@ -2,9 +2,10 @@ import * as React from 'react';
 import DeleteOutlined from '@ant-design/icons/DeleteOutlined';
 import DownloadOutlined from '@ant-design/icons/DownloadOutlined';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
-import classNames from 'classnames';
-import CSSMotion from 'rc-motion';
+import CSSMotion from '@rc-component/motion';
+import { clsx } from 'clsx';
 
+import { isFunction } from '../../_util/is';
 import { ConfigContext } from '../../config-provider';
 import Progress from '../../progress';
 import Tooltip from '../../tooltip';
@@ -14,12 +15,15 @@ import type {
   UploadListProgressProps,
   UploadListType,
   UploadLocale,
+  UploadSemanticAllType,
 } from '../interface';
 
 export interface ListItemProps {
   prefixCls: string;
   className?: string;
   style?: React.CSSProperties;
+  classNames?: UploadSemanticAllType['classNames'];
+  styles?: UploadSemanticAllType['styles'];
   locale: UploadLocale;
   file: UploadFile;
   items: UploadFile[];
@@ -53,6 +57,8 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
       prefixCls,
       className,
       style,
+      classNames: itemClassNames,
+      styles,
       locale,
       listType,
       file,
@@ -99,7 +105,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
     let icon = <div className={`${prefixCls}-icon`}>{iconNode}</div>;
     if (listType === 'picture' || listType === 'picture-card' || listType === 'picture-circle') {
       if (mergedStatus === 'uploading' || (!file.thumbUrl && !file.url)) {
-        const uploadingClassName = classNames(`${prefixCls}-list-item-thumbnail`, {
+        const uploadingClassName = clsx(`${prefixCls}-list-item-thumbnail`, {
           [`${prefixCls}-list-item-file`]: mergedStatus !== 'uploading',
         });
         icon = <div className={uploadingClassName}>{iconNode}</div>;
@@ -114,7 +120,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
         ) : (
           iconNode
         );
-        const aClassName = classNames(`${prefixCls}-list-item-thumbnail`, {
+        const aClassName = clsx(`${prefixCls}-list-item-thumbnail`, {
           [`${prefixCls}-list-item-file`]: isImgUrl && !isImgUrl(file),
         });
         icon = (
@@ -131,20 +137,17 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
       }
     }
 
-    const listItemClassName = classNames(
+    const listItemClassName = clsx(
       `${prefixCls}-list-item`,
       `${prefixCls}-list-item-${mergedStatus}`,
+      itemClassNames?.item,
     );
     const linkProps =
       typeof file.linkProps === 'string' ? JSON.parse(file.linkProps) : file.linkProps;
 
-    const removeIcon = (
-      typeof showRemoveIcon === 'function'
-        ? showRemoveIcon(file)
-        : showRemoveIcon
-    )
+    const removeIcon = (isFunction(showRemoveIcon) ? showRemoveIcon(file) : showRemoveIcon)
       ? actionIconRender(
-          (typeof customRemoveIcon === 'function' ? customRemoveIcon(file) : customRemoveIcon) || (
+          (isFunction(customRemoveIcon) ? customRemoveIcon(file) : customRemoveIcon) || (
             <DeleteOutlined />
           ),
           () => onClose(file),
@@ -157,12 +160,12 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
       : null;
 
     const downloadIcon =
-      (typeof showDownloadIcon === 'function' ? showDownloadIcon(file) : showDownloadIcon) &&
+      (isFunction(showDownloadIcon) ? showDownloadIcon(file) : showDownloadIcon) &&
       mergedStatus === 'done'
         ? actionIconRender(
-            (typeof customDownloadIcon === 'function'
-              ? customDownloadIcon(file)
-              : customDownloadIcon) || <DownloadOutlined />,
+            (isFunction(customDownloadIcon) ? customDownloadIcon(file) : customDownloadIcon) || (
+              <DownloadOutlined />
+            ),
             () => onDownload(file),
             prefixCls,
             locale.downloadFile,
@@ -171,21 +174,25 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
     const downloadOrDelete = listType !== 'picture-card' && listType !== 'picture-circle' && (
       <span
         key="download-delete"
-        className={classNames(`${prefixCls}-list-item-actions`, {
-          picture: listType === 'picture',
-        })}
+        className={clsx(`${prefixCls}-list-item-actions`, { picture: listType === 'picture' })}
       >
         {downloadIcon}
         {removeIcon}
       </span>
     );
 
-    const extraContent = typeof customExtra === 'function' ? customExtra(file) : customExtra;
+    const extraContent = isFunction(customExtra) ? customExtra(file) : customExtra;
     const extra = extraContent && (
       <span className={`${prefixCls}-list-item-extra`}>{extraContent}</span>
     );
 
-    const listItemNameClass = classNames(`${prefixCls}-list-item-name`);
+    const listItemNameClass = clsx(`${prefixCls}-list-item-name`);
+    const onPreviewKeyDown: React.KeyboardEventHandler<HTMLSpanElement> = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onPreview(file, e);
+      }
+    };
     const fileName = file.url ? (
       <a
         key="view"
@@ -203,8 +210,11 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
     ) : (
       <span
         key="view"
+        role="button"
+        tabIndex={0}
         className={listItemNameClass}
         onClick={(e) => onPreview(file, e)}
+        onKeyDown={onPreviewKeyDown}
         title={file.name}
       >
         {file.name}
@@ -213,7 +223,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
     );
 
     const previewIcon =
-      (typeof showPreviewIcon === 'function' ? showPreviewIcon(file) : showPreviewIcon) &&
+      (isFunction(showPreviewIcon) ? showPreviewIcon(file) : showPreviewIcon) &&
       (file.url || file.thumbUrl) ? (
         <a
           href={file.url || file.thumbUrl}
@@ -222,7 +232,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
           onClick={(e) => onPreview(file, e)}
           title={locale.previewFile}
         >
-          {typeof customPreviewIcon === 'function'
+          {isFunction(customPreviewIcon)
             ? customPreviewIcon(file)
             : customPreviewIcon || <EyeOutlined />}
         </a>
@@ -241,7 +251,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
     const rootPrefixCls = getPrefixCls();
 
     const dom = (
-      <div className={listItemClassName}>
+      <div className={listItemClassName} style={styles?.item}>
         {icon}
         {fileName}
         {downloadOrDelete}
@@ -266,7 +276,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
                 ) : null;
 
               return (
-                <div className={classNames(`${prefixCls}-list-item-progress`, motionClassName)}>
+                <div className={clsx(`${prefixCls}-list-item-progress`, motionClassName)}>
                   {loadingProgress}
                 </div>
               );
@@ -290,11 +300,7 @@ const ListItem = React.forwardRef<HTMLDivElement, ListItemProps>(
       );
 
     return (
-      <div
-        className={classNames(`${prefixCls}-list-item-container`, className)}
-        style={style}
-        ref={ref}
-      >
+      <div className={clsx(`${prefixCls}-list-item-container`, className)} style={style} ref={ref}>
         {itemRender
           ? itemRender(item, file, items, {
               download: onDownload.bind(null, file),

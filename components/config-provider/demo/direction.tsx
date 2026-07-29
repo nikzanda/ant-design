@@ -16,6 +16,7 @@ import {
   Col,
   ConfigProvider,
   Divider,
+  Flex,
   Input,
   InputNumber,
   Modal,
@@ -30,15 +31,70 @@ import {
   Tree,
   TreeSelect,
 } from 'antd';
+import { createStyles } from 'antd-style';
 
 type DirectionType = ConfigProviderProps['direction'];
 
-const InputGroup = Input.Group;
-const ButtonGroup = Button.Group;
+const useStyles = createStyles((props) => {
+  const { css } = props;
+  return {
+    headerExample: css`
+      display: inline-block;
+      width: 42px;
+      height: 42px;
+      vertical-align: middle;
+      background-color: #eee;
+      border-radius: 4px;
+    `,
+  };
+});
 
-const { Option } = Select;
-const { TreeNode } = Tree;
 const { Search } = Input;
+
+const treeData = [
+  {
+    title: 'parent 1',
+    key: '0-0',
+    children: [
+      {
+        title: 'parent 1-0',
+        key: '0-0-0',
+        disabled: true,
+        children: [
+          { title: 'leaf', key: '0-0-0-0', disableCheckbox: true },
+          { title: 'leaf', key: '0-0-0-1' },
+        ],
+      },
+      {
+        title: 'parent 1-1',
+        key: '0-0-1',
+        children: [{ title: <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' }],
+      },
+    ],
+  },
+];
+
+const treeSelectData = [
+  {
+    title: 'parent 1',
+    value: '0-1',
+    children: [
+      {
+        title: 'parent 1-0',
+        value: '0-1-1',
+        children: [
+          { title: 'my leaf', value: 'random' },
+          { title: 'your leaf', value: 'random1' },
+        ],
+      },
+      {
+        title: 'parent 1-1',
+        value: 'random2',
+        children: [{ title: <b style={{ color: '#08c' }}>sss</b>, value: 'random3' }],
+      },
+    ],
+  },
+];
 
 const cascaderOptions = [
   {
@@ -93,26 +149,38 @@ const cascaderOptions = [
 
 type Placement = 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight';
 
-const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
+const Page: React.FC<{ placement: Placement }> = (props) => {
+  const { placement } = props;
+
+  const { styles } = useStyles();
+
   const [currentStep, setCurrentStep] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [badgeCount, setBadgeCount] = useState(5);
   const [showBadge, setShowBadge] = useState(true);
 
   const selectBefore = (
-    <Select defaultValue="Http://" style={{ width: 90 }}>
-      <Option value="Http://">Http://</Option>
-      <Option value="Https://">Https://</Option>
-    </Select>
+    <Select
+      defaultValue="Http://"
+      style={{ width: 90 }}
+      options={[
+        { label: 'Http://', value: 'Http://' },
+        { label: 'Https://', value: 'Https://' },
+      ]}
+    />
   );
 
   const selectAfter = (
-    <Select defaultValue=".com" style={{ width: 80 }}>
-      <Option value=".com">.com</Option>
-      <Option value=".jp">.jp</Option>
-      <Option value=".cn">.cn</Option>
-      <Option value=".org">.org</Option>
-    </Select>
+    <Select
+      defaultValue=".com"
+      style={{ width: 80 }}
+      options={[
+        { label: '.com', value: '.com' },
+        { label: '.jp', value: '.jp' },
+        { label: '.cn', value: '.cn' },
+        { label: '.org', value: '.org' },
+      ]}
+    />
   );
 
   // ==== Cascader ====
@@ -129,13 +197,11 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
     setModalOpen(true);
   };
 
-  const handleOk = (e: React.MouseEvent<HTMLElement>) => {
-    console.log(e);
+  const handleOk = () => {
     setModalOpen(false);
   };
 
-  const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
-    console.log(e);
+  const handleCancel = () => {
     setModalOpen(false);
   };
 
@@ -160,10 +226,10 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
   // ==== End Badge ====
 
   return (
-    <div className="direction-components">
+    <Flex className="direction-components" vertical gap="large">
       <Row>
         <Col span={24}>
-          <Divider orientation="left">Cascader example</Divider>
+          <Divider titlePlacement="start">Cascader example</Divider>
           <Cascader
             suffixIcon={<SearchIcon />}
             options={cascaderOptions}
@@ -182,10 +248,9 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
           />
         </Col>
       </Row>
-      <br />
       <Row>
         <Col span={12}>
-          <Divider orientation="left">Switch example</Divider>
+          <Divider titlePlacement="start">Switch example</Divider>
           &nbsp;&nbsp;
           <Switch defaultChecked />
           &nbsp;&nbsp;
@@ -194,7 +259,7 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
           <Switch size="small" loading />
         </Col>
         <Col span={12}>
-          <Divider orientation="left">Radio Group example</Divider>
+          <Divider titlePlacement="start">Radio Group example</Divider>
           <Radio.Group defaultValue="c" buttonStyle="solid">
             <Radio.Button value="a">تهران</Radio.Button>
             <Radio.Button value="b" disabled>
@@ -205,11 +270,10 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
           </Radio.Group>
         </Col>
       </Row>
-      <br />
       <Row>
         <Col span={12}>
-          <Divider orientation="left">Button example</Divider>
-          <div className="button-demo">
+          <Divider titlePlacement="start">Button example</Divider>
+          <Flex wrap gap="small">
             <Button type="primary" icon={<DownloadOutlined />} />
             <Button type="primary" shape="circle" icon={<DownloadOutlined />} />
             <Button type="primary" shape="round" icon={<DownloadOutlined />} />
@@ -219,234 +283,231 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
             <Button type="primary" icon={<DownloadOutlined />}>
               Download
             </Button>
-            <br />
-            <Button.Group>
-              <Button type="primary">
-                <LeftOutlined />
+            <Space.Compact>
+              <Button type="primary" icon={<LeftOutlined />}>
                 Backward
               </Button>
-              <Button type="primary">
+              <Button type="primary" icon={<RightOutlined />} iconPlacement="end">
                 Forward
-                <RightOutlined />
               </Button>
-            </Button.Group>
+            </Space.Compact>
             <Button type="primary" loading>
               Loading
             </Button>
             <Button type="primary" size="small" loading>
               Loading
             </Button>
-          </div>
+          </Flex>
         </Col>
         <Col span={12}>
-          <Divider orientation="left">Tree example</Divider>
+          <Divider titlePlacement="start">Tree example</Divider>
           <Tree
             showLine
             checkable
             defaultExpandedKeys={['0-0-0', '0-0-1']}
             defaultSelectedKeys={['0-0-0', '0-0-1']}
             defaultCheckedKeys={['0-0-0', '0-0-1']}
-          >
-            <TreeNode title="parent 1" key="0-0">
-              <TreeNode title="parent 1-0" key="0-0-0" disabled>
-                <TreeNode title="leaf" key="0-0-0-0" disableCheckbox />
-                <TreeNode title="leaf" key="0-0-0-1" />
-              </TreeNode>
-              <TreeNode title="parent 1-1" key="0-0-1">
-                <TreeNode title={<span style={{ color: '#1677ff' }}>sss</span>} key="0-0-1-0" />
-              </TreeNode>
-            </TreeNode>
-          </Tree>
+            treeData={treeData}
+          />
         </Col>
       </Row>
-      <br />
       <Row>
         <Col span={24}>
-          <Divider orientation="left">Input (Input Group) example</Divider>
-          <InputGroup size="large">
-            <Row gutter={8}>
-              <Col span={5}>
-                <Input defaultValue="0571" />
+          <Divider titlePlacement="start">Input (Input Group) example</Divider>
+          <Flex vertical gap="large">
+            <Flex vertical gap="middle">
+              <Row gutter={8}>
+                <Col span={5}>
+                  <Input size="large" defaultValue="0571" />
+                </Col>
+                <Col span={8}>
+                  <Input size="large" defaultValue="26888888" />
+                </Col>
+              </Row>
+              <Space.Compact>
+                <Input style={{ width: '20%' }} defaultValue="0571" />
+                <Input style={{ width: '30%' }} defaultValue="26888888" />
+              </Space.Compact>
+              <Space.Compact>
+                <Select
+                  defaultValue="Option1"
+                  options={[
+                    { label: 'Option1', value: 'Option1' },
+                    { label: 'Option2', value: 'Option2' },
+                  ]}
+                />
+                <Input style={{ width: '50%' }} defaultValue="input content" />
+                <InputNumber />
+              </Space.Compact>
+              <Search placeholder="input search text" enterButton="Search" size="large" />
+              <Space.Compact>
+                {selectBefore}
+                <Input defaultValue="mysite" />
+                {selectAfter}
+              </Space.Compact>
+            </Flex>
+            <Row>
+              <Col span={12}>
+                <Divider titlePlacement="start">Select example</Divider>
+                <Space wrap>
+                  <Select
+                    mode="multiple"
+                    defaultValue="مورچه"
+                    style={{ width: 120 }}
+                    options={[
+                      { label: 'jack', value: 'jack' },
+                      { label: 'مورچه', value: 'مورچه' },
+                      { label: 'disabled', value: 'disabled', disabled: true },
+                      { label: 'yiminghe', value: 'Yiminghe' },
+                    ]}
+                  />
+                  <Select
+                    disabled
+                    defaultValue="مورچه"
+                    style={{ width: 120 }}
+                    options={[{ label: 'مورچه', value: 'مورچه' }]}
+                  />
+                  <Select
+                    loading
+                    defaultValue="مورچه"
+                    style={{ width: 120 }}
+                    options={[{ label: 'مورچه', value: 'مورچه' }]}
+                  />
+                  <Select
+                    showSearch
+                    style={{ width: 200 }}
+                    placeholder="Select a person"
+                    options={[
+                      { label: 'jack', value: 'jack' },
+                      { label: 'سعید', value: 'سعید' },
+                      { label: 'Tom', value: 'tom' },
+                    ]}
+                  />
+                </Space>
               </Col>
-              <Col span={8}>
-                <Input defaultValue="26888888" />
+              <Col span={12}>
+                <Divider titlePlacement="start">TreeSelect example</Divider>
+                <TreeSelect
+                  showSearch
+                  style={{ width: '100%' }}
+                  styles={{
+                    popup: {
+                      root: { maxHeight: 400, overflow: 'auto' },
+                    },
+                  }}
+                  placeholder="Please select"
+                  allowClear
+                  treeDefaultExpandAll
+                  treeData={treeSelectData}
+                />
               </Col>
             </Row>
-          </InputGroup>
-          <br />
-          <InputGroup compact>
-            <Input style={{ width: '20%' }} defaultValue="0571" />
-            <Input style={{ width: '30%' }} defaultValue="26888888" />
-          </InputGroup>
-          <br />
-          <InputGroup compact>
-            <Select defaultValue="Option1">
-              <Option value="Option1">Option1</Option>
-              <Option value="Option2">Option2</Option>
-            </Select>
-            <Input style={{ width: '50%' }} defaultValue="input content" />
-            <InputNumber />
-          </InputGroup>
-          <br />
-          <Search placeholder="input search text" enterButton="Search" size="large" />
-          <br />
-          <br />
-          <div style={{ marginBottom: 16 }}>
-            <Input addonBefore={selectBefore} addonAfter={selectAfter} defaultValue="mysite" />
-          </div>
-          <br />
-          <Row>
-            <Col span={12}>
-              <Divider orientation="left">Select example</Divider>
-              <Space wrap>
-                <Select mode="multiple" defaultValue="مورچه" style={{ width: 120 }}>
-                  <Option value="jack">Jack</Option>
-                  <Option value="مورچه">مورچه</Option>
-                  <Option value="disabled" disabled>
-                    Disabled
-                  </Option>
-                  <Option value="Yiminghe">yiminghe</Option>
-                </Select>
-                <Select defaultValue="مورچه" style={{ width: 120 }} disabled>
-                  <Option value="مورچه">مورچه</Option>
-                </Select>
-                <Select defaultValue="مورچه" style={{ width: 120 }} loading>
-                  <Option value="مورچه">مورچه</Option>
-                </Select>
-                <Select showSearch style={{ width: 200 }} placeholder="Select a person">
-                  <Option value="jack">Jack</Option>
-                  <Option value="سعید">سعید</Option>
-                  <Option value="tom">Tom</Option>
-                </Select>
-              </Space>
-            </Col>
-            <Col span={12}>
-              <Divider orientation="left">TreeSelect example</Divider>
-              <TreeSelect
-                showSearch
-                style={{ width: '100%' }}
-                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                placeholder="Please select"
-                allowClear
-                treeDefaultExpandAll
-              >
-                <TreeNode title="parent 1" key="0-1">
-                  <TreeNode title="parent 1-0" key="0-1-1">
-                    <TreeNode title="my leaf" key="random" />
-                    <TreeNode title="your leaf" key="random1" />
-                  </TreeNode>
-                  <TreeNode title="parent 1-1" key="random2">
-                    <TreeNode title={<b style={{ color: '#08c' }}>sss</b>} key="random3" />
-                  </TreeNode>
-                </TreeNode>
-              </TreeSelect>
-            </Col>
-          </Row>
-          <br />
-          <Row>
-            <Col span={24}>
-              <Divider orientation="left">Modal example</Divider>
-              <Button type="primary" onClick={showModal}>
-                Open Modal
-              </Button>
-              <Modal title="پنچره ساده" open={modalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <p>نگاشته‌های خود را اینجا قراردهید</p>
-                <p>نگاشته‌های خود را اینجا قراردهید</p>
-                <p>نگاشته‌های خود را اینجا قراردهید</p>
-              </Modal>
-            </Col>
-          </Row>
-          <br />
-          <Row>
-            <Col span={24}>
-              <Divider orientation="left">Steps example</Divider>
-              <Steps
-                progressDot
-                current={currentStep}
-                items={[
-                  {
-                    title: 'Finished',
-                    description: 'This is a description.',
-                  },
-                  {
-                    title: 'In Progress',
-                    description: 'This is a description.',
-                  },
-                  {
-                    title: 'Waiting',
-                    description: 'This is a description.',
-                  },
-                ]}
-              />
-              <br />
-              <Steps
-                current={currentStep}
-                onChange={onStepsChange}
-                items={[
-                  {
-                    title: 'Step 1',
-                    description: 'This is a description.',
-                  },
-                  {
-                    title: 'Step 2',
-                    description: 'This is a description.',
-                  },
-                  {
-                    title: 'Step 3',
-                    description: 'This is a description.',
-                  },
-                ]}
-              />
-            </Col>
-          </Row>
-          <br />
-          <Row>
-            <Col span={12}>
-              <Divider orientation="left">Rate example</Divider>
-              <Rate defaultValue={2.5} />
-              <br />
-              <strong>* Note:</strong> Half star not implemented in RTL direction, it will be
-              supported after{' '}
-              <a href="https://github.com/react-component/rate" target="_blank" rel="noreferrer">
-                rc-rate
-              </a>{' '}
-              implement rtl support.
-            </Col>
-            <Col span={12}>
-              <Divider orientation="left">Badge example</Divider>
-              <Badge count={badgeCount}>
-                <a href="#" className="head-example" />
-              </Badge>
-              <ButtonGroup>
-                <Button onClick={declineBadge}>
-                  <MinusOutlined />
+            <Row>
+              <Col span={24}>
+                <Divider titlePlacement="start">Modal example</Divider>
+                <Button type="primary" onClick={showModal}>
+                  Open Modal
                 </Button>
-                <Button onClick={increaseBadge}>
-                  <PlusOutlined />
-                </Button>
-              </ButtonGroup>
-              <div style={{ marginTop: 12 }}>
-                <Badge dot={showBadge}>
-                  <a href="#" className="head-example" />
-                </Badge>
-                <Switch onChange={onChangeBadge} checked={showBadge} />
-              </div>
-            </Col>
-          </Row>
+                <Modal title="پنچره ساده" open={modalOpen} onOk={handleOk} onCancel={handleCancel}>
+                  <p>نگاشته‌های خود را اینجا قراردهید</p>
+                  <p>نگاشته‌های خود را اینجا قراردهید</p>
+                  <p>نگاشته‌های خود را اینجا قراردهید</p>
+                </Modal>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24}>
+                <Divider titlePlacement="start">Steps example</Divider>
+                <Flex vertical gap="middle">
+                  <Steps
+                    progressDot
+                    current={currentStep}
+                    items={[
+                      {
+                        title: 'Finished',
+                        description: 'This is a description.',
+                      },
+                      {
+                        title: 'In Progress',
+                        description: 'This is a description.',
+                      },
+                      {
+                        title: 'Waiting',
+                        description: 'This is a description.',
+                      },
+                    ]}
+                  />
+                  <Steps
+                    current={currentStep}
+                    onChange={onStepsChange}
+                    items={[
+                      {
+                        title: 'Step 1',
+                        description: 'This is a description.',
+                      },
+                      {
+                        title: 'Step 2',
+                        description: 'This is a description.',
+                      },
+                      {
+                        title: 'Step 3',
+                        description: 'This is a description.',
+                      },
+                    ]}
+                  />
+                </Flex>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={12}>
+                <Divider titlePlacement="start">Rate example</Divider>
+                <Flex vertical gap="small">
+                  <Rate defaultValue={2.5} />
+                  <div>
+                    <strong>* Note:</strong> Half star not implemented in RTL direction, it will be
+                    supported after{' '}
+                    <a
+                      href="https://github.com/react-component/rate"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      rc-rate
+                    </a>{' '}
+                    implement rtl support.
+                  </div>
+                </Flex>
+              </Col>
+              <Col span={12}>
+                <Divider titlePlacement="start">Badge example</Divider>
+                <Flex align="center" gap="middle">
+                  <Badge count={badgeCount}>
+                    <a href="#" className={styles.headerExample} />
+                  </Badge>
+                  <Space.Compact>
+                    <Button icon={<MinusOutlined />} onClick={declineBadge} />
+                    <Button icon={<PlusOutlined />} onClick={increaseBadge} />
+                  </Space.Compact>
+                </Flex>
+                <Flex align="center" gap="middle" style={{ marginTop: 12 }}>
+                  <Badge dot={showBadge}>
+                    <a href="#" className={styles.headerExample} />
+                  </Badge>
+                  <Switch onChange={onChangeBadge} checked={showBadge} />
+                </Flex>
+              </Col>
+            </Row>
+          </Flex>
         </Col>
       </Row>
-      <br />
-      <br />
       <Row>
         <Col span={24}>
-          <Divider orientation="left">Pagination example</Divider>
+          <Divider titlePlacement="start">Pagination example</Divider>
           <Pagination showSizeChanger defaultCurrent={3} total={500} />
         </Col>
       </Row>
-      <br />
       <Row>
         <Col span={24}>
-          <Divider orientation="left">Grid System example</Divider>
+          <Divider titlePlacement="start">Grid System example</Divider>
           <div className="grid-demo">
             <div className="code-box-demo">
               <p>
@@ -484,7 +545,7 @@ const Page: React.FC<{ placement: Placement }> = ({ placement }) => {
           </div>
         </Col>
       </Row>
-    </div>
+    </Flex>
   );
 };
 

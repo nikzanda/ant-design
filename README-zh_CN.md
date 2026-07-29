@@ -6,17 +6,16 @@
 
 一套企业级 UI 设计语言和 React 组件库。
 
-[![CI status][github-action-image]][github-action-url] [![codecov][codecov-image]][codecov-url] [![NPM version][npm-image]][npm-url] [![NPM downloads][download-image]][download-url]
+[![CI status][github-action-image]][github-action-url] [![codecov][codecov-image]][codecov-url] [![NPM version][npm-image]][npm-url] [![NPM downloads][download-image]][download-url] [![][bundlephobia-image]][bundlephobia-url] [![][jsdelivr-image]][jsdelivr-url]
 
-[![][bundlephobia-image]][bundlephobia-url] [![][jsdelivr-image]][jsdelivr-url] [![FOSSA Status][fossa-image]][fossa-url] [![DeepWiki][deepwiki-image]][deepwiki-url]
-
-[![Follow Twitter][twitter-image]][twitter-url] [![Renovate status][renovate-image]][renovate-dashboard-url] [![][issues-helper-image]][issues-helper-url] [![dumi][dumi-image]][dumi-url] [![Issues need help][help-wanted-image]][help-wanted-url]
+[![Follow Twitter][twitter-image]][twitter-url] [![dumi][dumi-image]][dumi-url] [![FOSSA Status][fossa-image]][fossa-url] [![Issues need help][help-wanted-image]][help-wanted-url] [![LFX Active Contributors][lfx-image]][lfx-url]
 
 [更新日志](./CHANGELOG.zh-CN.md) · [报告问题][github-issues-url] · [特性需求][github-issues-url] · [English](./README.md) · 中文
 
 ## ❤️ 赞助者 [![](https://opencollective.com/ant-design/tiers/sponsors/badge.svg?label=Sponsors&color=brightgreen)](https://opencollective.com/ant-design/contribute/sponsors-218)
 
-[![](https://opencollective.com/ant-design/tiers/sponsors.svg?avatarHeight=72)](https://opencollective.com/ant-design/contribute/sponsors-218/checkout)
+| <a href="https://youmind.com/zh-CN?utm_source=ant-design"><img src="https://mdn.alipayobjects.com/huamei_vmgq1x/afts/img/A*SXcuQYBZ6oQAAAAAQJAAAAgAeh6VAQ/original" width="80" alt="YouMind"></a> | <a href="https://tractian.com?utm_source=ant-design"><img src="https://mdn.alipayobjects.com/huamei_vmgq1x/afts/img/A*Z4-4Q67SG5UAAAAAQLAAAAgAeh6VAQ/original" width="80" alt="TRACTIAN"></a> | <a href="https://lobehub.com?utm_source=ant-design"><img src="https://unpkg.com/@lobehub/icons-static-svg@1.79.0/icons/lobehub-color.svg" width="80" alt="LobeHub"></a> | <a href="https://coderabbit.ai?utm_source=ant-design"><img src="https://mdn.alipayobjects.com/huamei_vmgq1x/afts/img/A*yHnhRL4x1DEAAAAAQBAAAAgAeh6VAQ/original" width="80" alt="CodeRabbit"></a> |
+| :-: | :-: | :-: | :-: |
 
 [npm-image]: https://img.shields.io/npm/v/antd.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/antd
@@ -28,23 +27,19 @@
 [download-url]: https://npmjs.org/package/antd
 [fossa-image]: https://app.fossa.io/api/projects/git%2Bgithub.com%2Fant-design%2Fant-design.svg?type=shield
 [fossa-url]: https://app.fossa.io/projects/git%2Bgithub.com%2Fant-design%2Fant-design?ref=badge_shield
-[help-wanted-image]: https://flat.badgen.net/github/label-issues/ant-design/ant-design/help%20wanted/open
+[help-wanted-image]: https://img.shields.io/github/issues/ant-design/ant-design/help%20wanted?color=green&style=flat-square
 [help-wanted-url]: https://github.com/ant-design/ant-design/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22
 [twitter-image]: https://img.shields.io/twitter/follow/AntDesignUI.svg?label=Ant%20Design
 [twitter-url]: https://twitter.com/AntDesignUI
 [jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/antd/badge
 [jsdelivr-url]: https://www.jsdelivr.com/package/npm/antd
-[bundlephobia-image]: https://badgen.net/bundlephobia/minzip/antd?style=flat-square
+[bundlephobia-image]: https://img.shields.io/bundlephobia/minzip/antd
 [bundlephobia-url]: https://bundlephobia.com/package/antd
-[issues-helper-image]: https://img.shields.io/badge/using-actions--cool-blue?style=flat-square
-[issues-helper-url]: https://github.com/actions-cool
-[renovate-image]: https://img.shields.io/badge/renovate-enabled-brightgreen.svg?style=flat-square
-[renovate-dashboard-url]: https://github.com/ant-design/ant-design/issues/32498
 [dumi-image]: https://img.shields.io/badge/docs%20by-dumi-blue?style=flat-square
 [dumi-url]: https://github.com/umijs/dumi
 [github-issues-url]: https://new-issue.ant.design
-[deepwiki-url]: https://deepwiki.com/ant-design/ant-design
-[deepwiki-image]: https://img.shields.io/badge/Chat%20with-DeepWiki%20🤖-20B2AA?style=flat-square
+[lfx-image]: https://insights.linuxfoundation.org/api/badge/active-contributors?project=ant-design-ant-design&repos=https://github.com/ant-design/ant-design
+[lfx-url]: https://insights.linuxfoundation.org/project/ant-design-ant-design/repository/ant-design-ant-design
 
 </div>
 
@@ -121,6 +116,7 @@ export default App;
 
 - [首页](https://ant.design/)
 - [所有组件](https://ant.design/components/overview-cn)
+- [赞助](https://ant.design/docs/react/sponsor)
 - [更新日志](CHANGELOG.zh-CN.md)
 - [React 底层基础组件](https://react-component.github.io/)
 - [🆕 Ant Design X](https://x.ant.design/index-cn)
@@ -192,7 +188,7 @@ $ npm start
 </table>
 
 <a href="https://openomy.app/github/ant-design/ant-design" target="_blank" style="display: block; width: 100%;" align="center">
-  <img src="https://openomy.app/svg?repo=ant-design/ant-design&chart=bubble&latestMonth=3" target="_blank" alt="Contribution Leaderboard" style="display: block; width: 100%;" />
+  <img src="https://openomy.app/svg?repo=ant-design/ant-design&chart=bubble&latestMonth=3" alt="Contribution Leaderboard" style="display: block; width: 100%;" />
 </a>
 
 请参考[贡献指南](https://ant.design/docs/react/contributing-cn).

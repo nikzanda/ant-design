@@ -1,20 +1,19 @@
 import * as React from 'react';
 import type { JSX } from 'react';
-import classNames from 'classnames';
-import { Field, FieldContext, ListContext } from 'rc-field-form';
-import type { FieldProps } from 'rc-field-form/lib/Field';
-import type { InternalNamePath, Meta } from 'rc-field-form/lib/interface';
-import useState from 'rc-util/lib/hooks/useState';
-import { supportRef } from 'rc-util/lib/ref';
+import { Field, FieldContext, ListContext } from '@rc-component/form';
+import type { FieldProps, InternalNamePath, Meta, RuleObject } from '@rc-component/form';
+import { supportRef, useState } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { isFunction, isNonNullable, isPlainObject } from '../../_util/is';
 import { cloneElement } from '../../_util/reactNode';
-import { devUseWarning } from '../../_util/warning';
+import { useDevWarning } from '../../_util/warning';
 import { ConfigContext } from '../../config-provider';
 import useCSSVarCls from '../../config-provider/hooks/useCSSVarCls';
 import { FormContext, NoStyleItemContext } from '../context';
 import type { FormInstance, FormItemLayout } from '../Form';
 import type { FormItemInputProps } from '../FormItemInput';
-import type { FormItemLabelProps, LabelTooltipType } from '../FormItemLabel';
+import type { FormItemLabelProps } from '../FormItemLabel';
 import useChildren from '../hooks/useChildren';
 import useFormItemStatus from '../hooks/useFormItemStatus';
 import useFrameState from '../hooks/useFrameState';
@@ -48,7 +47,6 @@ export type FeedbackIcons = (itemStatus: {
 interface MemoInputProps {
   control: object;
   update: any;
-  children: React.ReactNode;
   childProps: any[];
 }
 
@@ -58,24 +56,18 @@ interface MemoInputProps {
 function isSimilarControl(a: object, b: object) {
   const keysA = Object.keys(a);
   const keysB = Object.keys(b);
-
   return (
     keysA.length === keysB.length &&
     keysA.every((key) => {
       const propValueA = (a as any)[key];
       const propValueB = (b as any)[key];
-
-      return (
-        propValueA === propValueB ||
-        typeof propValueA === 'function' ||
-        typeof propValueB === 'function'
-      );
+      return propValueA === propValueB || isFunction(propValueA) || isFunction(propValueB);
     })
   );
 }
 
-const MemoInput = React.memo(
-  ({ children }: MemoInputProps) => children as JSX.Element,
+const MemoInput = React.memo<React.PropsWithChildren<MemoInputProps>>(
+  (props) => props.children,
   (prev, next) =>
     isSimilarControl(prev.control, next.control) &&
     prev.update === next.update &&
@@ -84,9 +76,7 @@ const MemoInput = React.memo(
 );
 
 export interface FormItemProps<Values = any>
-  extends Omit<FormItemLabelProps, 'requiredMark'>,
-    FormItemInputProps,
-    RcFieldProps<Values> {
+  extends Omit<FormItemLabelProps, 'requiredMark'>, FormItemInputProps, RcFieldProps<Values> {
   prefixCls?: string;
   noStyle?: boolean;
   style?: React.CSSProperties;
@@ -100,9 +90,6 @@ export interface FormItemProps<Values = any>
   hidden?: boolean;
   initialValue?: any;
   messageVariables?: Record<string, string>;
-  tooltip?: LabelTooltipType;
-  /** @deprecated No need anymore */
-  fieldKey?: React.Key | React.Key[];
   layout?: FormItemLayout;
 }
 
@@ -141,23 +128,26 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
 
   const mergedChildren = useChildren(children);
 
-  const isRenderProps = typeof mergedChildren === 'function';
+  const isRenderProps = isFunction(mergedChildren);
+
   const notifyParentMetaChange = React.useContext(NoStyleItemContext);
 
   const { validateTrigger: contextValidateTrigger } = React.useContext(FieldContext);
-  const mergedValidateTrigger =
-    validateTrigger !== undefined ? validateTrigger : contextValidateTrigger;
 
-  const hasName = !(name === undefined || name === null);
+  const mergedValidateTrigger = isNonNullable(validateTrigger)
+    ? validateTrigger
+    : contextValidateTrigger;
+
+  const hasName = isNonNullable(name);
 
   const prefixCls = getPrefixCls('form', customizePrefixCls);
 
   // Style
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   // ========================= Warn =========================
-  const warning = devUseWarning('Form.Item');
+  const warning = useDevWarning('Form.Item');
 
   if (process.env.NODE_ENV !== 'production') {
     warning(name !== null, 'usage', '`null` is passed as `name` property');
@@ -269,7 +259,7 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
       <ItemHolder
         key="row"
         {...props}
-        className={classNames(className, cssVarCls, rootCls, hashId)}
+        className={clsx(className, cssVarCls, rootCls, hashId)}
         prefixCls={prefixCls}
         fieldId={fieldId}
         isRequired={isRequired}
@@ -286,7 +276,7 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
   }
 
   if (!hasName && !isRenderProps && !dependencies) {
-    return wrapCSSVar(renderLayout(mergedChildren) as JSX.Element);
+    return renderLayout(mergedChildren) as JSX.Element;
   }
 
   let variables: Record<string, string> = {};
@@ -300,7 +290,7 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
   }
 
   // >>>>> With Field
-  return wrapCSSVar(
+  return (
     <Field
       {...props}
       messageVariables={variables}
@@ -315,11 +305,15 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
         const isRequired =
           required !== undefined
             ? required
-            : !!rules?.some((rule) => {
-                if (rule && typeof rule === 'object' && rule.required && !rule.warningOnly) {
+            : rules?.some((rule) => {
+                if (
+                  isPlainObject(rule) &&
+                  (rule as RuleObject).required &&
+                  !(rule as RuleObject).warningOnly
+                ) {
                   return true;
                 }
-                if (typeof rule === 'function') {
+                if (isFunction(rule)) {
                   const ruleEntity = rule(context);
                   return ruleEntity?.required && !ruleEntity?.warningOnly;
                 }
@@ -379,7 +373,7 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
           }
 
           if (help || mergedErrors.length > 0 || mergedWarnings.length > 0 || props.extra) {
-            const describedbyArr = [];
+            const describedbyArr: string[] = [];
             if (help || mergedErrors.length > 0) {
               describedbyArr.push(`${fieldId}_help`);
             }
@@ -443,7 +437,7 @@ function InternalFormItem<Values = any>(props: FormItemProps<Values>): React.Rea
 
         return renderLayout(childNode, fieldId, isRequired);
       }}
-    </Field>,
+    </Field>
   );
 }
 

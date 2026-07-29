@@ -1,15 +1,15 @@
 import React from 'react';
-import KeyCode from 'rc-util/lib/KeyCode';
 
 import Modal from '..';
 import { act, fireEvent, render, waitFakeTimer } from '../../../tests/utils';
 import Button from '../../button';
-import ConfigProvider, { ConfigProviderProps } from '../../config-provider';
+import ConfigProvider from '../../config-provider';
+import type { ConfigProviderProps } from '../../config-provider';
 import Input from '../../input';
 import zhCN from '../../locale/zh_CN';
 import type { ModalFunc } from '../confirm';
 
-jest.mock('rc-util/lib/Portal');
+jest.mock('@rc-component/util/lib/Portal');
 
 // TODO: Remove this. Mock for React 19
 jest.mock('react-dom', () => {
@@ -183,11 +183,51 @@ describe('Modal.hook', () => {
 
     fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
     fireEvent.click(document.body.querySelectorAll('.ant-modal-confirm-btns .ant-btn')[0]);
-    expect(cancelCount).toEqual(1); // click cancel btn, trigger onCancel
+    expect(cancelCount).toBe(1); // click cancel btn, trigger onCancel
 
     fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
+    fireEvent.mouseDown(document.body.querySelectorAll('.ant-modal-wrap')[0]);
     fireEvent.click(document.body.querySelectorAll('.ant-modal-wrap')[0]);
-    expect(cancelCount).toEqual(2); // click modal wrapper, trigger onCancel
+    expect(cancelCount).toBe(2); // click modal wrapper, trigger onCancel
+  });
+
+  it('hooks modal should trigger onCancel with mask.closable', () => {
+    let cancelCount = 0;
+    const Demo = () => {
+      const [modal, contextHolder] = Modal.useModal();
+
+      const openBrokenModal = React.useCallback(() => {
+        modal.info({
+          okType: 'default',
+          mask: { closable: true },
+          okCancel: true,
+          onCancel: () => {
+            cancelCount += 1;
+          },
+          content: 'Hello!',
+        });
+      }, [modal]);
+
+      return (
+        <ConfigWarp>
+          {contextHolder}
+          <div className="open-hook-modal-btn" onClick={openBrokenModal}>
+            Test hook modal
+          </div>
+        </ConfigWarp>
+      );
+    };
+
+    const { container } = render(<Demo />);
+
+    fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
+    fireEvent.click(document.body.querySelectorAll('.ant-modal-confirm-btns .ant-btn')[0]);
+    expect(cancelCount).toBe(1); // click cancel btn, trigger onCancel
+
+    fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
+    fireEvent.mouseDown(document.body.querySelectorAll('.ant-modal-wrap')[0]);
+    fireEvent.click(document.body.querySelectorAll('.ant-modal-wrap')[0]);
+    expect(cancelCount).toBe(2); // click modal wrapper, trigger onCancel
   });
 
   it('update before render', () => {
@@ -221,8 +261,8 @@ describe('Modal.hook', () => {
 
     const { container } = render(<Demo />);
     fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
-    expect(document.body.querySelector('.ant-modal-confirm-title')!.textContent).toEqual('Bamboo');
-    expect(document.body.querySelector('.ant-modal-confirm-content')!.textContent).toEqual(
+    expect(document.body.querySelector('.ant-modal-confirm-title')!.textContent).toBe('Bamboo');
+    expect(document.body.querySelector('.ant-modal-confirm-content')!.textContent).toBe(
       'Little',
     );
   });
@@ -254,8 +294,8 @@ describe('Modal.hook', () => {
 
     const { container } = render(<Demo />);
     fireEvent.click(container.querySelector('.open-hook-modal-btn')!);
-    expect(document.body.querySelector('.ant-modal-confirm-title')!.textContent).toEqual('Bamboo');
-    expect(document.body.querySelector('.ant-modal-confirm-content')!.textContent).toEqual(
+    expect(document.body.querySelector('.ant-modal-confirm-title')!.textContent).toBe('Bamboo');
+    expect(document.body.querySelector('.ant-modal-confirm-content')!.textContent).toBe(
       'Little',
     );
   });
@@ -265,10 +305,7 @@ describe('Modal.hook', () => {
       const [modal, contextHolder] = Modal.useModal();
 
       const openBrokenModal = React.useCallback(() => {
-        const instance = modal.info({
-          title: 'Light',
-        });
-
+        const instance = modal.info({ title: 'Light' });
         instance.destroy();
       }, [modal]);
 
@@ -284,7 +321,7 @@ describe('Modal.hook', () => {
 
     const { container } = render(<Demo />);
     fireEvent.click(container.querySelectorAll('.open-hook-modal-btn')[0]);
-    expect(document.body.classList.contains('ant-modal-confirm-title')).toBeFalsy();
+    expect(document.body).not.toHaveClass('ant-modal-confirm-title');
   });
 
   it('the callback close should be a method when onCancel has a close parameter', async () => {
@@ -325,6 +362,7 @@ describe('Modal.hook', () => {
 
     expect(document.body.querySelectorAll('.ant-modal-confirm-confirm')).toHaveLength(1);
     // Click mask to close
+    fireEvent.mouseDown(document.body.querySelectorAll('.ant-modal-wrap')[0]);
     fireEvent.click(document.body.querySelectorAll('.ant-modal-wrap')[0]);
 
     await waitFakeTimer();
@@ -338,7 +376,7 @@ describe('Modal.hook', () => {
     expect(document.body.querySelectorAll('.ant-modal-confirm-confirm')).toHaveLength(1);
     // Press ESC to turn off
     fireEvent.keyDown(document.body.querySelectorAll('.ant-modal')[0], {
-      keyCode: KeyCode.ESC,
+      key: 'Escape',
     });
 
     await waitFakeTimer();
@@ -402,7 +440,7 @@ describe('Modal.hook', () => {
 
     render(<Demo />);
 
-    expect(document.body.querySelector('.bamboo')?.textContent).toEqual('好的');
+    expect(document.body.querySelector('.bamboo')?.textContent).toBe('好的');
   });
 
   it('it should call forwarded afterClose', () => {
@@ -422,6 +460,45 @@ describe('Modal.hook', () => {
     expect(afterClose).toHaveBeenCalledTimes(1);
   });
 
+  it('it should call afterClose in closable', () => {
+    const closableAfterClose = jest.fn();
+    const afterClose = jest.fn();
+    const Demo = () => {
+      const [modal, contextHolder] = Modal.useModal();
+      React.useEffect(() => {
+        modal.confirm({
+          title: 'Confirm',
+          closable: { afterClose: closableAfterClose },
+          afterClose,
+        });
+      }, []);
+      return <ConfigWarp>{contextHolder}</ConfigWarp>;
+    };
+
+    render(<Demo />);
+    const btns = document.body.querySelectorAll('.ant-btn');
+    fireEvent.click(btns[btns.length - 1]);
+
+    expect(afterClose).toHaveBeenCalledTimes(1);
+    expect(closableAfterClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('it should call onClose in closable', () => {
+    const onClose = jest.fn();
+    const Demo = () => {
+      const [modal, contextHolder] = Modal.useModal();
+      React.useEffect(() => {
+        modal.confirm({ title: 'Confirm', closable: { onClose }, open: true });
+      }, []);
+      return <ConfigWarp>{contextHolder}</ConfigWarp>;
+    };
+    render(<Demo />);
+    const btns = document.body.querySelectorAll('.ant-btn');
+    fireEvent.click(btns[btns.length - 1]);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('should be applied correctly locale', async () => {
     jest.useFakeTimers();
 
@@ -438,12 +515,12 @@ describe('Modal.hook', () => {
 
     const { unmount } = render(<Demo zh />);
     await waitFakeTimer();
-    expect(document.body.querySelector('.ant-btn-primary')!.textContent).toEqual('确 定');
+    expect(document.body.querySelector('.ant-btn-primary')!.textContent).toBe('确 定');
     unmount();
 
     render(<Demo />);
     await waitFakeTimer();
-    expect(document.body.querySelector('.ant-btn-primary')!.textContent).toEqual('OK');
+    expect(document.body.querySelector('.ant-btn-primary')!.textContent).toBe('OK');
 
     jest.useRealTimers();
   });
@@ -520,8 +597,7 @@ describe('Modal.hook', () => {
 
     // ESC to close
     fireEvent.keyDown(document.querySelector('.ant-modal')!, {
-      key: 'Esc',
-      keyCode: KeyCode.ESC,
+      key: 'Escape',
     });
     await waitFakeTimer();
 

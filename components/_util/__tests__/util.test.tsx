@@ -9,12 +9,12 @@ describe('Test utils function', () => {
       jest.useFakeTimers();
     });
 
-    afterAll(() => {
-      jest.useRealTimers();
-    });
-
     afterEach(() => {
       jest.clearAllTimers();
+    });
+
+    afterAll(() => {
+      jest.useRealTimers();
     });
 
     it('throttle function should work', async () => {
@@ -75,8 +75,9 @@ describe('Test utils function', () => {
     it('toList should work', () => {
       expect(toList(123)).toEqual([123]);
       expect(toList([123])).toEqual([123]);
-      expect(toList(null, true)).toEqual([]);
-      expect(toList(undefined, true)).toEqual([]);
+      expect(toList(false)).toEqual([false]);
+      expect(toList(null, { skipEmpty: true })).toEqual([]);
+      expect(toList(undefined, { skipEmpty: true })).toEqual([]);
     });
   });
 });

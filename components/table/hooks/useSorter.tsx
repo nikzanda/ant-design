@@ -1,14 +1,17 @@
 import * as React from 'react';
 import CaretDownOutlined from '@ant-design/icons/CaretDownOutlined';
 import CaretUpOutlined from '@ant-design/icons/CaretUpOutlined';
-import classNames from 'classnames';
-import KeyCode from 'rc-util/lib/KeyCode';
+import { KeyCode } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { isFunction, isNumber, isPlainObject } from '../../_util/is';
 import type { AnyObject } from '../../_util/type';
+import type { Locale } from '../../locale';
 import type { TooltipProps } from '../../tooltip';
 import Tooltip from '../../tooltip';
 import type {
   ColumnGroupType,
+  ColumnSorter,
   ColumnsType,
   ColumnTitleProps,
   ColumnType,
@@ -28,7 +31,7 @@ const DESCEND = 'descend';
 const getMultiplePriority = <RecordType extends AnyObject = AnyObject>(
   column: ColumnType<RecordType>,
 ): number | false => {
-  if (typeof column.sorter === 'object' && typeof column.sorter.multiple === 'number') {
+  if (isPlainObject<ColumnSorter<RecordType>>(column.sorter) && isNumber(column.sorter.multiple)) {
     return column.sorter.multiple;
   }
   return false;
@@ -37,10 +40,10 @@ const getMultiplePriority = <RecordType extends AnyObject = AnyObject>(
 const getSortFunction = <RecordType extends AnyObject = AnyObject>(
   sorter: ColumnType<RecordType>['sorter'],
 ): CompareFn<RecordType> | false => {
-  if (typeof sorter === 'function') {
+  if (isFunction(sorter)) {
     return sorter;
   }
-  if (sorter && typeof sorter === 'object' && sorter.compare) {
+  if (isPlainObject<ColumnSorter<RecordType>>(sorter) && sorter.compare) {
     return sorter.compare;
   }
   return false;
@@ -119,6 +122,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
   tableLocale?: TableLocale,
   tableShowSorterTooltip?: boolean | SorterTooltipProps,
   pos?: string,
+  a11yLocale?: Locale['global'],
 ): ColumnsType<RecordType> => {
   const finalColumns = (columns || []).map((column, index) => {
     const columnPos = getColumnPos(index, pos);
@@ -141,21 +145,17 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
       } else {
         const upNode: React.ReactNode = sortDirections.includes(ASCEND) && (
           <CaretUpOutlined
-            className={classNames(`${prefixCls}-column-sorter-up`, {
-              active: sortOrder === ASCEND,
-            })}
+            className={clsx(`${prefixCls}-column-sorter-up`, { active: sortOrder === ASCEND })}
           />
         );
         const downNode: React.ReactNode = sortDirections.includes(DESCEND) && (
           <CaretDownOutlined
-            className={classNames(`${prefixCls}-column-sorter-down`, {
-              active: sortOrder === DESCEND,
-            })}
+            className={clsx(`${prefixCls}-column-sorter-down`, { active: sortOrder === DESCEND })}
           />
         );
         sorter = (
           <span
-            className={classNames(`${prefixCls}-column-sorter`, {
+            className={clsx(`${prefixCls}-column-sorter`, {
               [`${prefixCls}-column-sorter-full`]: !!(upNode && downNode),
             })}
           >
@@ -174,16 +174,12 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
       } else if (nextSortOrder === ASCEND) {
         sortTip = triggerAsc;
       }
-      const tooltipProps: TooltipProps =
-        typeof showSorterTooltip === 'object'
-          ? {
-              title: sortTip,
-              ...showSorterTooltip,
-            }
-          : { title: sortTip };
+      const tooltipProps: TooltipProps = isPlainObject(showSorterTooltip)
+        ? { title: sortTip, ...showSorterTooltip }
+        : { title: sortTip };
       newColumn = {
         ...newColumn,
-        className: classNames(newColumn.className, { [`${prefixCls}-column-sort`]: sortOrder }),
+        className: clsx(newColumn.className, { [`${prefixCls}-column-sort`]: sortOrder }),
         title: (renderProps: ColumnTitleProps<RecordType>) => {
           const columnSortersClass = `${prefixCls}-column-sorters`;
           const renderColumnTitleWrapper = (
@@ -204,7 +200,10 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
             ) {
               return (
                 <div
-                  className={`${columnSortersClass} ${prefixCls}-column-sorters-tooltip-target-sorter`}
+                  className={clsx(
+                    columnSortersClass,
+                    `${columnSortersClass}-tooltip-target-sorter`,
+                  )}
                 >
                   {renderColumnTitleWrapper}
                   <Tooltip {...tooltipProps}>{sorter}</Tooltip>
@@ -247,8 +246,10 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
           if (sortOrder) {
             cell['aria-sort'] = sortOrder === 'ascend' ? 'ascending' : 'descending';
           }
+          // Inform the screen-reader so it can tell the visually impaired user that this column can be sorted
+          cell['aria-description'] = a11yLocale?.sortable;
           cell['aria-label'] = displayTitle || '';
-          cell.className = classNames(cell.className, `${prefixCls}-column-has-sorters`);
+          cell.className = clsx(cell.className, `${prefixCls}-column-has-sorters`);
           cell.tabIndex = 0;
           if (column.ellipsis) {
             cell.title = (renderTitle ?? '').toString();
@@ -270,6 +271,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
           tableLocale,
           tableShowSorterTooltip,
           columnPos,
+          a11yLocale,
         ),
       };
     }
@@ -294,9 +296,12 @@ const stateToInfo = <RecordType extends AnyObject = AnyObject>(
 const generateSorterInfo = <RecordType extends AnyObject = AnyObject>(
   sorterStates: SortState<RecordType>[],
 ): SorterResult<RecordType> | SorterResult<RecordType>[] => {
-  const activeSorters = sorterStates
-    .filter(({ sortOrder }) => sortOrder)
-    .map<SorterResult<RecordType>>(stateToInfo);
+  const activeSorters = sorterStates.reduce<SorterResult<RecordType>[]>((list, sorterState) => {
+    if (sorterState.sortOrder) {
+      list.push(stateToInfo(sorterState));
+    }
+    return list;
+  }, []);
 
   // =========== Legacy compatible support ===========
   // https://github.com/ant-design/ant-design/pull/19226
@@ -375,6 +380,14 @@ export const getSortData = <RecordType extends AnyObject = AnyObject>(
 interface SorterConfig<RecordType = AnyObject> {
   prefixCls: string;
   mergedColumns: ColumnsType<RecordType>;
+  /**
+   * Columns before applying the responsive filter.
+   * Used to collect `defaultSortOrder` / controlled `sortOrder` for columns
+   * that are currently hidden by `column.responsive`, so the user's sort
+   * intent is preserved when the column appears at a different breakpoint.
+   * Falls back to `mergedColumns` when not provided.
+   */
+  baseColumns?: ColumnsType<RecordType>;
   onSorterChange: (
     sorterResult: SorterResult<RecordType> | SorterResult<RecordType>[],
     sortStates: SortState<RecordType>[],
@@ -382,6 +395,7 @@ interface SorterConfig<RecordType = AnyObject> {
   sortDirections: SortOrder[];
   tableLocale?: TableLocale;
   showSorterTooltip?: boolean | SorterTooltipProps;
+  globalLocale?: Locale['global'];
 }
 
 const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
@@ -395,14 +409,22 @@ const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
   const {
     prefixCls,
     mergedColumns,
+    baseColumns,
     sortDirections,
     tableLocale,
     showSorterTooltip,
     onSorterChange,
+    globalLocale,
   } = props;
 
+  // Use base (pre-responsive) columns to seed sort states so that
+  // `defaultSortOrder` on a `responsive` column is honored even when the
+  // column is not visible at the current breakpoint.
+  // See: https://github.com/ant-design/ant-design/issues/32847
+  const collectColumns = baseColumns ?? mergedColumns;
+
   const [sortStates, setSortStates] = React.useState<SortState<RecordType>[]>(() =>
-    collectSortStates<RecordType>(mergedColumns, true),
+    collectSortStates<RecordType>(collectColumns, true),
   );
 
   const getColumnKeys = (columns: ColumnsType<RecordType>, pos?: string): Key[] => {
@@ -419,12 +441,15 @@ const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
   };
   const mergedSorterStates = React.useMemo<SortState<RecordType>[]>(() => {
     let validate = true;
-    const collectedStates = collectSortStates<RecordType>(mergedColumns, false);
+    // Collect controlled `sortOrder` from the full (pre-responsive) column
+    // set so that a controlled `sortOrder` on a hidden responsive column
+    // still applies to the sorted data.
+    const collectedStates = collectSortStates<RecordType>(collectColumns, false);
 
     // Return if not controlled
     if (!collectedStates.length) {
-      const mergedColumnsKeys = getColumnKeys(mergedColumns);
-      return sortStates.filter(({ key }) => mergedColumnsKeys.includes(key));
+      const collectColumnsKeys = getColumnKeys(collectColumns);
+      return sortStates.filter(({ key }) => collectColumnsKeys.includes(key));
     }
 
     const validateStates: SortState<RecordType>[] = [];
@@ -461,7 +486,7 @@ const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
     });
 
     return validateStates;
-  }, [mergedColumns, sortStates]);
+  }, [collectColumns, sortStates]);
 
   // Get render columns title required props
   const columnTitleSorterProps = React.useMemo<ColumnTitleProps<RecordType>>(() => {
@@ -505,6 +530,8 @@ const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
       sortDirections,
       tableLocale,
       showSorterTooltip,
+      undefined,
+      globalLocale,
     );
 
   const getSorters = () => generateSorterInfo(mergedSorterStates);

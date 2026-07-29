@@ -3,10 +3,15 @@ import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
 import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import ExclamationCircleFilled from '@ant-design/icons/ExclamationCircleFilled';
 import WarningFilled from '@ant-design/icons/WarningFilled';
-import classNames from 'classnames';
+import { pickAttrs } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import type { HTMLAriaDataAttributes } from '../_util/aria-data-attrs';
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isReactRenderable } from '../_util/is';
 import { devUseWarning } from '../_util/warning';
-import { ConfigContext } from '../config-provider';
+import { useComponentConfig } from '../config-provider/context';
 import noFound from './noFound';
 import serverError from './serverError';
 import useStyle from './style';
@@ -26,9 +31,31 @@ export const ExceptionMap = {
 };
 
 export type ExceptionStatusType = 403 | 404 | 500 | '403' | '404' | '500';
+
 export type ResultStatusType = ExceptionStatusType | keyof typeof IconMap;
 
-export interface ResultProps {
+export type ResultSemanticType = {
+  classNames?: {
+    root?: string;
+    title?: string;
+    subTitle?: string;
+    body?: string;
+    extra?: string;
+    icon?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    title?: React.CSSProperties;
+    subTitle?: React.CSSProperties;
+    body?: React.CSSProperties;
+    extra?: React.CSSProperties;
+    icon?: React.CSSProperties;
+  };
+};
+
+export type ResultSemanticAllType = GenerateSemantic<ResultSemanticType, ResultProps>;
+
+export interface ResultProps extends HTMLAriaDataAttributes {
   icon?: React.ReactNode;
   status?: ResultStatusType;
   title?: React.ReactNode;
@@ -39,6 +66,8 @@ export interface ResultProps {
   rootClassName?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  classNames?: ResultSemanticAllType['classNamesAndFn'];
+  styles?: ResultSemanticAllType['stylesAndFn'];
 }
 
 // ExceptionImageMap keys
@@ -52,17 +81,15 @@ const ExceptionStatus = Object.keys(ExceptionMap);
  */
 
 interface IconProps {
-  prefixCls: string;
+  className: string;
   icon: React.ReactNode;
   status: ResultStatusType;
+  style?: React.CSSProperties;
 }
 
-const Icon: React.FC<IconProps> = ({ prefixCls, icon, status }) => {
-  const className = classNames(`${prefixCls}-icon`);
-
+const Icon: React.FC<IconProps> = ({ icon, status, className, style }) => {
   if (process.env.NODE_ENV !== 'production') {
     const warning = devUseWarning('Result');
-
     warning(
       !(typeof icon === 'string' && icon.length > 2),
       'breaking',
@@ -73,7 +100,7 @@ const Icon: React.FC<IconProps> = ({ prefixCls, icon, status }) => {
   if (ExceptionStatus.includes(`${status}`)) {
     const SVGComponent = ExceptionMap[status as ExceptionStatusType];
     return (
-      <div className={`${className} ${prefixCls}-image`}>
+      <div className={className} style={style}>
         <SVGComponent />
       </div>
     );
@@ -87,19 +114,28 @@ const Icon: React.FC<IconProps> = ({ prefixCls, icon, status }) => {
     return null;
   }
 
-  return <div className={className}>{icon || iconNode}</div>;
+  return (
+    <div className={className} style={style}>
+      {icon || iconNode}
+    </div>
+  );
 };
 
 interface ExtraProps {
-  prefixCls: string;
   extra: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-const Extra: React.FC<ExtraProps> = ({ prefixCls, extra }) => {
-  if (!extra) {
+const Extra: React.FC<ExtraProps> = ({ className, extra, style }) => {
+  if (!isReactRenderable(extra)) {
     return null;
   }
-  return <div className={`${prefixCls}-extra`}>{extra}</div>;
+  return (
+    <div className={className} style={style}>
+      {extra}
+    </div>
+  );
 };
 
 export interface ResultType extends React.FC<ResultProps> {
@@ -108,46 +144,106 @@ export interface ResultType extends React.FC<ResultProps> {
   PRESENTED_IMAGE_500: React.FC;
 }
 
-const Result: ResultType = ({
-  prefixCls: customizePrefixCls,
-  className: customizeClassName,
-  rootClassName,
-  subTitle,
-  title,
-  style,
-  children,
-  status = 'info',
-  icon,
-  extra,
-}) => {
-  const { getPrefixCls, direction, result } = React.useContext(ConfigContext);
+const Result: ResultType = (props) => {
+  const {
+    prefixCls: customizePrefixCls,
+    className: customizeClassName,
+    rootClassName,
+    subTitle,
+    title,
+    style,
+    children,
+    status = 'info',
+    icon,
+    extra,
+    styles,
+    classNames,
+    ...rest
+  } = props;
+
+  const {
+    getPrefixCls,
+    direction,
+    className: contextClassName,
+    style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
+  } = useComponentConfig('result');
+
+  // =========== Merged Props for Semantic ==========
+  const mergedProps: ResultProps = {
+    ...props,
+    status,
+  };
+
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    ResultSemanticAllType['classNames'],
+    ResultSemanticAllType['styles'],
+    ResultProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props: mergedProps,
+  });
 
   const prefixCls = getPrefixCls('result', customizePrefixCls);
 
   // Style
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls);
 
-  const className = classNames(
+  const rootClassNames = clsx(
     prefixCls,
     `${prefixCls}-${status}`,
     customizeClassName,
-    result?.className,
+    contextClassName,
     rootClassName,
     { [`${prefixCls}-rtl`]: direction === 'rtl' },
     hashId,
     cssVarCls,
+    mergedClassNames.root,
   );
 
-  const mergedStyle: React.CSSProperties = { ...result?.style, ...style };
+  const titleClassNames = clsx(`${prefixCls}-title`, mergedClassNames.title);
 
-  return wrapCSSVar(
-    <div className={className} style={mergedStyle}>
-      <Icon prefixCls={prefixCls} status={status} icon={icon} />
-      <div className={`${prefixCls}-title`}>{title}</div>
-      {subTitle && <div className={`${prefixCls}-subtitle`}>{subTitle}</div>}
-      <Extra prefixCls={prefixCls} extra={extra} />
-      {children && <div className={`${prefixCls}-content`}>{children}</div>}
-    </div>,
+  const subTitleClassNames = clsx(`${prefixCls}-subtitle`, mergedClassNames.subTitle);
+
+  const extraClassNames = clsx(`${prefixCls}-extra`, mergedClassNames.extra);
+
+  const bodyClassNames = clsx(`${prefixCls}-body`, mergedClassNames.body);
+
+  const iconClassNames = clsx(
+    `${prefixCls}-icon`,
+    { [`${prefixCls}-image`]: ExceptionStatus.includes(`${status}`) },
+    mergedClassNames.icon,
+  );
+
+  const rootStyles: React.CSSProperties = {
+    ...mergedStyles.root,
+  };
+
+  const restProps = pickAttrs(rest, { aria: true, data: true });
+
+  return (
+    <div {...restProps} className={rootClassNames} style={rootStyles}>
+      <Icon className={iconClassNames} style={mergedStyles.icon} status={status} icon={icon} />
+      {isReactRenderable(title) && (
+        <div className={titleClassNames} style={mergedStyles.title}>
+          {title}
+        </div>
+      )}
+      {isReactRenderable(subTitle) && (
+        <div className={subTitleClassNames} style={mergedStyles.subTitle}>
+          {subTitle}
+        </div>
+      )}
+      <Extra className={extraClassNames} extra={extra} style={mergedStyles.extra} />
+      {isReactRenderable(children) && (
+        <div className={bodyClassNames} style={mergedStyles.body}>
+          {children}
+        </div>
+      )}
+    </div>
   );
 };
 

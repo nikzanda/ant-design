@@ -1,15 +1,25 @@
 import React from 'react';
 
-export type SemanticName = 'label' | 'content';
+export type CellSemanticType = {
+  classNames?: {
+    label?: string;
+    content?: string;
+  };
+  styles?: {
+    label?: React.CSSProperties;
+    content?: React.CSSProperties;
+  };
+};
+
 export interface DescriptionsContextProps {
-  /** @deprecated Please use `styles={{ label: {} }}` instead */
+  /** @deprecated Please use `styles.label` instead */
   labelStyle?: React.CSSProperties;
-  /** @deprecated Please use `styles={{ content: {} }}` instead */
+  /** @deprecated Please use `styles.content` instead */
   contentStyle?: React.CSSProperties;
-  styles?: Partial<Record<SemanticName, React.CSSProperties>>;
-  classNames?: Partial<Record<SemanticName, string>>;
+  classNames?: CellSemanticType['classNames'];
+  styles?: CellSemanticType['styles'];
 }
 
-const DescriptionsContext = React.createContext<DescriptionsContextProps>({});
+const DescriptionsContext = React.createContext<DescriptionsContextProps>(null!);
 
 export default DescriptionsContext;

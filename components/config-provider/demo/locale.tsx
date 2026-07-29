@@ -41,7 +41,6 @@ type Locale = ConfigProviderProps['locale'];
 
 dayjs.locale('en');
 
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const columns: TableProps['columns'] = [
@@ -126,16 +125,24 @@ const Page: React.FC = () => {
 
   return (
     <Space
-      direction="vertical"
+      vertical
       size={[0, 16]}
-      style={{ width: '100%', paddingTop: 16, borderTop: `1px solid ${token.colorBorder}` }}
+      style={{
+        width: '100%',
+        paddingTop: token.padding,
+        borderTop: `${token.lineWidth}px ${token.lineType} ${token.colorBorder}`,
+      }}
     >
       <Pagination defaultCurrent={1} total={50} showSizeChanger />
       <Space wrap>
-        <Select showSearch style={{ width: 200 }}>
-          <Option value="jack">jack</Option>
-          <Option value="lucy">lucy</Option>
-        </Select>
+        <Select
+          showSearch
+          style={{ width: 200 }}
+          options={[
+            { label: 'jack', value: 'jack' },
+            { label: 'lucy', value: 'lucy' },
+          ]}
+        />
         <DatePicker />
         <TimePicker />
         <RangePicker />
@@ -151,7 +158,13 @@ const Page: React.FC = () => {
         </Popconfirm>
       </Space>
       <Transfer dataSource={[]} showSearch targetKeys={[]} />
-      <div style={{ width: 320, border: `1px solid ${token.colorBorder}`, borderRadius: 8 }}>
+      <div
+        style={{
+          width: 320,
+          border: `${token.lineWidth}px ${token.lineType} ${token.colorBorder}`,
+          borderRadius: token.borderRadiusLG,
+        }}
+      >
         <Calendar fullscreen={false} value={dayjs()} />
       </div>
       <Form name="basic" autoComplete="off" labelCol={{ sm: { span: 4 } }} wrapperCol={{ span: 6 }}>
@@ -188,7 +201,7 @@ const Page: React.FC = () => {
         />
       </Space>
       <Upload listType="picture-card" fileList={fileList} />
-      <Divider orientation="left">Tour</Divider>
+      <Divider titlePlacement="start">Tour</Divider>
       <Button type="primary" onClick={() => setTourOpen(true)}>
         Begin Tour
       </Button>
@@ -222,11 +235,11 @@ const Page: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [locale, setLocal] = useState<Locale>(enUS);
+  const [locale, setLocale] = useState<Locale>(enUS);
 
   const changeLocale = (e: RadioChangeEvent) => {
     const localeValue = e.target.value;
-    setLocal(localeValue);
+    setLocale(localeValue);
     if (!localeValue) {
       dayjs.locale('en');
     } else {

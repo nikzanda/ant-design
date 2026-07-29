@@ -20,7 +20,6 @@ const siderStyle: React.CSSProperties = {
   position: 'sticky',
   insetInlineStart: 0,
   top: 0,
-  bottom: 0,
   scrollbarWidth: 'thin',
   scrollbarGutter: 'stable',
 };
@@ -44,6 +43,7 @@ const App: React.FC = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const currentYear = new Date().getFullYear();
 
   return (
     <Layout hasSider>
@@ -75,7 +75,7 @@ const App: React.FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          Ant Design ©{currentYear} Created by Ant UED
         </Footer>
       </Layout>
     </Layout>

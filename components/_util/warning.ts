@@ -1,8 +1,9 @@
 import * as React from 'react';
-import rcWarning, { resetWarned as rcResetWarned } from 'rc-util/lib/warning';
+import { warning as rcWarning } from '@rc-component/util';
 
 export function noop() {}
 
+const { resetWarned: rcResetWarned } = rcWarning;
 let deprecatedWarnList: Record<string, string[]> | null = null;
 
 export function resetWarned() {
@@ -52,11 +53,10 @@ export interface WarningContextProps {
 export const WarningContext = React.createContext<WarningContextProps>({});
 
 /**
- * This is a hook but we not named as `useWarning`
- * since this is only used in development.
- * We should always wrap this in `if (process.env.NODE_ENV !== 'production')` condition
+ * This is a hook only used in development.
+ * We should always wrap this in `if (process.env.NODE_ENV !== 'production')` condition.
  */
-export const devUseWarning: (component: string) => TypeWarning =
+export const useDevWarning: (component: string) => TypeWarning =
   process.env.NODE_ENV !== 'production'
     ? (component) => {
         const { strict } = React.useContext(WarningContext);
@@ -88,13 +88,11 @@ export const devUseWarning: (component: string) => TypeWarning =
           }
         };
 
-        typeWarning.deprecated = (valid, oldProp, newProp, message) => {
+        typeWarning.deprecated = (valid, oldProp, newProp, message = '') => {
           typeWarning(
             valid,
             'deprecated',
-            `\`${oldProp}\` is deprecated. Please use \`${newProp}\` instead.${
-              message ? ` ${message}` : ''
-            }`,
+            `\`${oldProp}\` is deprecated. Please use \`${newProp}\` instead.${message ? ` ${message}` : ''}`,
           );
         };
 
@@ -107,5 +105,7 @@ export const devUseWarning: (component: string) => TypeWarning =
 
         return noopWarning;
       };
+
+export const devUseWarning = useDevWarning;
 
 export default warning;

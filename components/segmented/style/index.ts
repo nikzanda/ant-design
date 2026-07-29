@@ -63,12 +63,12 @@ function getItemDisabledStyle(cls: string, token: SegmentedToken): CSSObject {
   };
 }
 
-function getItemSelectedStyle(token: SegmentedToken): CSSObject {
+const getItemSelectedStyle: GenerateStyle<SegmentedToken, CSSObject> = (token) => {
   return {
-    backgroundColor: token.itemSelectedBg,
+    background: token.itemSelectedBg,
     boxShadow: token.boxShadowTertiary,
   };
-}
+};
 
 const segmentedTextEllipsisCss: CSSObject = {
   overflow: 'hidden',
@@ -77,8 +77,8 @@ const segmentedTextEllipsisCss: CSSObject = {
 };
 
 // ============================== Styles ==============================
-const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken) => {
-  const { componentCls } = token;
+const genSegmentedStyle: GenerateStyle<SegmentedToken, CSSObject> = (token) => {
+  const { componentCls, motionDurationSlow, motionEaseInOut, motionDurationMid } = token;
 
   const labelHeight = token
     .calc(token.controlHeight)
@@ -102,7 +102,7 @@ const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken)
       color: token.itemColor,
       background: token.trackBg,
       borderRadius: token.borderRadius,
-      transition: `all ${token.motionDurationMid} ${token.motionEaseInOut}`,
+      transition: `all ${motionDurationMid}`,
       ...genFocusStyle(token),
 
       [`${componentCls}-group`]: {
@@ -146,7 +146,7 @@ const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken)
         position: 'relative',
         textAlign: 'center',
         cursor: 'pointer',
-        transition: `color ${token.motionDurationMid} ${token.motionEaseInOut}`,
+        transition: `color ${motionDurationMid}`,
         borderRadius: token.borderRadiusSM,
         // Fix Safari render bug
         // https://github.com/ant-design/ant-design/issues/45250
@@ -169,22 +169,23 @@ const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken)
           insetInlineStart: 0,
           borderRadius: 'inherit',
           opacity: 0,
-          transition: `opacity ${token.motionDurationMid}`,
           // This is mandatory to make it not clickable or hoverable
           // Ref: https://github.com/ant-design/ant-design/issues/40888
           pointerEvents: 'none',
+          transition: ['opacity', 'background-color']
+            .map((prop) => `${prop} ${motionDurationMid}`)
+            .join(', '),
         },
 
-        [`&:hover:not(${componentCls}-item-selected):not(${componentCls}-item-disabled)`]: {
-          color: token.itemHoverColor,
-          '&::after': {
+        [`&:not(${componentCls}-item-selected):not(${componentCls}-item-disabled)`]: {
+          '&:hover, &:active': {
+            color: token.itemHoverColor,
+          },
+          '&:hover::after': {
             opacity: 1,
             backgroundColor: token.itemHoverBg,
           },
-        },
-        [`&:active:not(${componentCls}-item-selected):not(${componentCls}-item-disabled)`]: {
-          color: token.itemHoverColor,
-          '&::after': {
+          '&:active::after': {
             opacity: 1,
             backgroundColor: token.itemActiveBg,
           },
@@ -224,7 +225,6 @@ const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken)
         height: '100%',
         padding: `${unit(token.paddingXXS)} 0`,
         borderRadius: token.borderRadiusSM,
-        transition: `transform ${token.motionDurationSlow} ${token.motionEaseInOut}, height ${token.motionDurationSlow} ${token.motionEaseInOut}`,
 
         [`& ~ ${componentCls}-item:not(${componentCls}-item-selected):not(${componentCls}-item-disabled)::after`]:
           {
@@ -264,8 +264,10 @@ const genSegmentedStyle: GenerateStyle<SegmentedToken> = (token: SegmentedToken)
 
       // transition effect when `appear-active`
       [`${componentCls}-thumb-motion-appear-active`]: {
-        transition: `transform ${token.motionDurationSlow} ${token.motionEaseInOut}, width ${token.motionDurationSlow} ${token.motionEaseInOut}`,
         willChange: 'transform, width',
+        transition: [`transform`, `width`]
+          .map((prop) => `${prop} ${motionDurationSlow} ${motionEaseInOut}`)
+          .join(', '),
       },
 
       [`&${componentCls}-shape-round`]: {

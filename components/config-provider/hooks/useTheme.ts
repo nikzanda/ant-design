@@ -1,11 +1,11 @@
-import useMemo from 'rc-util/lib/hooks/useMemo';
-import isEqual from 'rc-util/lib/isEqual';
+import { useId } from 'react';
+import { isEqual, useMemo } from '@rc-component/util';
 
+import { isPlainObject } from '../../_util/is';
 import { devUseWarning } from '../../_util/warning';
 import type { OverrideToken } from '../../theme/interface';
 import { defaultConfig } from '../../theme/internal';
 import type { ThemeConfig } from '../context';
-import useThemeKey from './useThemeKey';
 
 export default function useTheme(
   theme?: ThemeConfig,
@@ -26,14 +26,12 @@ export default function useTheme(
         }
       : parentTheme;
 
-  const themeKey = useThemeKey();
+  // Generate a unique key for cssVar
+  const themeKey = useId();
 
   if (process.env.NODE_ENV !== 'production') {
     const cssVarEnabled = themeConfig.cssVar || parentThemeConfig.cssVar;
-    const validKey = !!(
-      (typeof themeConfig.cssVar === 'object' && themeConfig.cssVar?.key) ||
-      themeKey
-    );
+    const validKey = !!((isPlainObject(themeConfig.cssVar) && themeConfig.cssVar?.key) || themeKey);
     warning(
       !cssVarEnabled || validKey,
       'breaking',
@@ -60,11 +58,11 @@ export default function useTheme(
       });
 
       const cssVarKey = `css-var-${themeKey.replace(/:/g, '')}`;
-      const mergedCssVar = (themeConfig.cssVar ?? parentThemeConfig.cssVar) && {
+      const mergedCssVar = {
         prefix: config?.prefixCls, // Same as prefixCls by default
-        ...(typeof parentThemeConfig.cssVar === 'object' ? parentThemeConfig.cssVar : {}),
-        ...(typeof themeConfig.cssVar === 'object' ? themeConfig.cssVar : {}),
-        key: (typeof themeConfig.cssVar === 'object' && themeConfig.cssVar?.key) || cssVarKey,
+        ...parentThemeConfig.cssVar,
+        ...themeConfig.cssVar,
+        key: themeConfig.cssVar?.key || cssVarKey,
       };
 
       // Base token
@@ -80,11 +78,10 @@ export default function useTheme(
         cssVar: mergedCssVar,
       };
     },
-    [themeConfig, parentThemeConfig],
+    [themeConfig, parentThemeConfig, config?.prefixCls, themeKey],
     (prev, next) =>
       prev.some((prevTheme, index) => {
         const nextTheme = next[index];
-
         return !isEqual(prevTheme, nextTheme, true);
       }),
   );

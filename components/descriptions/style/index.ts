@@ -62,7 +62,7 @@ export interface ComponentToken {
 
 interface DescriptionsToken extends FullToken<'Descriptions'> {}
 
-const genBorderedStyle = (token: DescriptionsToken): CSSObject => {
+const genBorderedStyle: GenerateStyle<DescriptionsToken, CSSObject> = (token) => {
   const { componentCls, labelBg } = token;
   return {
     [`&${componentCls}-bordered`]: {
@@ -100,7 +100,7 @@ const genBorderedStyle = (token: DescriptionsToken): CSSObject => {
           },
         },
       },
-      [`&${componentCls}-middle`]: {
+      [`&${componentCls}-medium`]: {
         [`${componentCls}-row`]: {
           [`> ${componentCls}-item-label, > ${componentCls}-item-content`]: {
             padding: `${unit(token.paddingSM)} ${unit(token.paddingLG)}`,
@@ -118,7 +118,7 @@ const genBorderedStyle = (token: DescriptionsToken): CSSObject => {
   };
 };
 
-const genDescriptionStyles: GenerateStyle<DescriptionsToken> = (token) => {
+const genDescriptionStyles: GenerateStyle<DescriptionsToken, CSSObject> = (token) => {
   const {
     componentCls,
     extraColor,
@@ -154,10 +154,14 @@ const genDescriptionStyles: GenerateStyle<DescriptionsToken> = (token) => {
         fontSize: token.fontSize,
       },
       [`${componentCls}-view`]: {
+        // #54268 used `width: 0` with `min-width: 100%` to avoid oversized
+        // intrinsic widths in max-content ancestors. Keep the wrapper at
+        // `width: 100%` so it remains measurable in shrink-to-fit containers
+        // like Popover (#58574), while the inner table preserves the minimum.
         width: '100%',
         borderRadius: token.borderRadiusLG,
         table: {
-          width: '100%',
+          minWidth: '100%',
           tableLayout: 'fixed',
           borderCollapse: 'collapse',
         },
@@ -226,7 +230,7 @@ const genDescriptionStyles: GenerateStyle<DescriptionsToken> = (token) => {
           },
         },
       },
-      '&-middle': {
+      '&-medium': {
         [`${componentCls}-row`]: {
           '> th, > td': {
             paddingBottom: token.paddingSM,

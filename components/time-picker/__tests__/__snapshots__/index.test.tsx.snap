@@ -2,7 +2,7 @@
 
 exports[`TimePicker not render clean icon when allowClear is false 1`] = `
 <div
-  class="ant-picker ant-picker-outlined"
+  class="ant-picker ant-picker-outlined css-var-root ant-picker-css-var"
 >
   <div
     class="ant-picker-input"
@@ -18,6 +18,7 @@ exports[`TimePicker not render clean icon when allowClear is false 1`] = `
       class="ant-picker-suffix"
     >
       <span
+        aria-hidden="true"
         aria-label="clock-circle"
         class="anticon anticon-clock-circle"
         role="img"
@@ -47,7 +48,7 @@ exports[`TimePicker not render clean icon when allowClear is false 1`] = `
 exports[`TimePicker prop locale should works 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-root ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -63,6 +64,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -85,9 +87,10 @@ Array [
           </svg>
         </span>
       </span>
-      <span
+      <button
+        aria-label="Clear"
         class="ant-picker-clear"
-        role="button"
+        type="button"
       >
         <span
           aria-label="close-circle"
@@ -109,11 +112,11 @@ Array [
             />
           </svg>
         </span>
-      </span>
+      </button>
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-root ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -1613,7 +1616,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-root ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   type="button"
                 >
                   <span>
@@ -1632,7 +1635,7 @@ Array [
 
 exports[`TimePicker rtl render component should be rendered correctly in RTL direction 1`] = `
 <div
-  class="ant-picker ant-picker-rtl ant-picker-outlined"
+  class="ant-picker ant-picker-rtl ant-picker-outlined css-var-root ant-picker-css-var"
 >
   <div
     class="ant-picker-input"
@@ -1648,6 +1651,7 @@ exports[`TimePicker rtl render component should be rendered correctly in RTL dir
       class="ant-picker-suffix"
     >
       <span
+        aria-hidden="true"
         aria-label="clock-circle"
         class="anticon anticon-clock-circle"
         role="img"
@@ -1676,7 +1680,7 @@ exports[`TimePicker rtl render component should be rendered correctly in RTL dir
 
 exports[`TimePicker should support bordered 1`] = `
 <div
-  class="ant-picker ant-picker-borderless custom-class"
+  class="ant-picker ant-picker-borderless custom-class css-var-root ant-picker-css-var"
 >
   <div
     class="ant-picker-input"
@@ -1692,6 +1696,7 @@ exports[`TimePicker should support bordered 1`] = `
       class="ant-picker-suffix"
     >
       <span
+        aria-hidden="true"
         aria-label="clock-circle"
         class="anticon anticon-clock-circle"
         role="img"
@@ -1714,9 +1719,10 @@ exports[`TimePicker should support bordered 1`] = `
         </svg>
       </span>
     </span>
-    <span
+    <button
+      aria-label="Clear"
       class="ant-picker-clear"
-      role="button"
+      type="button"
     >
       <span
         aria-label="close-circle"
@@ -1738,7 +1744,7 @@ exports[`TimePicker should support bordered 1`] = `
           />
         </svg>
       </span>
-    </span>
+    </button>
   </div>
 </div>
 `;

@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/by_BY';
+import Pagination from '@rc-component/pagination/locale/by_BY';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/by_BY';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Калі ласка, выберыце',
     close: 'Закрыць',
+    show: 'Паказаць',
+    hide: 'Схаваць',
+    sortable: 'сартавальны',
   },
   Table: {
     filterTitle: 'Фільтр',
@@ -61,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Выбраць усе даныя',
     removeAll: 'Выдаліць усе даныя',
     selectInvert: 'Паказаць у адваротным парадку',
+    deselectAll: 'Адмяніце выбар усіх даных',
   },
   Upload: {
     uploading: 'Запампоўка...',
@@ -80,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Капіяваць',
     copied: 'Капіяванне завершана',
     expand: 'Разгарнуць',
+    collapse: 'Згарнуць',
   },
   Form: {
     optional: '(не абавязкова)',
@@ -131,8 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Preview',
+  QRCode: {
+    expired: 'Тэрмін дзеяння QR-кода скончыўся',
+    refresh: 'Абнавіць',
+    scanned: 'Адсканаваныя',
+  },
+  ColorPicker: {
+    presetEmpty: 'Пусты',
+    transparent: 'Празрысты',
+    singleColor: 'Аднакаляровы',
+    gradientColor: 'Градыент колеру',
   },
 };
 

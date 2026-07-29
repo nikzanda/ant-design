@@ -1,6 +1,7 @@
 import React from 'react';
 import CloseOutlined from '@ant-design/icons/CloseOutlined';
 
+import { isFunction } from '../_util/is';
 import { DisabledContextProvider } from '../config-provider/DisabledContext';
 import { useLocale } from '../locale';
 import NormalCancelBtn from './components/NormalCancelBtn';
@@ -20,7 +21,7 @@ export function renderCloseIcon(prefixCls: string, closeIcon?: React.ReactNode) 
 
 interface FooterProps {
   onOk?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-  onCancel?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onCancel?: ModalProps['onCancel'];
 }
 
 export const Footer: React.FC<
@@ -54,8 +55,18 @@ export const Footer: React.FC<
   const okTextLocale: React.ReactNode = okText || locale?.okText;
   const cancelTextLocale = cancelText || locale?.cancelText;
 
-  // ================= Context Value =================
-  const btnCtxValue: ModalContextProps = {
+  const memoizedValue = React.useMemo<ModalContextProps>(() => {
+    return {
+      confirmLoading,
+      okButtonProps,
+      cancelButtonProps,
+      okTextLocale,
+      cancelTextLocale,
+      okType,
+      onOk,
+      onCancel,
+    };
+  }, [
     confirmLoading,
     okButtonProps,
     cancelButtonProps,
@@ -64,12 +75,10 @@ export const Footer: React.FC<
     okType,
     onOk,
     onCancel,
-  };
-
-  const btnCtxValueMemo = React.useMemo(() => btnCtxValue, [...Object.values(btnCtxValue)]);
+  ]);
 
   let footerNode: React.ReactNode;
-  if (typeof footer === 'function' || typeof footer === 'undefined') {
+  if (isFunction(footer) || typeof footer === 'undefined') {
     footerNode = (
       <>
         <NormalCancelBtn />
@@ -77,14 +86,11 @@ export const Footer: React.FC<
       </>
     );
 
-    if (typeof footer === 'function') {
-      footerNode = footer(footerNode, {
-        OkBtn: NormalOkBtn,
-        CancelBtn: NormalCancelBtn,
-      });
+    if (isFunction(footer)) {
+      footerNode = footer(footerNode, { OkBtn: NormalOkBtn, CancelBtn: NormalCancelBtn });
     }
 
-    footerNode = <ModalContextProvider value={btnCtxValueMemo}>{footerNode}</ModalContextProvider>;
+    footerNode = <ModalContextProvider value={memoizedValue}>{footerNode}</ModalContextProvider>;
   } else {
     footerNode = footer;
   }

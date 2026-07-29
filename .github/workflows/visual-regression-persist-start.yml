@@ -12,26 +12,31 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-image:
     name: test image
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: utooland/setup-utoo@e7aa4d726a17f79f68aed736476ea5bd68f8ba52 # v1
+      - run: ut
       - name: generate image snapshots
         run: |
           node node_modules/puppeteer/install.mjs
-          bun run version
-          bun run test:image
+          ut version
+          ut test:image
           tar -czvf imageSnapshots.tar.gz imageSnapshots/*
         env:
           NODE_OPTIONS: --max_old_space_size=4096
 
       # Upload `imageSnapshots` on master
       - name: upload report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: image-snapshots
           path: imageSnapshots.tar.gz
@@ -43,7 +48,7 @@ jobs:
 
       - name: Upload persist key
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: visual-regression-ref
           path: ./visual-regression-ref.txt

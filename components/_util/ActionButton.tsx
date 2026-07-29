@@ -1,9 +1,10 @@
 import * as React from 'react';
-import useState from 'rc-util/lib/hooks/useState';
+import { useState } from '@rc-component/util';
 
-import Button from '../button';
-import type { ButtonProps, LegacyButtonType } from '../button/button';
+import Button from '../button/Button';
+import type { ButtonProps, LegacyButtonType } from '../button/Button';
 import { convertLegacyProps } from '../button/buttonHelpers';
+import { isThenable } from './is';
 
 export interface ActionButtonProps {
   type?: LegacyButtonType;
@@ -20,10 +21,6 @@ export interface ActionButtonProps {
    * Do not throw if is await mode
    */
   isSilent?: () => boolean;
-}
-
-function isThenable<T>(thing?: PromiseLike<T>): boolean {
-  return !!thing?.then;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = (props) => {
@@ -52,9 +49,7 @@ const ActionButton: React.FC<ActionButtonProps> = (props) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     if (autoFocus) {
       timeoutId = setTimeout(() => {
-        buttonRef.current?.focus({
-          preventScroll: true,
-        });
+        buttonRef.current?.focus({ preventScroll: true });
       });
     }
     return () => {
@@ -62,14 +57,14 @@ const ActionButton: React.FC<ActionButtonProps> = (props) => {
         clearTimeout(timeoutId);
       }
     };
-  }, []);
+  }, [autoFocus]);
 
   const handlePromiseOnOk = (returnValueOfOnOk?: PromiseLike<any>) => {
     if (!isThenable(returnValueOfOnOk)) {
       return;
     }
     setLoading(true);
-    returnValueOfOnOk!.then(
+    returnValueOfOnOk.then(
       (...args: any[]) => {
         setLoading(false, true);
         onInternalClose(...args);

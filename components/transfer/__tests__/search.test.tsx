@@ -1,8 +1,8 @@
 import React from 'react';
 import { render as testLibRender } from '@testing-library/react';
 
+import Transfer from '..';
 import { fireEvent, render } from '../../../tests/utils';
-import Transfer from '../index';
 import Search from '../search';
 
 describe('Transfer.Search', () => {
@@ -89,7 +89,7 @@ describe('Transfer.Search', () => {
 
     fireEvent.change(
       container
-        ?.querySelectorAll('.ant-transfer-list')
+        ?.querySelectorAll('.ant-transfer-section')
         ?.item(0)
         ?.querySelector('input[type="text"]')!,
       { target: { value: 'a' } },
@@ -108,7 +108,7 @@ describe('Transfer.Search', () => {
     filterOption.mockReset();
     fireEvent.change(
       container
-        ?.querySelectorAll('.ant-transfer-list')
+        ?.querySelectorAll('.ant-transfer-section')
         ?.item(1)
         ?.querySelector('input[type="text"]')!,
       { target: { value: 'b' } },

@@ -1,24 +1,49 @@
 import * as React from 'react';
-import classNames from 'classnames';
 import type {
   SegmentedLabeledOption as RcSegmentedLabeledOption,
   SegmentedProps as RCSegmentedProps,
   SegmentedValue as RcSegmentedValue,
   SegmentedRawOption,
-} from 'rc-segmented';
-import RcSegmented from 'rc-segmented';
-import useId from 'rc-util/lib/hooks/useId';
+} from '@rc-component/segmented';
+import RcSegmented from '@rc-component/segmented';
+import { useId } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { useOrientation } from '../_util/hooks';
+import type { Orientation } from '../_util/hooks';
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isPlainObject } from '../_util/is';
 import { useComponentConfig } from '../config-provider/context';
 import useSize from '../config-provider/hooks/useSize';
 import type { SizeType } from '../config-provider/SizeContext';
+import Tooltip from '../tooltip';
+import type { TooltipProps } from '../tooltip';
 import useStyle from './style';
 
-export type { SegmentedValue } from 'rc-segmented';
+export type { SegmentedValue } from '@rc-component/segmented';
+
+export type SegmentedSemanticType = {
+  classNames?: {
+    root?: string;
+    icon?: string;
+    label?: string;
+    item?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    icon?: React.CSSProperties;
+    label?: React.CSSProperties;
+    item?: React.CSSProperties;
+  };
+};
+
+export type SegmentedSemanticAllType = GenerateSemantic<SegmentedSemanticType, SegmentedProps>;
 
 interface SegmentedLabeledOptionWithoutIcon<ValueType = RcSegmentedValue>
   extends RcSegmentedLabeledOption<ValueType> {
   label: RcSegmentedLabeledOption['label'];
+  tooltip?: string | Omit<TooltipProps, 'children'>;
 }
 
 interface SegmentedLabeledOptionWithIcon<ValueType = RcSegmentedValue>
@@ -26,12 +51,13 @@ interface SegmentedLabeledOptionWithIcon<ValueType = RcSegmentedValue>
   label?: RcSegmentedLabeledOption['label'];
   /** Set icon for Segmented item */
   icon: React.ReactNode;
+  tooltip?: string | Omit<TooltipProps, 'children'>;
 }
 
 function isSegmentedLabeledOptionWithIcon(
   option: SegmentedRawOption | SegmentedLabeledOptionWithIcon | SegmentedLabeledOptionWithoutIcon,
 ): option is SegmentedLabeledOptionWithIcon {
-  return typeof option === 'object' && !!(option as SegmentedLabeledOptionWithIcon)?.icon;
+  return isPlainObject(option) && !!(option as SegmentedLabeledOptionWithIcon)?.icon;
 }
 
 export type SegmentedLabeledOption<ValueType = RcSegmentedValue> =
@@ -41,7 +67,10 @@ export type SegmentedLabeledOption<ValueType = RcSegmentedValue> =
 export type SegmentedOptions<T = SegmentedRawOption> = (T | SegmentedLabeledOption<T>)[];
 
 export interface SegmentedProps<ValueType = RcSegmentedValue>
-  extends Omit<RCSegmentedProps<ValueType>, 'size' | 'options'> {
+  extends Omit<
+    RCSegmentedProps<ValueType>,
+    'size' | 'options' | 'itemRender' | 'styles' | 'classNames'
+  > {
   rootClassName?: string;
   options: SegmentedOptions<ValueType>;
   /** Option to fit width to its parent's width */
@@ -49,23 +78,28 @@ export interface SegmentedProps<ValueType = RcSegmentedValue>
   /** Option to control the display size */
   size?: SizeType;
   vertical?: boolean;
+  orientation?: Orientation;
+  classNames?: SegmentedSemanticAllType['classNamesAndFn'];
+  styles?: SegmentedSemanticAllType['stylesAndFn'];
   shape?: 'default' | 'round';
 }
 
 const InternalSegmented = React.forwardRef<HTMLDivElement, SegmentedProps>((props, ref) => {
   const defaultName = useId();
-
   const {
     prefixCls: customizePrefixCls,
     className,
     rootClassName,
     block,
     options = [],
-    size: customSize = 'middle',
+    size: customSize,
     style,
     vertical,
+    orientation,
     shape = 'default',
     name = defaultName,
+    styles,
+    classNames,
     ...restProps
   } = props;
 
@@ -74,10 +108,31 @@ const InternalSegmented = React.forwardRef<HTMLDivElement, SegmentedProps>((prop
     direction,
     className: contextClassName,
     style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
   } = useComponentConfig('segmented');
+
+  const mergedProps: SegmentedProps = {
+    ...props,
+    options,
+    size: customSize,
+    shape,
+  };
+
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    SegmentedSemanticAllType['classNames'],
+    SegmentedSemanticAllType['styles'],
+    SegmentedProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props: mergedProps,
+  });
+
   const prefixCls = getPrefixCls('segmented', customizePrefixCls);
   // Style
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls);
 
   // ===================== Size =====================
   const mergedSize = useSize(customSize);
@@ -92,7 +147,12 @@ const InternalSegmented = React.forwardRef<HTMLDivElement, SegmentedProps>((prop
             ...restOption,
             label: (
               <>
-                <span className={`${prefixCls}-item-icon`}>{icon}</span>
+                <span
+                  className={clsx(`${prefixCls}-item-icon`, mergedClassNames.icon)}
+                  style={mergedStyles.icon}
+                >
+                  {icon}
+                </span>
                 {label && <span>{label}</span>}
               </>
             ),
@@ -100,38 +160,52 @@ const InternalSegmented = React.forwardRef<HTMLDivElement, SegmentedProps>((prop
         }
         return option;
       }),
-    [options, prefixCls],
+    [options, prefixCls, mergedClassNames.icon, mergedStyles.icon],
   );
 
-  const cls = classNames(
+  const [, mergedVertical] = useOrientation(orientation, vertical);
+
+  const cls = clsx(
     className,
     rootClassName,
     contextClassName,
+    mergedClassNames.root,
     {
       [`${prefixCls}-block`]: block,
       [`${prefixCls}-sm`]: mergedSize === 'small',
       [`${prefixCls}-lg`]: mergedSize === 'large',
-      [`${prefixCls}-vertical`]: vertical,
+      [`${prefixCls}-vertical`]: mergedVertical,
       [`${prefixCls}-shape-${shape}`]: shape === 'round',
     },
     hashId,
     cssVarCls,
   );
 
-  const mergedStyle: React.CSSProperties = { ...contextStyle, ...style };
+  const itemRender = (node: React.ReactNode, { item }: { item: SegmentedLabeledOption }) => {
+    if (!item.tooltip) {
+      return node;
+    }
 
-  return wrapCSSVar(
+    const tooltipProps = isPlainObject(item.tooltip) ? item.tooltip : { title: item.tooltip };
+
+    return <Tooltip {...tooltipProps}>{node}</Tooltip>;
+  };
+
+  return (
     <RcSegmented
       {...restProps}
       name={name}
       className={cls}
-      style={mergedStyle}
+      style={mergedStyles.root}
+      classNames={mergedClassNames}
+      styles={mergedStyles}
+      itemRender={itemRender}
       options={extendedOptions}
       ref={ref}
       prefixCls={prefixCls}
       direction={direction}
-      vertical={vertical}
-    />,
+      vertical={mergedVertical}
+    />
   );
 });
 

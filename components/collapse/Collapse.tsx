@@ -1,12 +1,14 @@
 import * as React from 'react';
 import RightOutlined from '@ant-design/icons/RightOutlined';
-import classNames from 'classnames';
-import type { CollapseProps as RcCollapseProps } from 'rc-collapse';
-import RcCollapse from 'rc-collapse';
-import type { CSSMotionProps } from 'rc-motion';
-import toArray from 'rc-util/lib/Children/toArray';
-import omit from 'rc-util/lib/omit';
+import type { CollapseProps as RcCollapseProps } from '@rc-component/collapse';
+import RcCollapse from '@rc-component/collapse';
+import type { CSSMotionProps } from '@rc-component/motion';
+import { omit, toArray } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isFunction } from '../_util/is';
 import initCollapseMotion from '../_util/motion';
 import { cloneElement } from '../_util/reactNode';
 import { devUseWarning } from '../_util/warning';
@@ -17,9 +19,26 @@ import type { CollapsibleType } from './CollapsePanel';
 import CollapsePanel from './CollapsePanel';
 import useStyle from './style';
 
-/** @deprecated Please use `start` | `end` instead */
-type ExpandIconPositionLegacy = 'left' | 'right';
-export type ExpandIconPosition = 'start' | 'end' | ExpandIconPositionLegacy | undefined;
+export type ExpandIconPlacement = 'start' | 'end';
+
+export type CollapseSemanticType = {
+  classNames?: {
+    root?: string;
+    header?: string;
+    title?: string;
+    body?: string;
+    icon?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    header?: React.CSSProperties;
+    title?: React.CSSProperties;
+    body?: React.CSSProperties;
+    icon?: React.CSSProperties;
+  };
+};
+
+export type CollapseSemanticAllType = GenerateSemantic<CollapseSemanticType, CollapseProps>;
 
 export interface CollapseProps extends Pick<RcCollapseProps, 'items'> {
   activeKey?: Array<string | number> | string | number;
@@ -39,7 +58,9 @@ export interface CollapseProps extends Pick<RcCollapseProps, 'items'> {
   bordered?: boolean;
   prefixCls?: string;
   expandIcon?: (panelProps: PanelProps) => React.ReactNode;
-  expandIconPosition?: ExpandIconPosition;
+  expandIconPlacement?: ExpandIconPlacement;
+  /** @deprecated Please use `expandIconPlacement` instead */
+  expandIconPosition?: ExpandIconPlacement;
   ghost?: boolean;
   size?: SizeType;
   collapsible?: CollapsibleType;
@@ -47,6 +68,8 @@ export interface CollapseProps extends Pick<RcCollapseProps, 'items'> {
    * @deprecated use `items` instead
    */
   children?: React.ReactNode;
+  classNames?: CollapseSemanticAllType['classNamesAndFn'];
+  styles?: CollapseSemanticAllType['stylesAndFn'];
 }
 
 interface PanelProps {
@@ -56,10 +79,10 @@ interface PanelProps {
   style?: React.CSSProperties;
   showArrow?: boolean;
   forceRender?: boolean;
-  /** @deprecated Use `collapsible="disabled"` instead */
-  disabled?: boolean;
   extra?: React.ReactNode;
   collapsible?: CollapsibleType;
+  classNames?: CollapseSemanticAllType['classNames'];
+  styles?: CollapseSemanticAllType['styles'];
 }
 
 const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) => {
@@ -69,6 +92,8 @@ const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) =>
     expandIcon: contextExpandIcon,
     className: contextClassName,
     style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
   } = useComponentConfig('collapse');
 
   const {
@@ -79,111 +104,104 @@ const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) =>
     bordered = true,
     ghost,
     size: customizeSize,
-    expandIconPosition = 'start',
+    expandIconPlacement,
+    expandIconPosition,
     children,
     destroyInactivePanel,
     destroyOnHidden,
     expandIcon,
+    classNames,
+    styles,
   } = props;
 
   const mergedSize = useSize((ctx) => customizeSize ?? ctx ?? 'middle');
   const prefixCls = getPrefixCls('collapse', customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls);
+  const mergedPlacement = expandIconPlacement ?? expandIconPosition ?? 'start';
 
-  if (process.env.NODE_ENV !== 'production') {
-    const warning = devUseWarning('Collapse');
+  // =========== Merged Props for Semantic ===========
+  const mergedProps: CollapseProps = {
+    ...props,
+    size: mergedSize,
+    bordered,
+    expandIconPlacement: mergedPlacement,
+  };
 
-    // Warning if use legacy type `expandIconPosition`
-    warning(
-      expandIconPosition !== 'left' && expandIconPosition !== 'right',
-      'deprecated',
-      '`expandIconPosition` with `left` or `right` is deprecated. Please use `start` or `end` instead.',
-    );
-    warning.deprecated(
-      !('destroyInactivePanel' in props),
-      'destroyInactivePanel',
-      'destroyOnHidden',
-    );
-  }
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
 
-  // Align with logic position
-  const mergedExpandIconPosition = React.useMemo<'start' | 'end'>(() => {
-    if (expandIconPosition === 'left') {
-      return 'start';
-    }
-    return expandIconPosition === 'right' ? 'end' : expandIconPosition;
-  }, [expandIconPosition]);
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    CollapseSemanticAllType['classNames'],
+    CollapseSemanticAllType['styles'],
+    CollapseProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props: mergedProps,
+  });
 
   const mergedExpandIcon = expandIcon ?? contextExpandIcon;
 
+  if (process.env.NODE_ENV !== 'production') {
+    const warning = devUseWarning('Collapse');
+    [
+      ['destroyInactivePanel', 'destroyOnHidden'],
+      ['expandIconPosition', 'expandIconPlacement'],
+    ].forEach(([deprecatedName, newName]) => {
+      warning.deprecated(!(deprecatedName in props), deprecatedName, newName);
+    });
+  }
+
   const renderExpandIcon = React.useCallback(
     (panelProps: PanelProps = {}) => {
-      const icon =
-        typeof mergedExpandIcon === 'function' ? (
-          mergedExpandIcon(panelProps)
-        ) : (
-          <RightOutlined
-            rotate={panelProps.isActive ? (direction === 'rtl' ? -90 : 90) : undefined}
-            aria-label={panelProps.isActive ? 'expanded' : 'collapsed'}
-          />
-        );
-      return cloneElement(icon, () => ({
-        className: classNames(
-          (icon as React.ReactElement<{ className?: string }>).props?.className,
-          `${prefixCls}-arrow`,
-        ),
+      const icon = isFunction(mergedExpandIcon) ? (
+        mergedExpandIcon(panelProps)
+      ) : (
+        <RightOutlined
+          rotate={panelProps.isActive ? (direction === 'rtl' ? -90 : 90) : undefined}
+          aria-label={panelProps.isActive ? 'expanded' : 'collapsed'}
+        />
+      );
+      return cloneElement(icon, (oriProps) => ({
+        className: clsx(oriProps.className, `${prefixCls}-arrow`),
       }));
     },
     [mergedExpandIcon, prefixCls, direction],
   );
 
-  const collapseClassName = classNames(
-    `${prefixCls}-icon-position-${mergedExpandIconPosition}`,
+  const collapseClassName = clsx(
+    `${prefixCls}-icon-placement-${mergedPlacement}`,
     {
       [`${prefixCls}-borderless`]: !bordered,
       [`${prefixCls}-rtl`]: direction === 'rtl',
       [`${prefixCls}-ghost`]: !!ghost,
-      [`${prefixCls}-${mergedSize}`]: mergedSize !== 'middle',
+      [`${prefixCls}-large`]: mergedSize === 'large',
+      [`${prefixCls}-small`]: mergedSize === 'small',
     },
     contextClassName,
     className,
     rootClassName,
     hashId,
     cssVarCls,
+    mergedClassNames.root,
   );
 
   const openMotion = React.useMemo<CSSMotionProps>(
     () => ({
       ...initCollapseMotion(rootPrefixCls),
       motionAppear: false,
-      leavedClassName: `${prefixCls}-content-hidden`,
+      leavedClassName: `${prefixCls}-panel-hidden`,
     }),
     [rootPrefixCls, prefixCls],
   );
 
   const items = React.useMemo<React.ReactNode[] | null>(() => {
-    if (!children) {
-      return null;
+    if (children) {
+      return toArray(children).map((child) => child);
     }
-    return toArray(children).map((child, index) => {
-      const childProps = (
-        child as React.ReactElement<{ disabled?: boolean; collapsible?: CollapsibleType }>
-      ).props;
-      if (childProps?.disabled) {
-        const key = child.key ?? String(index);
-        const mergedChildProps: Omit<CollapseProps, 'items'> & { key: React.Key } = {
-          ...omit(child.props as any, ['disabled']),
-          key,
-          collapsible: childProps.collapsible ?? 'disabled',
-        };
-        return cloneElement(child, mergedChildProps);
-      }
-      return child;
-    });
+    return null;
   }, [children]);
 
-  return wrapCSSVar(
+  return (
     // @ts-ignore
     <RcCollapse
       ref={ref}
@@ -192,12 +210,13 @@ const Collapse = React.forwardRef<HTMLDivElement, CollapseProps>((props, ref) =>
       expandIcon={renderExpandIcon}
       prefixCls={prefixCls}
       className={collapseClassName}
-      style={{ ...contextStyle, ...style }}
-      // TODO: In the future, destroyInactivePanel in rc-collapse needs to be upgrade to destroyOnHidden
-      destroyInactivePanel={destroyOnHidden ?? destroyInactivePanel}
+      style={mergedStyles.root}
+      classNames={mergedClassNames}
+      styles={mergedStyles}
+      destroyOnHidden={destroyOnHidden ?? destroyInactivePanel}
     >
       {items}
-    </RcCollapse>,
+    </RcCollapse>
   );
 });
 

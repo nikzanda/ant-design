@@ -1,36 +1,29 @@
 import React, { cloneElement, isValidElement } from 'react';
 import { BugOutlined } from '@ant-design/icons';
-import { Button, Drawer, Flex, Grid, Popover, Tag, Timeline, Typography } from 'antd';
+import { Button, Drawer, Flex, Popover, Tag, Timeline, Typography } from 'antd';
 import type { TimelineItemProps } from 'antd';
 import { createStyles } from 'antd-style';
 
-import useFetch from '../../../hooks/useFetch';
+import type { ChangelogInfo } from '../../../hooks/useChangelog';
+import useChangelog from '../../../hooks/useChangelog';
 import useLocale from '../../../hooks/useLocale';
 import useLocation from '../../../hooks/useLocation';
 import { matchDeprecated } from '../../utils';
 import Link from '../Link';
 
-interface ChangelogInfo {
-  version: string;
-  changelog: string;
-  refs: string[];
-  contributors: string[];
-  releaseDate: string;
-}
-
-const useStyle = createStyles(({ token, css }) => ({
+const useStyle = createStyles(({ cssVar, token, css }) => ({
   listWrap: css`
     > li {
       line-height: 2;
     }
   `,
   linkRef: css`
-    margin-inline-start: ${token.marginXS}px;
+    margin-inline-start: ${cssVar.marginXS};
   `,
   bug: css`
-    font-size: ${token.fontSize}px;
+    font-size: ${cssVar.fontSize};
     color: #aaa;
-    margin-inline-start: ${token.marginXS}px;
+    margin-inline-start: ${cssVar.marginXS};
     display: inline-block;
     vertical-align: inherit;
     cursor: pointer;
@@ -39,22 +32,22 @@ const useStyle = createStyles(({ token, css }) => ({
     }
   `,
   bugReasonTitle: css`
-    padding: ${token.paddingXXS}px ${token.paddingXS}px;
+    padding: ${cssVar.paddingXXS} ${cssVar.paddingXS};
   `,
   bugReasonList: css`
     width: 100%;
     max-width: 100%;
     li {
-      padding: ${token.paddingXXS}px ${token.paddingXS}px;
+      padding: ${cssVar.paddingXXS} ${cssVar.paddingXS};
       a {
         display: flex;
         align-items: center;
-        gap: ${token.marginXXS}px;
+        gap: ${cssVar.marginXXS};
       }
     }
   `,
   extraLink: css`
-    font-size: ${token.fontSize}px;
+    font-size: ${cssVar.fontSize};
   `,
   drawerContent: {
     position: 'relative',
@@ -72,6 +65,7 @@ const useStyle = createStyles(({ token, css }) => ({
     font-weight: 600;
     font-size: 20px;
     margin: 0 !important;
+    padding: 0;
   `,
   versionTag: css`
     user-select: none;
@@ -101,7 +95,11 @@ const locales = {
   },
 };
 
-const ParseChangelog: React.FC<{ changelog: string }> = (props) => {
+interface ParseChangelogProps {
+  changelog: string;
+}
+
+const ParseChangelog: React.FC<ParseChangelogProps> = (props) => {
   const { changelog = '' } = props;
 
   const parsedChangelog = React.useMemo(() => {
@@ -144,14 +142,25 @@ const ParseChangelog: React.FC<{ changelog: string }> = (props) => {
   return <span>{parsedChangelog}</span>;
 };
 
-const RefLinks: React.FC<{ refs: string[]; contributors: string[] }> = ({ refs, contributors }) => {
+interface RefLinksProps {
+  refs: string[];
+  contributors: string[];
+}
+
+const RefLinks: React.FC<RefLinksProps> = ({ refs, contributors }) => {
   const { styles } = useStyle();
 
   return (
     <>
       {refs?.map((ref) => (
         <React.Fragment key={ref}>
-          <a className={styles.linkRef} key={ref} href={ref} target="_blank" rel="noreferrer">
+          <a
+            className={styles.linkRef}
+            key={ref}
+            href={ref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             #{ref.match(/[^/]+$/)?.[0]}
           </a>
         </React.Fragment>
@@ -163,7 +172,7 @@ const RefLinks: React.FC<{ refs: string[]; contributors: string[] }> = ({ refs, 
             key={contributor}
             href={`https://github.com/${contributor}`}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             @{contributor}
           </a>
@@ -173,22 +182,29 @@ const RefLinks: React.FC<{ refs: string[]; contributors: string[] }> = ({ refs, 
   );
 };
 
-const RenderChangelogList: React.FC<{ changelogList: ChangelogInfo[] }> = ({ changelogList }) => {
+interface RenderChangelogListProps {
+  changelogList: ChangelogInfo[];
+}
+
+const RenderChangelogList: React.FC<RenderChangelogListProps> = ({ changelogList }) => {
   const elements: React.ReactNode[] = [];
   const { styles } = useStyle();
   const len = changelogList.length;
   for (let i = 0; i < len; i += 1) {
     const { refs, changelog, contributors } = changelogList[i];
     // Check if the next line is an image link and append it to the current line
-    if (i + 1 < len && changelogList[i + 1].changelog.trim().startsWith('<img')) {
-      const imgDom = new DOMParser().parseFromString(changelogList[i + 1].changelog, 'text/html');
-      const imgElement = imgDom.querySelector<HTMLImageElement>('img');
+    const nextChangelog = changelogList[i + 1]?.changelog || '';
+    if (i + 1 < len && nextChangelog.trim().startsWith('<img')) {
+      const parser = new DOMParser();
+      const document = parser.parseFromString(nextChangelog, 'text/html');
+      const imgElement = document.querySelector<HTMLImageElement>('img');
       elements.push(
-        <li key={i}>
+        <li key={`img-${i}`}>
           <ParseChangelog changelog={changelog} />
           <RefLinks refs={refs} contributors={contributors} />
           <br />
           <img
+            draggable={false}
             src={imgElement?.getAttribute('src') || ''}
             alt={imgElement?.getAttribute('alt') || ''}
             width={imgElement?.getAttribute('width') || ''}
@@ -198,7 +214,7 @@ const RenderChangelogList: React.FC<{ changelogList: ChangelogInfo[] }> = ({ cha
       i += 1; // Skip the next line
     } else {
       elements.push(
-        <li key={i}>
+        <li key={`changelog-${i}`}>
           <ParseChangelog changelog={changelog} />
           <RefLinks refs={refs} contributors={contributors} />
         </li>,
@@ -206,22 +222,6 @@ const RenderChangelogList: React.FC<{ changelogList: ChangelogInfo[] }> = ({ cha
     }
   }
   return <ul className={styles.listWrap}>{elements}</ul>;
-};
-
-const useChangelog = (componentPath: string, lang: 'cn' | 'en'): ChangelogInfo[] => {
-  const logFileName = `components-changelog-${lang}.json`;
-
-  const data = useFetch({
-    key: `component-changelog-${lang}`,
-    request: () => import(`../../../preset/${logFileName}`),
-  });
-  return React.useMemo(() => {
-    const component = componentPath.replace(/-/g, '');
-    const componentName = Object.keys(data).find(
-      (name) => name.toLowerCase() === component.toLowerCase(),
-    );
-    return data[componentName as keyof typeof data] as ChangelogInfo[];
-  }, [data, componentPath]);
 };
 
 const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) => {
@@ -267,7 +267,7 @@ const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) 
                       <ul className={styles.bugReasonList}>
                         {bugVersionInfo.reason.map<React.ReactNode>((reason, index) => (
                           <li key={`reason-${index}`}>
-                            <a type="link" target="_blank" rel="noreferrer" href={reason}>
+                            <a target="_blank" rel="noopener noreferrer" href={reason}>
                               <BugOutlined />
                               {reason
                                 ?.replace(/#.*$/, '')
@@ -285,7 +285,7 @@ const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) 
                   </Popover>
                 )}
               </Button>
-              <Tag className={styles.versionTag} bordered={false} color="blue">
+              <Tag className={styles.versionTag} variant="filled" color="blue">
                 {changelogList[0]?.releaseDate}
               </Tag>
             </Flex>
@@ -294,10 +294,17 @@ const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) 
         ),
       };
     });
-  }, [list]);
-
-  const screens = Grid.useBreakpoint();
-  const width = screens.md ? '48vw' : '90vw';
+  }, [
+    lang,
+    list,
+    locale.bugList,
+    styles.bug,
+    styles.bugReasonList,
+    styles.bugReasonTitle,
+    styles.versionTag,
+    styles.versionTitle,
+    styles.versionWrap,
+  ]);
 
   if (!pathname.startsWith('/components/') || !list || !list.length) {
     return null;
@@ -305,8 +312,8 @@ const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) 
 
   return (
     <>
-      {isValidElement(children) &&
-        cloneElement(children as React.ReactElement<any>, {
+      {isValidElement<React.HTMLAttributes<HTMLElement>>(children) &&
+        cloneElement(children, {
           onClick: () => setShow(true),
         })}
       <Drawer
@@ -319,7 +326,7 @@ const ComponentChangelog: React.FC<Readonly<React.PropsWithChildren>> = (props) 
           </Link>
         }
         open={show}
-        width={width}
+        size="large"
         onClose={() => setShow(false)}
       >
         <Timeline items={timelineItems} />

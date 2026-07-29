@@ -5,14 +5,16 @@ const CheckboxGroup = Checkbox.Group;
 
 const operations = <Button>Extra Action</Button>;
 
-const OperationsSlot: Record<PositionType, React.ReactNode> = {
-  left: <Button className="tabs-extra-demo-button">Left Extra Action</Button>,
-  right: <Button>Right Extra Action</Button>,
+const operationsSlot: Record<PositionType, React.ReactNode> = {
+  left: <Button style={{ marginInlineEnd: 16 }}>Left Extra Action</Button>,
+  right: <Button style={{ marginInlineStart: 16 }}>Right Extra Action</Button>,
 };
 
 const options = ['left', 'right'];
 
 type PositionType = 'left' | 'right';
+
+type TabBarExtraMap = Partial<Record<PositionType, React.ReactNode>>;
 
 const items = Array.from({ length: 3 }).map((_, i) => {
   const id = String(i + 1);
@@ -30,8 +32,8 @@ const App: React.FC = () => {
     if (position.length === 0) {
       return null;
     }
-    return position.reduce(
-      (acc, direction) => ({ ...acc, [direction]: OperationsSlot[direction] }),
+    return position.reduce<TabBarExtraMap>(
+      (acc, direction) => ({ ...acc, [direction]: operationsSlot[direction] }),
       {},
     );
   }, [position]);
@@ -44,13 +46,7 @@ const App: React.FC = () => {
       <br />
       <div>You can also specify its direction or both side</div>
       <Divider />
-      <CheckboxGroup
-        options={options}
-        value={position}
-        onChange={(value) => {
-          setPosition(value as PositionType[]);
-        }}
-      />
+      <CheckboxGroup<PositionType> options={options} value={position} onChange={setPosition} />
       <br />
       <br />
       <Tabs tabBarExtraContent={slot} items={items} />

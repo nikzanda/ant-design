@@ -1,6 +1,6 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import raf from 'rc-util/lib/raf';
+import { raf } from '@rc-component/util';
+import { clsx } from 'clsx';
 
 import { ConfigContext } from '../../config-provider';
 import Input from '../Input';
@@ -16,18 +16,19 @@ export interface OTPInputProps extends Omit<InputProps, 'onChange'> {
 }
 
 const OTPInput = React.forwardRef<InputRef, OTPInputProps>((props, ref) => {
-  const { className, value, onChange, onActiveChange, index, mask, ...restProps } = props;
+  const { className, value, onChange, onActiveChange, index, mask, onFocus, ...restProps } = props;
   const { getPrefixCls } = React.useContext(ConfigContext);
   const prefixCls = getPrefixCls('otp');
   const maskValue = typeof mask === 'string' ? mask : value;
 
   // ========================== Ref ===========================
   const inputRef = React.useRef<InputRef>(null);
+
   React.useImperativeHandle(ref, () => inputRef.current!);
 
   // ========================= Input ==========================
-  const onInternalChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    onChange(index, e.target.value);
+  const onInternalChange: React.InputEventHandler<HTMLInputElement> = (e) => {
+    onChange(index, (e.target as HTMLInputElement).value);
   };
 
   // ========================= Focus ==========================
@@ -40,6 +41,11 @@ const OTPInput = React.forwardRef<InputRef, OTPInputProps>((props, ref) => {
     });
   };
 
+  const onInternalFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
+    onFocus?.(e);
+    syncSelection();
+  };
+
   // ======================== Keyboard ========================
   const onInternalKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     const { key, ctrlKey, metaKey } = event;
@@ -50,13 +56,7 @@ const OTPInput = React.forwardRef<InputRef, OTPInputProps>((props, ref) => {
       onActiveChange(index + 1);
     } else if (key === 'z' && (ctrlKey || metaKey)) {
       event.preventDefault();
-    }
-
-    syncSelection();
-  };
-
-  const onInternalKeyUp: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Backspace' && !value) {
+    } else if (key === 'Backspace' && !value) {
       onActiveChange(index - 1);
     }
 
@@ -80,14 +80,11 @@ const OTPInput = React.forwardRef<InputRef, OTPInputProps>((props, ref) => {
         ref={inputRef}
         value={value}
         onInput={onInternalChange}
-        onFocus={syncSelection}
+        onFocus={onInternalFocus}
         onKeyDown={onInternalKeyDown}
-        onKeyUp={onInternalKeyUp}
         onMouseDown={syncSelection}
         onMouseUp={syncSelection}
-        className={classNames(className, {
-          [`${prefixCls}-mask-input`]: mask,
-        })}
+        className={clsx(className, { [`${prefixCls}-mask-input`]: mask })}
       />
     </span>
   );

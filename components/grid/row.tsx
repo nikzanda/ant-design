@@ -1,6 +1,7 @@
 import * as React from 'react';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 
+import { isNumber, isPlainObject, isString } from '../_util/is';
 import type { Breakpoint, ScreenMap } from '../_util/responsiveObserver';
 import { responsiveArray } from '../_util/responsiveObserver';
 import { ConfigContext } from '../config-provider';
@@ -20,15 +21,16 @@ const _RowJustify = [
   'space-evenly',
 ] as const;
 
-type Responsive = 'xxl' | 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 type ResponsiveLike<T> = {
-  [key in Responsive]?: T;
+  [key in Breakpoint]?: T;
 };
 
-export type Gutter = number | undefined | Partial<Record<Breakpoint, number>>;
+export type Gutter = number | string | undefined | Partial<Record<Breakpoint, number>>;
 
 type ResponsiveAligns = ResponsiveLike<(typeof _RowAligns)[number]>;
+
 type ResponsiveJustify = ResponsiveLike<(typeof _RowJustify)[number]>;
+
 export interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   gutter?: Gutter | [Gutter, Gutter];
   align?: (typeof _RowAligns)[number] | ResponsiveAligns;
@@ -37,17 +39,17 @@ export interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   wrap?: boolean;
 }
 
-function useMergedPropByScreen(
+const useMergedPropByScreen = (
   oriProp: RowProps['align'] | RowProps['justify'],
   screen: ScreenMap | null,
-) {
-  const [prop, setProp] = React.useState(typeof oriProp === 'string' ? oriProp : '');
+) => {
+  const [prop, setProp] = React.useState(() => (isString(oriProp) ? oriProp : ''));
 
   const calcMergedAlignOrJustify = () => {
-    if (typeof oriProp === 'string') {
+    if (isString(oriProp)) {
       setProp(oriProp);
     }
-    if (typeof oriProp !== 'object') {
+    if (!isPlainObject(oriProp)) {
       return;
     }
     for (let i = 0; i < responsiveArray.length; i++) {
@@ -69,7 +71,7 @@ function useMergedPropByScreen(
   }, [JSON.stringify(oriProp), screen]);
 
   return prop;
-}
+};
 
 const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
   const {
@@ -93,10 +95,10 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
 
   const prefixCls = getPrefixCls('row', customizePrefixCls);
 
-  const [wrapCSSVar, hashId, cssVarCls] = useRowStyle(prefixCls);
+  const [hashId, cssVarCls] = useRowStyle(prefixCls);
 
   const gutters = useGutter(gutter, screens);
-  const classes = classNames(
+  const classes = clsx(
     prefixCls,
     {
       [`${prefixCls}-no-wrap`]: wrap === false,
@@ -111,11 +113,12 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
 
   // Add gutter related style
   const rowStyle: React.CSSProperties = {};
-  const horizontalGutter = gutters[0] != null && gutters[0] > 0 ? gutters[0] / -2 : undefined;
 
-  if (horizontalGutter) {
-    rowStyle.marginLeft = horizontalGutter;
-    rowStyle.marginRight = horizontalGutter;
+  if (gutters?.[0]) {
+    const horizontalGutter = isNumber(gutters[0])
+      ? `${gutters[0] / -2}px`
+      : `calc(${gutters[0]} / -2)`;
+    rowStyle.marginInline = horizontalGutter;
   }
 
   // "gutters" is a new array in each rendering phase, it'll make 'React.useMemo' effectless.
@@ -129,12 +132,12 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
     [gutterH, gutterV, wrap],
   );
 
-  return wrapCSSVar(
+  return (
     <RowContext.Provider value={rowContext}>
       <div {...others} className={classes} style={{ ...rowStyle, ...style }} ref={ref}>
         {children}
       </div>
-    </RowContext.Provider>,
+    </RowContext.Provider>
   );
 });
 

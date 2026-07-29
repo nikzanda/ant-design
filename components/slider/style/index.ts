@@ -113,7 +113,7 @@ interface SliderToken extends FullToken<'Slider'> {
 }
 
 // =============================== Base ===============================
-const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
+const genBaseStyle: GenerateStyle<SliderToken, CSSObject> = (token) => {
   const {
     componentCls,
     antCls,
@@ -133,6 +133,16 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
     motionDurationMid,
   } = token;
 
+  const disabledHandle = {
+    backgroundColor: token.colorBgElevated,
+    cursor: 'not-allowed',
+    width: handleSize,
+    height: handleSize,
+    boxShadow: `0 0 0 ${unit(handleLineWidth)} ${handleColorDisabled}`,
+    insetInlineStart: 0,
+    insetBlockStart: 0,
+  };
+
   return {
     [componentCls]: {
       ...resetComponent(token),
@@ -143,6 +153,9 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
       padding: 0,
       cursor: 'pointer',
       touchAction: 'none',
+      // https://github.com/ant-design/ant-design/issues/55686
+      // Prevent text selection on adjacent content when dragging the handle in Safari.
+      userSelect: 'none',
 
       '&-vertical': {
         margin: `${unit(marginFull)} ${unit(marginPart)}`,
@@ -184,7 +197,7 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
           borderColor: colorFillContentHover,
         },
 
-        [`${componentCls}-handle::after`]: {
+        [`${componentCls}-handle:not(${componentCls}-handle-disabled)::after`]: {
           boxShadow: `0 0 0 ${unit(handleLineWidth)} ${token.colorPrimaryBorderHover}`,
         },
 
@@ -228,18 +241,20 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
           outline: `0px solid transparent`,
           borderRadius: '50%',
           cursor: 'pointer',
-          transition: `
-            inset-inline-start ${motionDurationMid},
-            inset-block-start ${motionDurationMid},
-            width ${motionDurationMid},
-            height ${motionDurationMid},
-            box-shadow ${motionDurationMid},
-            outline ${motionDurationMid}
-          `,
+          transition: [
+            'inset-inline-start',
+            'inset-block-start',
+            'width',
+            'height',
+            'box-shadow',
+            'outline',
+          ]
+            .map((prop) => `${prop} ${motionDurationMid}`)
+            .join(', '),
         },
 
         '&:hover, &:active, &:focus': {
-          '&::before': {
+          [`&:not(${componentCls}-handle-disabled)::before`]: {
             insetInlineStart: calc(handleSizeHover)
               .sub(handleSize)
               .div(2)
@@ -256,7 +271,7 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
             height: calc(handleSizeHover).add(calc(handleLineWidthHover).mul(2)).equal(),
           },
 
-          '&::after': {
+          [`&:not(${componentCls}-handle-disabled)::after`]: {
             boxShadow: `0 0 0 ${unit(handleLineWidthHover)} ${handleActiveColor}`,
             outline: `6px solid ${handleActiveOutlineColor}`,
             width: handleSizeHover,
@@ -335,13 +350,7 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
         },
 
         [`${componentCls}-handle::after`]: {
-          backgroundColor: token.colorBgElevated,
-          cursor: 'not-allowed',
-          width: handleSize,
-          height: handleSize,
-          boxShadow: `0 0 0 ${unit(handleLineWidth)} ${handleColorDisabled}`,
-          insetInlineStart: 0,
-          insetBlockStart: 0,
+          ...disabledHandle,
         },
 
         [`
@@ -352,7 +361,11 @@ const genBaseStyle: GenerateStyle<SliderToken> = (token) => {
         },
       },
 
-      [`&-tooltip ${antCls}-tooltip-inner`]: {
+      [`${componentCls}-handle-disabled::after`]: {
+        ...disabledHandle,
+      },
+
+      [`&-tooltip ${antCls}-tooltip-container`]: {
         minWidth: 'unset',
       },
     },
@@ -431,13 +444,11 @@ const genDirectionStyle = (token: SliderToken, horizontal: boolean): CSSObject =
   };
 };
 // ============================ Horizontal ============================
-const genHorizontalStyle: GenerateStyle<SliderToken> = (token) => {
+const genHorizontalStyle: GenerateStyle<SliderToken, CSSObject> = (token) => {
   const { componentCls, marginPartWithMark } = token;
-
   return {
     [`${componentCls}-horizontal`]: {
       ...genDirectionStyle(token, true),
-
       [`&${componentCls}-with-marks`]: {
         marginBottom: marginPartWithMark,
       },
@@ -446,9 +457,8 @@ const genHorizontalStyle: GenerateStyle<SliderToken> = (token) => {
 };
 
 // ============================= Vertical =============================
-const genVerticalStyle: GenerateStyle<SliderToken> = (token) => {
+const genVerticalStyle: GenerateStyle<SliderToken, CSSObject> = (token) => {
   const { componentCls } = token;
-
   return {
     [`${componentCls}-vertical`]: {
       ...genDirectionStyle(token, false),

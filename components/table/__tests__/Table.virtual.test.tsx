@@ -2,6 +2,7 @@ import React from 'react';
 
 import Table from '..';
 import { render } from '../../../tests/utils';
+import ConfigProvider from '../../config-provider';
 
 describe('Table.Virtual', () => {
   it('should work', () => {
@@ -9,16 +10,8 @@ describe('Table.Virtual', () => {
       <Table
         virtual
         scroll={{ x: 100, y: 100 }}
-        columns={[
-          {
-            dataIndex: 'key',
-          },
-        ]}
-        dataSource={[
-          {
-            key: 'bamboo',
-          },
-        ]}
+        columns={[{ dataIndex: 'key' }]}
+        dataSource={[{ key: 'bamboo' }]}
       />,
     );
 
@@ -32,10 +25,10 @@ describe('Table.Virtual', () => {
     ).toHaveLength(1);
     expect(
       container.querySelector('.ant-table-tbody-virtual-holder .ant-table-cell')?.textContent,
-    ).toEqual('bamboo');
+    ).toBe('bamboo');
   });
 
-  // warning from `rc-table`
+  // warning from `rc-component/table`
   it('warning if no scroll', () => {
     const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     render(<Table virtual />);
@@ -63,16 +56,8 @@ describe('Table.Virtual', () => {
         virtual
         components={components}
         scroll={{ y: 100 }}
-        columns={[
-          {
-            dataIndex: 'key',
-          },
-        ]}
-        dataSource={[
-          {
-            key: 'bamboo',
-          },
-        ]}
+        columns={[{ dataIndex: 'key' }]}
+        dataSource={[{ key: 'bamboo' }]}
       />,
     );
 
@@ -84,13 +69,12 @@ describe('Table.Virtual', () => {
     ).toHaveLength(1);
     expect(
       container.querySelector('.ant-table-tbody-virtual-holder .ant-table-cell')?.textContent,
-    ).toEqual('bamboo');
-    const styleMap = getComputedStyle(
+    ).toBe('bamboo');
+    expect(
       container.querySelector<HTMLElement>(
         '.ant-table-wrapper .ant-table-tbody-virtual .ant-table-row',
-      )!,
-    );
-    expect(styleMap.display).toEqual('flex');
+      ),
+    ).toHaveStyle({ display: 'flex' });
   });
 
   it('should work with sub table', () => {
@@ -100,7 +84,7 @@ describe('Table.Virtual', () => {
         { title: 'Name', dataIndex: 'name', key: 'name' },
         { title: 'Upgrade Status', dataIndex: 'upgradeNum', key: 'upgradeNum' },
       ];
-      const data = [];
+      const data: any[] = [];
       for (let i = 0; i < 3; ++i) {
         data.push({
           key: i.toString(),
@@ -113,18 +97,10 @@ describe('Table.Virtual', () => {
     };
     const { container } = render(
       <Table
-        columns={[
-          {
-            dataIndex: 'key',
-          },
-        ]}
+        columns={[{ dataIndex: 'key' }]}
         expandable={{ expandedRowRender, defaultExpandedRowKeys: ['0'] }}
-        dataSource={[
-          {
-            key: '0',
-          },
-        ]}
-        size="middle"
+        dataSource={[{ key: '0' }]}
+        size="medium"
         virtual
         scroll={{ y: 200 }}
       />,
@@ -133,21 +109,67 @@ describe('Table.Virtual', () => {
     expect(
       container.querySelectorAll('.ant-table-tbody-virtual-holder-inner > div > .ant-table-row'),
     ).toHaveLength(1);
+
     expect(
       container.querySelectorAll(
         '.ant-table-tbody-virtual-holder-inner > div > .ant-table-row > .ant-table-cell',
       )?.[1]?.textContent,
-    ).toEqual('0');
+    ).toBe('0');
 
     expect(
       container.querySelectorAll('.ant-table-tbody-virtual-holder .ant-table-expanded-row'),
     ).toHaveLength(1);
 
-    const styleMap = getComputedStyle(
+    expect(
       container.querySelector<HTMLElement>(
         '.ant-table-tbody-virtual-holder .ant-table-expanded-row .ant-table-row',
-      )!,
+      ),
+    ).toHaveStyle({ display: 'table-row' });
+  });
+
+  it('should support columnWidth from token', () => {
+    const { container } = render(
+      <ConfigProvider
+        theme={{
+          components: {
+            Table: {
+              selectionColumnWidth: 200,
+            },
+          },
+        }}
+      >
+        <Table
+          columns={[{ dataIndex: 'key' }]}
+          dataSource={[{ key: '0' }]}
+          virtual
+          scroll={{ y: 0 }}
+          rowSelection={{}}
+        />
+      </ConfigProvider>,
     );
-    expect(styleMap.display).toEqual('table-row');
+    expect(container.querySelector('.ant-table-selection-col')).toHaveStyle({ width: '200px' });
+  });
+
+  it('should support custom columnWidth priority over token', () => {
+    const { container } = render(
+      <ConfigProvider
+        theme={{
+          components: {
+            Table: {
+              selectionColumnWidth: 200,
+            },
+          },
+        }}
+      >
+        <Table
+          columns={[{ dataIndex: 'key' }]}
+          dataSource={[{ key: '0' }]}
+          virtual
+          scroll={{ y: 0 }}
+          rowSelection={{ columnWidth: 50 }}
+        />
+      </ConfigProvider>,
+    );
+    expect(container.querySelector('.ant-table-selection-col')).toHaveStyle({ width: '50px' });
   });
 });

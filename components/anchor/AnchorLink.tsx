@@ -1,5 +1,5 @@
 import * as React from 'react';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 
 import { devUseWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
@@ -13,6 +13,7 @@ export interface AnchorLinkBaseProps {
   title: React.ReactNode;
   className?: string;
   replace?: boolean;
+  targetOffset?: number;
 }
 
 export interface AnchorLinkProps extends AnchorLinkBaseProps {
@@ -28,22 +29,32 @@ const AnchorLink: React.FC<AnchorLinkProps> = (props) => {
     className,
     target,
     replace,
+    targetOffset,
   } = props;
 
   const context = React.useContext<AntAnchor | undefined>(AnchorContext);
 
-  const { registerLink, unregisterLink, scrollTo, onClick, activeLink, direction } = context || {};
+  const {
+    registerLink,
+    unregisterLink,
+    scrollTo,
+    onClick,
+    activeLink,
+    direction,
+    classNames: mergedClassNames,
+    styles: mergedStyles,
+  } = context || {};
 
   React.useEffect(() => {
-    registerLink?.(href);
+    registerLink?.(href, targetOffset);
     return () => {
       unregisterLink?.(href);
     };
-  }, [href]);
+  }, [href, targetOffset]);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     onClick?.(e, { title, href });
-    scrollTo?.(href);
+    scrollTo?.(href, targetOffset);
 
     // Support clicking on an anchor does not record history.
     if (e.defaultPrevented) {
@@ -83,20 +94,21 @@ const AnchorLink: React.FC<AnchorLinkProps> = (props) => {
 
   const active = activeLink === href;
 
-  const wrapperClassName = classNames(`${prefixCls}-link`, className, {
+  const wrapperClassName = clsx(`${prefixCls}-link`, className, mergedClassNames?.item, {
     [`${prefixCls}-link-active`]: active,
   });
 
-  const titleClassName = classNames(`${prefixCls}-link-title`, {
+  const titleClassName = clsx(`${prefixCls}-link-title`, mergedClassNames?.itemTitle, {
     [`${prefixCls}-link-title-active`]: active,
   });
 
   return (
-    <div className={wrapperClassName}>
+    <div className={wrapperClassName} style={mergedStyles?.item}>
       <a
         className={titleClassName}
+        style={mergedStyles?.itemTitle}
         href={href}
-        title={typeof title === 'string' ? title : ''}
+        title={typeof title === 'string' ? title : undefined}
         target={target}
         onClick={handleClick}
       >

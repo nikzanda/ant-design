@@ -1,11 +1,11 @@
 /* eslint no-param-reassign: 0 */
 // This config is for building dist files
-const getWebpackConfig = require('@ant-design/tools/lib/getWebpackConfig');
+const { getWebpackConfig } = require('@ant-design/tools');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { codecovWebpackPlugin } = require('@codecov/webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const DuplicatePackageCheckerPlugin = require('@madccc/duplicate-package-checker-webpack-plugin');
-const path = require('path');
+const path = require('node:path');
 
 function addLocales(config) {
   const newConfig = { ...config }; // Avoid mutating the original config

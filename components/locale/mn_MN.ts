@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/mn_MN';
+import Pagination from '@rc-component/pagination/locale/mn_MN';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/mn_MN';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Сонгоно уу',
     close: 'Хаах',
+    show: 'Харуулах',
+    hide: 'Нуух',
+    sortable: 'ангилах боломжтой',
   },
   Table: {
     filterTitle: 'Хайх цэс',
@@ -61,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Бүх өгөгдлийг сонгоно уу',
     removeAll: 'Бүх өгөгдлийг устгана уу',
     selectInvert: 'Одоогийн хуудсыг эргүүлэх',
+    deselectAll: 'Бүх өгөгдлийн сонголтыг цуцлах',
   },
   Upload: {
     uploading: 'Хуулж байна...',
@@ -80,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Хуулбарлах',
     copied: 'Хуулсан',
     expand: 'Өргөтгөх',
+    collapse: 'Нурах',
   },
   Form: {
     optional: '(сонголттой)',
@@ -131,8 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Урьдчилан үзэх',
+  QRCode: {
+    expired: 'QR кодын хугацаа дууссан',
+    refresh: 'Сэргээх',
+    scanned: 'Сканнердсан',
+  },
+  ColorPicker: {
+    presetEmpty: 'Хоосон',
+    transparent: 'Ил тод',
+    singleColor: 'Ганц өнгө',
+    gradientColor: 'Градиент өнгө',
   },
 };
 

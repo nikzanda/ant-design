@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/ms_MY';
+import Pagination from '@rc-component/pagination/locale/ms_MY';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/ms_MY';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Sila pilih',
     close: 'Tutup',
+    show: 'Tunjukkan',
+    hide: 'Sembunyikan',
+    sortable: 'boleh disusun',
   },
   Table: {
     filterTitle: 'Cari dengan tajuk',
@@ -62,6 +65,7 @@ const localeValues: Locale = {
     selectAll: 'Pilih Semua',
     removeAll: 'Buang Semua',
     selectInvert: 'Balik Pilihan',
+    deselectAll: 'Nyahpilih semua data',
   },
   Upload: {
     uploading: 'Sedang memuat naik...',
@@ -81,6 +85,7 @@ const localeValues: Locale = {
     copy: 'Salin',
     copied: 'Berjaya menyalin',
     expand: 'Kembang',
+    collapse: 'Runtuh',
   },
   Form: {
     optional: '(Opsional)',
@@ -132,12 +137,10 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Pratonton',
-  },
   QRCode: {
     expired: 'Kod QR luput',
     refresh: 'Segar Semula',
+    scanned: 'Diimbas',
   },
   ColorPicker: {
     presetEmpty: 'Tiada',

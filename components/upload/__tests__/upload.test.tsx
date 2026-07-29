@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import type { UploadRequestOption } from '@rc-component/upload';
 import { produce } from 'immer';
 import cloneDeep from 'lodash/cloneDeep';
-import type { UploadRequestOption } from 'rc-upload/lib/interface';
 
 import type { RcFile, UploadFile, UploadProps } from '..';
 import Upload from '..';
@@ -24,15 +24,15 @@ describe('Upload', () => {
     jest.useFakeTimers();
   });
   beforeEach(() => setup());
-  afterAll(() => {
-    jest.useRealTimers();
-  });
   afterEach(() => {
     jest.clearAllTimers();
     return teardown();
   });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
 
-  // Mock for rc-util raf
+  // Mock for rc-component/util raf
   window.requestAnimationFrame = (callback) => window.setTimeout(callback, 16);
 
   window.cancelAnimationFrame = (id) => window.clearTimeout(id);
@@ -127,7 +127,7 @@ describe('Upload', () => {
       onChange: ({ file }) => {
         if (file.status !== 'uploading') {
           expect(data).toHaveBeenCalled();
-          expect(file.name).toEqual('test.png');
+          expect(file.name).toBe('test.png');
           done();
         }
       },
@@ -1120,7 +1120,7 @@ describe('Upload', () => {
     );
     const normalEl = normalContainer.querySelector('.ant-upload');
     expect(normalEl).toBeTruthy();
-    expect(getComputedStyle(normalEl!).background).toContain('rgb(255, 0, 0)');
+    expect(normalEl).toHaveStyle({ background: 'rgb(255, 0, 0)' });
 
     // Drag type
     const { container: dragContainer } = render(
@@ -1130,7 +1130,7 @@ describe('Upload', () => {
     );
     const dragEl = dragContainer.querySelector('.ant-upload-drag');
     expect(dragEl).toBeTruthy();
-    expect(getComputedStyle(dragEl!).background).toContain('rgb(0, 128, 0)');
+    expect(dragEl).toHaveStyle({ background: 'rgb(0, 128, 0)' });
 
     // Picture-card type
     const { container: pictureCardContainer } = render(
@@ -1140,7 +1140,7 @@ describe('Upload', () => {
     );
     const pictureCardEl = pictureCardContainer.querySelector('.ant-upload');
     expect(pictureCardEl).toBeTruthy();
-    expect(getComputedStyle(pictureCardEl!).background).toContain('rgb(0, 0, 255)');
+    expect(pictureCardEl).toHaveStyle({ background: 'rgb(0, 0, 255)' });
 
     // Dragger component
     const { container: draggerContainer } = render(
@@ -1150,7 +1150,7 @@ describe('Upload', () => {
     );
     const draggerEl = draggerContainer.querySelector('.ant-upload-drag');
     expect(draggerEl).toBeTruthy();
-    expect(getComputedStyle(draggerEl!).background).toContain('rgb(255, 255, 0)');
+    expect(draggerEl).toHaveStyle({ background: 'rgb(255, 255, 0)' });
   });
 
   it('supports ConfigProvider customRequest', async () => {
@@ -1199,6 +1199,82 @@ describe('Upload', () => {
 
     fileListOut.forEach((file) => {
       expect(file.status).toBe('done');
+    });
+  });
+
+  describe('ConfigProvider progress', () => {
+    const uploadingFileList: UploadProps['fileList'] = [
+      {
+        uid: '1',
+        name: 'test.png',
+        status: 'uploading',
+        percent: 50,
+      },
+    ];
+
+    it('should use ConfigProvider progress config when Upload has no progress prop', async () => {
+      const { container } = render(
+        <ConfigProvider upload={{ progress: { showInfo: true } }}>
+          <Upload fileList={uploadingFileList}>
+            <button type="button">upload</button>
+          </Upload>
+        </ConfigProvider>,
+      );
+
+      // ListItem delays showing progress by 300ms
+      await act(async () => {
+        jest.advanceTimersByTime(300);
+      });
+
+      const progressBar = container.querySelector('.ant-upload-list-item-progress');
+      expect(progressBar).toBeTruthy();
+      const progressWithInfo = container.querySelector('.ant-progress-show-info');
+      expect(progressWithInfo).toBeTruthy();
+    });
+
+    it('should prefer Upload progress prop over ConfigProvider progress', async () => {
+      const { container } = render(
+        <ConfigProvider upload={{ progress: { showInfo: true } }}>
+          <Upload fileList={uploadingFileList} progress={{ showInfo: false }}>
+            <button type="button">upload</button>
+          </Upload>
+        </ConfigProvider>,
+      );
+
+      await act(async () => {
+        jest.advanceTimersByTime(300);
+      });
+
+      const progressBar = container.querySelector('.ant-upload-list-item-progress');
+      expect(progressBar).toBeTruthy();
+      const progressWithInfo = container.querySelector('.ant-progress-show-info');
+      expect(progressWithInfo).toBeFalsy();
+    });
+  });
+
+  describe('ConfigProvider accept', () => {
+    it('should use ConfigProvider accept when Upload has no accept prop', () => {
+      const { container } = render(
+        <ConfigProvider upload={{ accept: 'image/*' }}>
+          <Upload>
+            <button type="button">upload</button>
+          </Upload>
+        </ConfigProvider>,
+      );
+      const input = container.querySelector('input[type="file"]');
+      expect(input?.getAttribute('accept')).toBe('image/*');
+    });
+
+    it('should prefer Upload accept prop over ConfigProvider accept', () => {
+      const { container } = render(
+        <ConfigProvider upload={{ accept: 'image/*' }}>
+          <Upload accept=".pdf">
+            <button type="button">upload</button>
+          </Upload>
+        </ConfigProvider>,
+      );
+      const input = container.querySelector('input[type="file"]');
+      expect(input?.getAttribute('accept')).toBe('.pdf');
     });
   });
 });

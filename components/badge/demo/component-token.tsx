@@ -13,11 +13,12 @@ export default () => (
           dotSize: 4,
           textFontWeight: 'bold',
           statusSize: 8,
+          paddingInline: 12,
         },
       },
     }}
   >
-    <Space direction="vertical">
+    <Space vertical>
       <Badge count={5}>
         <Avatar shape="square" size="large" />
       </Badge>

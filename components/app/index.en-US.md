@@ -7,7 +7,6 @@ cover: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*HJz8SZos2wgAAAAAAA
 coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*oC92TK44Ex8AAAAAAAAAAAAADrJ8AQ/original
 demo:
   cols: 2
-tag: 5.1.0
 ---
 
 ## When To Use
@@ -34,11 +33,11 @@ import { App } from 'antd';
 const MyPage: React.FC = () => {
   const { message, notification, modal } = App.useApp();
   message.success('Good!');
-  notification.info({ message: 'Good' });
+  notification.info({ title: 'Good' });
   modal.warning({ title: 'Good' });
   // ....
   // other message, notification, modal static function
-  return <div>Hello word</div>;
+  return <div>Hello world</div>;
 };
 
 const MyApp: React.FC = () => (
@@ -64,7 +63,7 @@ The App component can only use the token in the `ConfigProvider`, if you need to
 </ConfigProvider>
 ```
 
-### Embedded usage scenarios (if not necessary, try not to do nesting)
+### Embedded usage scenarios (if not necessary, try not to do nesting) {#embedded-usage-scenarios}
 
 ```tsx
 <App>
@@ -75,7 +74,7 @@ The App component can only use the token in the `ConfigProvider`, if you need to
 </App>
 ```
 
-### Global scene (redux scene)
+### Global scene (redux scene) {#global-scene-redux}
 
 ```tsx
 // Entry component
@@ -129,11 +128,11 @@ Common props ref：[Common props](/docs/react/common-props)
 
 ### App
 
-| Property | Description | Type | Default | Version |
-| --- | --- | --- | --- | --- |
-| component | Config render element, if `false` will not create DOM node | ComponentType \| false | div | 5.11.0 |
-| message | Global config for Message | [MessageConfig](/components/message/#messageconfig) | - | 5.3.0 |
-| notification | Global config for Notification | [NotificationConfig](/components/notification/#notificationconfig) | - | 5.3.0 |
+| Property | Description | Type | Default | Version | [Global Config](/components/config-provider#component-config) |
+| --- | --- | --- | --- | --- | --- |
+| component | Config render element, if `false` will not create DOM node | ComponentType \| false | div | 5.11.0 | × |
+| message | Global config for Message | [MessageConfig](/components/message/#messageconfig) | - | 5.3.0 | × |
+| notification | Global config for Notification | [NotificationConfig](/components/notification/#notificationconfig) | - | 5.3.0 | × |
 
 ## Design Token
 
@@ -141,6 +140,6 @@ Common props ref：[Common props](/docs/react/common-props)
 
 ## FAQ
 
-### CSS Var doesn't work inside `<App component={false}>`
+### CSS Var doesn't work inside `<App component={false}>` {#faq-css-var-component-false}
 
 Make sure the App `component` is a valid html tag, so when you're turning on CSS variables, there's a container to hold the CSS class name. If not set, it defaults to the `div` tag. If set to `false`, no additional DOM nodes will be created, and no default styles will be provided.

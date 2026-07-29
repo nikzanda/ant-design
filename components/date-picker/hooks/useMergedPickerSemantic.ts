@@ -1,27 +1,24 @@
 import * as React from 'react';
+import { clsx } from 'clsx';
 
-import cls from 'classnames';
-
-import useMergeSemantic from '../../_util/hooks/useMergeSemantic';
+import { useMergeSemantic } from '../../_util/hooks/useMergeSemantic';
+import type { AnyObject } from '../../_util/type';
 import { useComponentConfig } from '../../config-provider/context';
-import type {
-  PickerClassNames,
-  PickerStyles,
-  RequiredSemanticPicker,
-} from '../generatePicker/interface';
 
-const useMergedPickerSemantic = (
+const useMergedPickerSemantic = <P extends AnyObject = AnyObject>(
   pickerType: 'timePicker' | 'datePicker',
-  classNames?: PickerClassNames,
-  styles?: PickerStyles,
+  classNames?: P['classNames'],
+  styles?: P['styles'],
   popupClassName?: string,
   popupStyle?: React.CSSProperties,
+  mergedProps?: P,
 ) => {
   const { classNames: contextClassNames, styles: contextStyles } = useComponentConfig(pickerType);
 
   const [mergedClassNames, mergedStyles] = useMergeSemantic(
-    [contextClassNames as PickerClassNames, classNames as PickerClassNames],
-    [contextStyles as PickerStyles, styles as PickerStyles],
+    [contextClassNames as P['classNames'], classNames],
+    [contextStyles as P['styles'], styles],
+    { props: mergedProps as P },
     {
       popup: {
         _default: 'root',
@@ -35,24 +32,18 @@ const useMergedPickerSemantic = (
       ...mergedClassNames,
       popup: {
         ...mergedClassNames.popup,
-        root: cls(mergedClassNames.popup?.root, popupClassName),
+        root: clsx(mergedClassNames.popup?.root, popupClassName),
       },
     };
 
     // Styles
     const filledStyles = {
       ...mergedStyles,
-      popup: {
-        ...mergedStyles.popup,
-        root: {
-          ...mergedStyles.popup?.root,
-          ...popupStyle,
-        },
-      },
+      popup: { ...mergedStyles.popup, root: { ...mergedStyles.popup?.root, ...popupStyle } },
     };
 
     // Return
-    return [filledClassNames, filledStyles] as RequiredSemanticPicker;
+    return [filledClassNames, filledStyles];
   }, [mergedClassNames, mergedStyles, popupClassName, popupStyle]);
 };
 

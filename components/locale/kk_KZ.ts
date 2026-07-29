@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/kk_KZ';
+import Pagination from '@rc-component/pagination/locale/kk_KZ';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/kk_KZ';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Таңдаңыз',
     close: 'Жабу',
+    show: 'Көрсету',
+    hide: 'Жасыру',
+    sortable: 'сұрыпталатын',
   },
   Table: {
     filterTitle: 'Фильтр',
@@ -32,6 +35,9 @@ const localeValues: Locale = {
     triggerDesc: 'Төмендеуді сұрыптау үшін басыңыз',
     triggerAsc: 'Өсу ретімен сұрыптау үшін басыңыз',
     cancelSort: 'Сұрыптаудан бас тарту үшін басыңыз',
+    filterCheckAll: 'Барлық элементтерді таңдаңыз',
+    filterSearchPlaceholder: 'Сүзгілерде іздеу',
+    selectNone: 'Барлық деректерді өшіріңіз',
   },
   Tour: {
     Next: 'Келесі',
@@ -58,6 +64,7 @@ const localeValues: Locale = {
     selectInvert: 'Кері тәртіпте көрсету',
     removeAll: 'Барлық деректерді жою',
     removeCurrent: 'Ағымдағы парақты өшіру',
+    deselectAll: 'Барлық деректердің таңдауын алып тастаңыз',
   },
   Upload: {
     uploading: 'Жүктеу...',
@@ -77,8 +84,10 @@ const localeValues: Locale = {
     copy: 'Көшіру',
     copied: 'Көшірілді',
     expand: 'Жазу',
+    collapse: 'Жыйрату',
   },
   Form: {
+    optional: '(міндетті емес)',
     defaultValidateMessages: {
       default: '${label} өрісін тексеру қателігі',
       required: '${label} енгізіңіз',
@@ -114,6 +123,7 @@ const localeValues: Locale = {
         len: '${label} ${len} тең болуы керек',
         min: '${label} ${min} мәнінен үлкен немесе оған тең болуы керек',
         max: '${label} ${max} мәнінен аз немесе оған тең болуы керек',
+        range: '${label} ${min}-${max} аралығында болуы керек',
       },
       array: {
         len: '${label} элементтерінің саны ${len} тең болуы керек',
@@ -125,6 +135,17 @@ const localeValues: Locale = {
         mismatch: '${label} ${pattern} мен сәйкес келмейді',
       },
     },
+  },
+  QRCode: {
+    expired: 'QR кодының мерзімі аяқталды',
+    refresh: 'Жаңарту',
+    scanned: 'Сканерленген',
+  },
+  ColorPicker: {
+    presetEmpty: 'Бос',
+    transparent: 'Мөлдір',
+    singleColor: 'Бір түсті',
+    gradientColor: 'Градиент түсі',
   },
 };
 

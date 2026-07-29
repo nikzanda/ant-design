@@ -1,11 +1,11 @@
 import React from 'react';
 import { InfoCircleOutlined, PushpinOutlined } from '@ant-design/icons';
+import { get, set } from '@rc-component/util';
 import { Button, Col, ConfigProvider, Flex, Popover, Row, Tag, theme, Typography } from 'antd';
-import { createStyles, css } from 'antd-style';
-import classnames from 'classnames';
+import { createStaticStyles } from 'antd-style';
+import { clsx } from 'clsx';
 import Prism from 'prismjs';
-import get from 'rc-util/lib/utils/get';
-import set from 'rc-util/lib/utils/set';
+import 'prismjs/components/prism-jsx';
 
 import Markers from './Markers';
 
@@ -13,17 +13,20 @@ export interface SemanticPreviewInjectionProps {
   classNames?: Record<string, string>;
 }
 
-const useStyle = createStyles(({ token }) => ({
+const styles = createStaticStyles(({ css, cssVar }) => ({
   container: css`
     position: relative;
+    z-index: 0;
   `,
   colWrap: css`
-    border-inline-end: 1px solid ${token.colorBorderSecondary};
+    border-inline-end: 1px solid ${cssVar.colorBorderSecondary};
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: ${token.paddingMD}px;
+    padding: ${cssVar.paddingMD};
     overflow: hidden;
+    position: relative;
+    z-index: 0;
   `,
   colWrapPaddingLess: css`
     padding: 0;
@@ -34,17 +37,18 @@ const useStyle = createStyles(({ token }) => ({
     list-style: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
+    max-height: 600px;
   `,
   listItem: css`
     cursor: pointer;
-    padding: ${token.paddingSM}px;
-    transition: background-color ${token.motionDurationFast} ease;
+    padding: ${cssVar.paddingSM};
+    transition: background-color ${cssVar.motionDurationFast} ease;
     &:hover {
-      background-color: ${token.controlItemBgHover};
+      background-color: ${cssVar.controlItemBgHover};
     }
     &:not(:first-of-type) {
-      border-top: 1px solid ${token.colorBorderSecondary};
+      border-top: 1px solid ${cssVar.colorBorderSecondary};
     }
   `,
 }));
@@ -100,11 +104,10 @@ function HighlightExample(props: {
 />`.trim();
     }
 
-    return Prism.highlight(code, Prism.languages.javascript, 'jsx');
-  }, [componentName, semanticName]);
+    return Prism.highlight(code, Prism.languages.jsx || Prism.languages.javascript, 'jsx');
+  }, [componentName, itemsAPI, semanticName]);
 
   return (
-    // biome-ignore lint: lint/security/noDangerouslySetInnerHtml
     <div dangerouslySetInnerHTML={{ __html: highlightCode }} />
   );
 }
@@ -119,6 +122,8 @@ export interface SemanticPreviewProps {
   children: React.ReactElement<any>;
   height?: number;
   padding?: false;
+  style?: React.CSSProperties;
+  motion?: boolean;
 }
 
 const SemanticPreview: React.FC<SemanticPreviewProps> = (props) => {
@@ -127,8 +132,10 @@ const SemanticPreview: React.FC<SemanticPreviewProps> = (props) => {
     children,
     height,
     padding,
+    style,
     componentName = 'Component',
     itemsAPI,
+    motion = false,
   } = props;
   const { token } = theme.useToken();
 
@@ -151,8 +158,6 @@ const SemanticPreview: React.FC<SemanticPreviewProps> = (props) => {
 
   const mergedSemantic = pinSemantic || hoverSemantic;
 
-  const { styles } = useStyle();
-
   const hoveredSemanticClassNames = React.useMemo(() => {
     if (!mergedSemantic) {
       return semanticClassNames;
@@ -162,7 +167,7 @@ const SemanticPreview: React.FC<SemanticPreviewProps> = (props) => {
     const clone = set(
       semanticClassNames,
       hoverCell,
-      classnames(get(semanticClassNames, hoverCell), getMarkClassName('active')),
+      clsx(get(semanticClassNames, hoverCell), getMarkClassName('active')),
     );
 
     return clone;
@@ -174,20 +179,21 @@ const SemanticPreview: React.FC<SemanticPreviewProps> = (props) => {
   });
 
   return (
-    <div className={classnames(styles.container)} ref={containerRef}>
+    <div className={clsx(styles.container)} ref={containerRef}>
       <Row style={{ minHeight: height }}>
         <Col
           span={16}
-          className={classnames(styles.colWrap, padding === false && styles.colWrapPaddingLess)}
+          className={clsx(styles.colWrap, padding === false && styles.colWrapPaddingLess)}
+          style={style}
         >
-          <ConfigProvider theme={{ token: { motion: false } }}>{cloneNode}</ConfigProvider>
+          <ConfigProvider theme={{ token: { motion } }}>{cloneNode}</ConfigProvider>
         </Col>
         <Col span={8}>
-          <ul className={classnames(styles.listWrap)}>
+          <ul className={clsx(styles.listWrap)}>
             {semantics.map<React.ReactNode>((semantic) => (
               <li
                 key={semantic.name}
-                className={classnames(styles.listItem)}
+                className={clsx(styles.listItem)}
                 onMouseEnter={() => setHoverSemantic(semantic.name)}
                 onMouseLeave={() => setHoverSemantic(null)}
               >

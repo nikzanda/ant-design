@@ -77,3 +77,13 @@ __image_snapshots__/
 
 .env
 examples/
+.neocoder/
+.claude/*
+!.claude/skills/
+!.claude/skills/*
+.superpowers/
+docs/superpowers/
+
+# generated css
+components/style/antd.css
+.turbopack

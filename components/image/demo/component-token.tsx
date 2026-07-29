@@ -14,14 +14,16 @@ const App: React.FC = () => (
     }}
   >
     <Image.PreviewGroup
-      preview={{ countRender: (current, total) => `当前 ${current} / 总计 ${total}` }}
+      preview={{ countRender: (current, total) => `Current ${current} / Total ${total}` }}
     >
       <Image
         width={150}
+        alt="svg image"
         src="https://gw.alipayobjects.com/zos/antfincdn/aPkFc8Sj7n/method-draw-image.svg"
       />
       <Image
         width={150}
+        alt="basic image"
         src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
       />
     </Image.PreviewGroup>

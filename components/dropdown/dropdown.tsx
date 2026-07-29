@@ -1,23 +1,23 @@
 import * as React from 'react';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import RightOutlined from '@ant-design/icons/RightOutlined';
+import RcDropdown from '@rc-component/dropdown';
+import type { MenuProps as RcMenuProps } from '@rc-component/menu';
 import type { AlignType } from '@rc-component/trigger';
-import classNames from 'classnames';
-import RcDropdown from 'rc-dropdown';
-import useEvent from 'rc-util/lib/hooks/useEvent';
-import useMergedState from 'rc-util/lib/hooks/useMergedState';
-import omit from 'rc-util/lib/omit';
-import type { MenuProps as RcMenuProps } from 'rc-menu';
+import { getNodeRef, omit, useComposeRef, useControlledState, useEvent } from '@rc-component/util';
+import { clsx } from 'clsx';
 
-import { useZIndex } from '../_util/hooks/useZIndex';
-import isPrimitive from '../_util/isPrimitive';
+import { useZIndex } from '../_util/hooks';
+import { useMergeSemantic } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isPlainObject, isPrimitive } from '../_util/is';
 import type { AdjustOverflow } from '../_util/placements';
 import getPlacements from '../_util/placements';
 import genPurePanel from '../_util/PurePanel';
 import { cloneElement } from '../_util/reactNode';
 import { devUseWarning } from '../_util/warning';
 import zIndexContext from '../_util/zindexContext';
-import { ConfigContext } from '../config-provider';
+import { useComponentConfig } from '../config-provider/context';
 import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import type { MenuProps } from '../menu';
 import Menu from '../menu';
@@ -34,18 +34,43 @@ const _Placements = [
   'bottomRight',
   'top',
   'bottom',
+  'left',
+  'leftTop',
+  'leftBottom',
+  'right',
+  'rightTop',
+  'rightBottom',
 ] as const;
 
 type Placement = (typeof _Placements)[number];
-type DropdownPlacement = Exclude<Placement, 'topCenter' | 'bottomCenter'>;
 
-type OverlayFunc = () => React.ReactElement;
+type DropdownPlacement = Exclude<Placement, 'topCenter' | 'bottomCenter'>;
 
 export type DropdownArrowOptions = {
   pointAtCenter?: boolean;
 };
+export type DropdownSemanticType = {
+  classNames?: {
+    root?: string;
+    item?: string;
+    itemTitle?: string;
+    itemIcon?: string;
+    itemContent?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    item?: React.CSSProperties;
+    itemTitle?: React.CSSProperties;
+    itemIcon?: React.CSSProperties;
+    itemContent?: React.CSSProperties;
+  };
+};
+
+export type DropdownSemanticAllType = GenerateSemantic<DropdownSemanticType, DropdownProps>;
 
 export interface DropdownProps {
+  classNames?: DropdownSemanticAllType['classNamesAndFn'];
+  styles?: DropdownSemanticAllType['stylesAndFn'];
   menu?: MenuProps & { activeKey?: RcMenuProps['activeKey'] };
   autoFocus?: boolean;
   arrow?: boolean | DropdownArrowOptions;
@@ -69,7 +94,9 @@ export interface DropdownProps {
   rootClassName?: string;
   transitionName?: string;
   placement?: Placement;
+  /** @deprecated please use `classNames.root` instead.*/
   overlayClassName?: string;
+  /** @deprecated please use `styles.root` instead.*/
   overlayStyle?: React.CSSProperties;
   forceRender?: boolean;
   mouseEnterDelay?: number;
@@ -77,21 +104,15 @@ export interface DropdownProps {
   openClassName?: string;
   children?: React.ReactNode;
   autoAdjustOverflow?: boolean | AdjustOverflow;
-
-  // Deprecated
-  /** @deprecated Please use `menu` instead */
-  overlay?: React.ReactElement | OverlayFunc;
-  /** @deprecated Please use `open` instead */
-  visible?: boolean;
-  /** @deprecated Please use `onOpenChange` instead */
-  onVisibleChange?: (open: boolean) => void;
 }
 
-type CompoundedComponent = React.FC<DropdownProps> & {
+type CompoundedComponent = React.ForwardRefExoticComponent<
+  DropdownProps & React.RefAttributes<HTMLElement>
+> & {
   _InternalPanelDoNotUseOrYouWillBeFired: typeof WrapPurePanel;
 };
 
-const Dropdown: CompoundedComponent = (props) => {
+const Dropdown: CompoundedComponent = React.forwardRef<HTMLElement, DropdownProps>((props, ref) => {
   const {
     menu,
     arrow,
@@ -107,38 +128,57 @@ const Dropdown: CompoundedComponent = (props) => {
     overlayStyle,
     open,
     onOpenChange,
-    // Deprecated
-    visible,
-    onVisibleChange,
     mouseEnterDelay = 0.15,
     mouseLeaveDelay = 0.1,
     autoAdjustOverflow = true,
     placement = '',
-    overlay,
     transitionName,
-    destroyOnHidden,
+    classNames,
+    styles,
     destroyPopupOnHide,
+    destroyOnHidden,
   } = props;
 
   const {
-    getPopupContainer: getContextPopupContainer,
     getPrefixCls,
     direction,
-    dropdown,
-  } = React.useContext(ConfigContext);
+    getPopupContainer: getContextPopupContainer,
+    className: contextClassName,
+    style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
+  } = useComponentConfig('dropdown');
+
+  const mergedProps: DropdownProps = {
+    ...props,
+    mouseEnterDelay,
+    mouseLeaveDelay,
+    autoAdjustOverflow,
+  };
+  const [mergedClassNames, mergedStyles] = useMergeSemantic(
+    [contextClassNames, classNames],
+    [contextStyles, styles],
+    {
+      props: mergedProps,
+    },
+  );
+
+  const mergedRootStyles: React.CSSProperties = {
+    ...contextStyle,
+    ...overlayStyle,
+    ...mergedStyles.root,
+  };
 
   const mergedPopupRender = popupRender || dropdownRender;
 
-  // Warning for deprecated usage
+  // =================== Warning =====================
   const warning = devUseWarning('Dropdown');
-
   if (process.env.NODE_ENV !== 'production') {
     const deprecatedProps = {
-      visible: 'open',
-      onVisibleChange: 'onOpenChange',
-      overlay: 'menu',
       dropdownRender: 'popupRender',
       destroyPopupOnHide: 'destroyOnHidden',
+      overlayClassName: 'classNames.root',
+      overlayStyle: 'styles.root',
     };
 
     Object.entries(deprecatedProps).forEach(([deprecatedName, newName]) => {
@@ -160,8 +200,14 @@ const Dropdown: CompoundedComponent = (props) => {
     if (transitionName !== undefined) {
       return transitionName;
     }
-    if (placement.includes('top')) {
+    if (placement.startsWith('top')) {
       return `${rootPrefixCls}-slide-down`;
+    }
+    if (placement.startsWith('left')) {
+      return `${rootPrefixCls}-slide-right`;
+    }
+    if (placement.startsWith('right')) {
+      return `${rootPrefixCls}-slide-left`;
     }
     return `${rootPrefixCls}-slide-up`;
   }, [getPrefixCls, placement, transitionName]);
@@ -180,79 +226,88 @@ const Dropdown: CompoundedComponent = (props) => {
 
   const prefixCls = getPrefixCls('dropdown', customizePrefixCls);
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   const [, token] = useToken();
 
   const child = React.Children.only(
     isPrimitive(children) ? <span>{children}</span> : children,
-  ) as React.ReactElement<{
-    className?: string;
-    disabled?: boolean;
-  }>;
+  ) as React.ReactElement<{ className?: string; disabled?: boolean }>;
+
+  const composedRef = useComposeRef(ref, getNodeRef(child));
 
   const popupTrigger = cloneElement(child, {
-    className: classNames(
+    className: clsx(
       `${prefixCls}-trigger`,
-      {
-        [`${prefixCls}-rtl`]: direction === 'rtl',
-      },
+      { [`${prefixCls}-rtl`]: direction === 'rtl' },
       child.props.className,
     ),
     disabled: child.props.disabled ?? disabled,
+    ref: composedRef,
   });
   const triggerActions = disabled ? [] : trigger;
   const alignPoint = !!triggerActions?.includes('contextMenu');
 
   // =========================== Open ============================
-  const [mergedOpen, setOpen] = useMergedState(false, {
-    value: open ?? visible,
-  });
+  const [mergedOpen, setOpen] = useControlledState(false, open);
 
   const onInnerOpenChange = useEvent((nextOpen: boolean) => {
     onOpenChange?.(nextOpen, { source: 'trigger' });
-    onVisibleChange?.(nextOpen);
     setOpen(nextOpen);
   });
 
   // =========================== Overlay ============================
-  const overlayClassNameCustomized = classNames(
+  const overlayClassNameCustomized = clsx(
     overlayClassName,
     rootClassName,
     hashId,
     cssVarCls,
     rootCls,
-    dropdown?.className,
+    contextClassName,
+    mergedClassNames.root,
     { [`${prefixCls}-rtl`]: direction === 'rtl' },
   );
 
   const builtinPlacements = getPlacements({
-    arrowPointAtCenter: typeof arrow === 'object' && arrow.pointAtCenter,
+    arrowPointAtCenter: isPlainObject(arrow) && arrow.pointAtCenter,
     autoAdjustOverflow,
     offset: token.marginXXS,
     arrowWidth: arrow ? token.sizePopupArrow : 0,
     borderRadius: token.borderRadius,
   });
 
-  const onMenuClick = React.useCallback(() => {
+  const onMenuClick = useEvent(() => {
     if (menu?.selectable && menu?.multiple) {
       return;
     }
     onOpenChange?.(false, { source: 'menu' });
     setOpen(false);
-  }, [menu?.selectable, menu?.multiple]);
+  });
 
   const renderOverlay = () => {
-    // rc-dropdown already can process the function of overlay, but we have check logic here.
-    // So we need render the element to check and pass back to rc-dropdown.
-
+    // @rc-component/dropdown already can process the function of overlay, but we have check logic here.
+    // So we need render the element to check and pass back to @rc-component/dropdown.
+    const menuClassNames = omit(mergedClassNames, ['root']);
+    const menuStyles = omit(mergedStyles, ['root']);
     let overlayNode: React.ReactNode;
     if (menu?.items) {
-      overlayNode = <Menu {...menu} />;
-    } else if (typeof overlay === 'function') {
-      overlayNode = overlay();
-    } else {
-      overlayNode = overlay;
+      overlayNode = (
+        <Menu
+          {...menu}
+          classNames={{
+            ...menuClassNames,
+            subMenu: {
+              ...menuClassNames,
+            },
+          }}
+          styles={{
+            ...menuStyles,
+            subMenu: {
+              ...menuStyles,
+            },
+          }}
+        />
+      );
     }
     if (mergedPopupRender) {
       overlayNode = mergedPopupRender(overlayNode);
@@ -263,7 +318,7 @@ const Dropdown: CompoundedComponent = (props) => {
     return (
       <OverrideProvider
         prefixCls={`${prefixCls}-menu`}
-        rootClassName={classNames(cssVarCls, rootCls)}
+        rootClassName={clsx(cssVarCls, rootCls)}
         expandIcon={
           <span className={`${prefixCls}-menu-submenu-arrow`}>
             {direction === 'rtl' ? (
@@ -291,13 +346,13 @@ const Dropdown: CompoundedComponent = (props) => {
   };
 
   // =========================== zIndex ============================
-  const [zIndex, contextZIndex] = useZIndex('Dropdown', overlayStyle?.zIndex as number);
+  const [zIndex, contextZIndex] = useZIndex('Dropdown', mergedRootStyles.zIndex as number);
 
   // ============================ Render ============================
   let renderNode = (
     <RcDropdown
       alignPoint={alignPoint}
-      {...omit(props, ['rootClassName'])}
+      {...omit(props, ['rootClassName', 'onOpenChange'])}
       mouseEnterDelay={mouseEnterDelay}
       mouseLeaveDelay={mouseLeaveDelay}
       visible={mergedOpen}
@@ -309,9 +364,9 @@ const Dropdown: CompoundedComponent = (props) => {
       transitionName={memoTransitionName}
       trigger={triggerActions}
       overlay={renderOverlay}
-      placement={memoPlacement}
+      placement={memoPlacement as React.ComponentProps<typeof RcDropdown>['placement']}
       onVisibleChange={onInnerOpenChange}
-      overlayStyle={{ ...dropdown?.style, ...overlayStyle, zIndex }}
+      overlayStyle={{ ...mergedRootStyles, zIndex }}
       autoDestroy={destroyOnHidden ?? destroyPopupOnHide}
     >
       {popupTrigger}
@@ -324,8 +379,8 @@ const Dropdown: CompoundedComponent = (props) => {
     );
   }
 
-  return wrapCSSVar(renderNode);
-};
+  return renderNode;
+}) as CompoundedComponent;
 
 // We don't care debug panel
 const PurePanel = genPurePanel(Dropdown, 'align', undefined, 'dropdown', (prefixCls) => prefixCls);

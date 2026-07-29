@@ -29,7 +29,6 @@ dayjs.extend(customParseFormat);
 
 const { Panel } = Collapse;
 const { TreeNode } = Tree;
-const { TabPane } = Tabs;
 const { Meta } = Card;
 const { Link } = Anchor;
 const { Text } = Typography;
@@ -180,8 +179,8 @@ const nestDataSource = Array.from({ length: 3 }).map<NestDataType>((_, i) => ({
 }));
 
 const columnsFixed: TableProps<FixedDataType>['columns'] = [
-  { title: 'Full Name', width: 100, dataIndex: 'name', key: 'name', fixed: 'left' },
-  { title: 'Age', width: 100, dataIndex: 'age', key: 'age', fixed: 'left' },
+  { title: 'Full Name', width: 100, dataIndex: 'name', key: 'name', fixed: 'start' },
+  { title: 'Age', width: 100, dataIndex: 'age', key: 'age', fixed: 'start' },
   { title: 'Column 1', dataIndex: 'address', key: '1' },
   { title: 'Column 2', dataIndex: 'address', key: '2' },
   { title: 'Column 3', dataIndex: 'address', key: '3' },
@@ -190,7 +189,7 @@ const columnsFixed: TableProps<FixedDataType>['columns'] = [
   { title: 'Column 6', dataIndex: 'address', key: '6' },
   { title: 'Column 7', dataIndex: 'address', key: '7' },
   { title: 'Column 8', dataIndex: 'address', key: '8' },
-  { title: 'Action', key: 'operation', fixed: 'right', width: 100, render: () => <a>action</a> },
+  { title: 'Action', key: 'operation', fixed: 'end', width: 100, render: () => <a>action</a> },
 ];
 
 const fixedDataSource: FixedDataType[] = [
@@ -219,14 +218,15 @@ const TableTransfer: React.FC<
 
         const rowSelection: TableProps<DataType>['rowSelection'] = {
           getCheckboxProps: (item) => ({ disabled: listDisabled || item.disabled }),
-          onSelectAll(selected, selectedRows) {
+          onChange(_selectedKeys, selectedRows, info) {
             const treeSelectedKeys = selectedRows
               .filter((item) => !item.disabled)
               .map(({ key }) => key);
-            const diffKeys = selected
-              ? difference(treeSelectedKeys, listSelectedKeys)
-              : difference(listSelectedKeys, treeSelectedKeys);
-            onItemSelectAll(diffKeys, selected);
+            const diffKeys =
+              info.type === 'all'
+                ? difference(treeSelectedKeys, listSelectedKeys)
+                : difference(listSelectedKeys, treeSelectedKeys);
+            onItemSelectAll(diffKeys, info.type === 'all');
           },
           onSelect({ key }, selected) {
             onItemSelect(key, selected);
@@ -339,13 +339,11 @@ const Demo: React.FC = () => {
     setOpen(true);
   };
 
-  const handleOk = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    console.log(e);
+  const handleOk = () => {
     setOpen(false);
   };
 
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    console.log(e);
+  const handleCancel = () => {
     setOpen(false);
   };
 
@@ -431,17 +429,14 @@ const Demo: React.FC = () => {
             <Link href="#Link-Props" title="Link Props" />
           </Link>
         </Anchor>
-        <Tabs type="card">
-          <TabPane tab="Tab 1" key="1">
-            Content of Tab Pane 1
-          </TabPane>
-          <TabPane tab="Tab 2" key="2">
-            Content of Tab Pane 2
-          </TabPane>
-          <TabPane tab="Tab 3" key="3">
-            Content of Tab Pane 3
-          </TabPane>
-        </Tabs>
+        <Tabs
+          type="card"
+          items={[
+            { key: '1', label: 'Tab 1', children: 'Content of Tab Pane 1' },
+            { key: '2', label: 'Tab 2', children: 'Content of Tab Pane 2' },
+            { key: '3', label: 'Tab 3', children: 'Content of Tab Pane 3' },
+          ]}
+        />
         <Timeline>
           <Timeline.Item>Create a services site 2015-09-01</Timeline.Item>
           <Timeline.Item>Solve initial network problems 2015-09-01</Timeline.Item>

@@ -81,7 +81,7 @@ interface ListToken extends FullToken<'List'> {
   minHeight: number | string;
 }
 
-const genBorderedStyle = (token: ListToken): CSSObject => {
+const genBorderedStyle: GenerateStyle<ListToken, CSSObject> = (token) => {
   const {
     listBorderedCls,
     componentCls,
@@ -92,10 +92,21 @@ const genBorderedStyle = (token: ListToken): CSSObject => {
     marginLG,
     borderRadiusLG,
   } = token;
+
+  const innerCornerBorderRadius = unit(token.calc(borderRadiusLG).sub(token.lineWidth).equal());
+
   return {
     [listBorderedCls]: {
       border: `${unit(token.lineWidth)} ${token.lineType} ${token.colorBorder}`,
       borderRadius: borderRadiusLG,
+      [`${componentCls}-header`]: {
+        borderRadius: `${innerCornerBorderRadius} ${innerCornerBorderRadius} 0 0`,
+      },
+
+      [`${componentCls}-footer`]: {
+        borderRadius: `0 0 ${innerCornerBorderRadius} ${innerCornerBorderRadius}`,
+      },
+
       [`${componentCls}-header,${componentCls}-footer,${componentCls}-item`]: {
         paddingInline: paddingLG,
       },
@@ -117,7 +128,7 @@ const genBorderedStyle = (token: ListToken): CSSObject => {
     },
   };
 };
-const genResponsiveStyle = (token: ListToken): CSSObject => {
+const genResponsiveStyle: GenerateStyle<ListToken, CSSObject> = (token) => {
   const { componentCls, screenSM, screenMD, marginLG, marginSM, margin } = token;
   return {
     [`@media screen and (max-width:${screenMD}px)`]: {
@@ -167,7 +178,7 @@ const genResponsiveStyle = (token: ListToken): CSSObject => {
 };
 
 // =============================== Base ===============================
-const genBaseStyle: GenerateStyle<ListToken> = (token) => {
+const genBaseStyle: GenerateStyle<ListToken, CSSObject> = (token) => {
   const {
     componentCls,
     antCls,
@@ -443,4 +454,7 @@ export default genStyleHooks(
     return [genBaseStyle(listToken), genBorderedStyle(listToken), genResponsiveStyle(listToken)];
   },
   prepareComponentToken,
+  {
+    extraCssVarPrefixCls: ({ prefixCls }) => [`${prefixCls}-container`],
+  },
 );

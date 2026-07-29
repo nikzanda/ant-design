@@ -6,13 +6,19 @@ subtitle: 列表
 description: 最基础的列表展示，可承载文字、列表、图片、段落。
 cover: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*EYuhSpw1iSwAAAAAAAAAAAAADrJ8AQ/original
 coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*tBzwQ7raKX8AAAAAAAAAAAAADrJ8AQ/original
+tag: DEPRECATED
 ---
 
 ## 何时使用 {#when-to-use}
 
 最基础的列表展示，可承载文字、列表、图片、段落，常用于后台数据展示页面。
 
-## 代码演示
+<!-- prettier-ignore -->
+:::warning{title=废弃提示}
+List 组件已经进入废弃阶段，将于下个 major 版本移除。
+:::
+
+## 代码演示 {#examples}
 
 <!-- prettier-ignore -->
 <code src="./demo/simple.tsx">简单列表</code>
@@ -24,8 +30,13 @@ coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*tBzwQ7raKX8AAA
 <code src="./demo/grid-test.tsx" debug>测试栅格列表</code>
 <code src="./demo/responsive.tsx">响应式的栅格列表</code>
 <code src="./demo/infinite-load.tsx">滚动加载</code>
+<code src="./demo/drag-sorting.tsx">拖拽排序</code>
+<code src="./demo/drag-sorting-handler.tsx">拖拽排序（拖拽手柄）</code>
+<code src="./demo/grid-drag-sorting.tsx">栅格拖拽排序</code>
+<code src="./demo/grid-drag-sorting-handler.tsx">栅格拖拽排序（拖拽手柄）</code>
 <code src="./demo/virtual-list.tsx">滚动加载无限长列表</code>
 <code src="./demo/component-token.tsx" debug>自定义组件 token</code>
+<code src="./demo/spin-debug.tsx" debug>Spin 加载状态调试</code>
 
 ## API
 
@@ -35,22 +46,22 @@ coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*tBzwQ7raKX8AAA
 
 ### List
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| bordered | 是否展示边框 | boolean | false |  |
-| dataSource | 列表数据源 | any\[] | - |  |
-| footer | 列表底部 | ReactNode | - |  |
-| grid | 列表栅格配置 | [object](#list-grid-props) | - |  |
-| header | 列表头部 | ReactNode | - |  |
-| itemLayout | 设置 `List.Item` 布局，设置成 `vertical` 则竖直样式显示，默认横排 | string | - |  |
-| loading | 当卡片内容还在加载中时，可以用 `loading` 展示一个占位 | boolean \| [object](/components/spin-cn#api) ([更多](https://github.com/ant-design/ant-design/issues/8659)) | false |  |
-| loadMore | 加载更多 | ReactNode | - |  |
-| locale | 默认文案设置，目前包括空数据文案 | object | {emptyText: `暂无数据`} |  |
-| pagination | 对应的 `pagination` 配置，设置 false 不显示 | boolean \| object | false |  |
-| renderItem | 当使用 dataSource 时，可以用 `renderItem` 自定义渲染列表项 | (item: T, index: number) => ReactNode | - |  |
-| rowKey | 当 `renderItem` 自定义渲染列表项有效时，自定义每一行的 `key` 的获取方式 | `keyof` T \| (item: T) => `React.Key` | `"key"` |  |
-| size | list 的尺寸 | `default` \| `large` \| `small` | `default` |  |
-| split | 是否展示分割线 | boolean | true |  |
+| 参数 | 说明 | 类型 | 默认值 | 版本 | [全局配置](/components/config-provider-cn#component-config) |
+| --- | --- | --- | --- | --- | --- |
+| bordered | 是否展示边框 | boolean | false |  | × |
+| dataSource | 列表数据源 | any\[] | - |  | × |
+| footer | 列表底部 | ReactNode | - |  | × |
+| grid | 列表栅格配置 | [object](#list-grid-props) | - |  | × |
+| header | 列表头部 | ReactNode | - |  | × |
+| itemLayout | 设置 `List.Item` 布局，设置成 `vertical` 则竖直样式显示，默认横排 | string | - |  | × |
+| loading | 当卡片内容还在加载中时，可以用 `loading` 展示一个占位 | boolean \| [object](/components/spin-cn#api) ([更多](https://github.com/ant-design/ant-design/issues/8659)) | false |  | × |
+| loadMore | 加载更多 | ReactNode | - |  | × |
+| locale | 默认文案设置，目前包括空数据文案 | object | {emptyText: `暂无数据`} |  | × |
+| pagination | 对应的 `pagination` 配置，设置 false 不显示 | boolean \| object | false |  | × |
+| renderItem | 当使用 dataSource 时，可以用 `renderItem` 自定义渲染列表项 | (item: T, index: number) => ReactNode | - |  | × |
+| rowKey | 当 `renderItem` 自定义渲染列表项有效时，自定义每一行的 `key` 的获取方式 | `keyof` T \| (item: T) => `React.Key` | `"key"` |  | × |
+| size | list 的尺寸 | `default` \| `large` \| `small` | `default` |  | × |
+| split | 是否展示分割线 | boolean | true |  | × |
 
 ### pagination
 
@@ -65,25 +76,26 @@ coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*tBzwQ7raKX8AAA
 
 ### List grid props
 
-| 参数   | 说明                 | 类型   | 默认值 | 版本 |
-| ------ | -------------------- | ------ | ------ | ---- |
-| column | 列数                 | number | -      |      |
-| gutter | 栅格间隔             | number | 0      |      |
-| xs     | `<576px` 展示的列数  | number | -      |      |
-| sm     | `≥576px` 展示的列数  | number | -      |      |
-| md     | `≥768px` 展示的列数  | number | -      |      |
-| lg     | `≥992px` 展示的列数  | number | -      |      |
-| xl     | `≥1200px` 展示的列数 | number | -      |      |
-| xxl    | `≥1600px` 展示的列数 | number | -      |      |
+| 参数   | 说明                 | 类型   | 默认值 | 版本  |
+| ------ | -------------------- | ------ | ------ | ----- |
+| column | 列数                 | number | -      |       |
+| gutter | 栅格间隔             | number | 0      |       |
+| xs     | `<576px` 展示的列数  | number | -      |       |
+| sm     | `≥576px` 展示的列数  | number | -      |       |
+| md     | `≥768px` 展示的列数  | number | -      |       |
+| lg     | `≥992px` 展示的列数  | number | -      |       |
+| xl     | `≥1200px` 展示的列数 | number | -      |       |
+| xxl    | `≥1600px` 展示的列数 | number | -      |       |
+| xxxl   | `≥1920px` 展示的列数 | number | -      | 6.3.0 |
 
 ### List.Item
 
-| 参数 | 说明 | 类型 | 默认值 | 版本 |
-| --- | --- | --- | --- | --- |
-| actions | 列表操作组，根据 `itemLayout` 的不同，位置在卡片底部或者最右侧 | Array&lt;ReactNode> | - |  |
-| classNames | 语义化结构 className | [`Record<actions \| extra, string>`](#semantic-dom) | - | 5.18.0 |
-| extra | 额外内容，通常用在 `itemLayout` 为 `vertical` 的情况下，展示右侧内容; `horizontal` 展示在列表元素最右侧 | ReactNode | - |  |
-| styles | 语义化结构 style | [`Record<actions \| extra, CSSProperties>`](#semantic-dom) | - | 5.18.0 |
+| 参数 | 说明 | 类型 | 默认值 | 版本 | [全局配置](/components/config-provider-cn#component-config) |
+| --- | --- | --- | --- | --- | --- |
+| actions | 列表操作组，根据 `itemLayout` 的不同，位置在卡片底部或者最右侧 | Array&lt;ReactNode> | - |  | × |
+| classNames | 语义化结构 className | [`Record<actions \| extra, string>`](#semantic-dom) | - | 5.18.0 | 5.18.0 |
+| extra | 额外内容，通常用在 `itemLayout` 为 `vertical` 的情况下，展示右侧内容; `horizontal` 展示在列表元素最右侧 | ReactNode | - |  | × |
+| styles | 语义化结构 style | [`Record<actions \| extra, CSSProperties>`](#semantic-dom) | - | 5.18.0 | 5.18.0 |
 
 ### List.Item.Meta
 
@@ -97,6 +109,23 @@ coverDark: https://mdn.alipayobjects.com/huamei_7uahnr/afts/img/A*tBzwQ7raKX8AAA
 
 <code src="./demo/_semantic.tsx" simplify="true"></code>
 
-## 主题变量（Design Token）
+## 主题变量（Design Token）{#design-token}
 
 <ComponentTokenTable component="List"></ComponentTokenTable>
+
+## FAQ {#faq}
+
+### List 组件废弃后，有替代方案吗？ {#faq-listy-replacement}
+
+在 Ant Design v6 中，我们将推出一个全新的 Listy 组件作为 List 的继任者。
+
+Listy 内置虚拟滚动能力，并更加强调灵活的布局控制，旨在帮助开发者根据不同业务场景更高效地实现自定义列表。
+
+目前，底层实现 rc-listy 已基本开发完成，正在等待核心维护者的评审与后续调整。
+
+Ant Design v6 将基于 rc-listy 正式提供 Listy 组件。
+
+相关链接：
+
+- Pull Request: [PR #54182](https://github.com/ant-design/ant-design/pull/54182)
+- RFC 讨论: [Discussion #54458](https://github.com/ant-design/ant-design/discussions/54458)

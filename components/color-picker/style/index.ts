@@ -76,7 +76,7 @@ export const genActiveStyle = (
   outline: 0,
 });
 
-const genRtlStyle = (token: ColorPickerToken): CSSObject => {
+const genRtlStyle: GenerateStyle<ColorPickerToken, CSSObject> = (token) => {
   const { componentCls } = token;
   return {
     '&-rtl': {
@@ -99,14 +99,15 @@ const genClearStyle = (
   size: number,
   extraStyle?: CSSObject,
 ): CSSObject => {
-  const { componentCls, borderRadiusSM, lineWidth, colorSplit, colorBorder, red6 } = token;
+  const { componentCls, borderRadiusSM, lineWidth, lineType, colorSplit, colorBorder, red6 } =
+    token;
 
   return {
     [`${componentCls}-clear`]: {
       width: size,
       height: size,
       borderRadius: borderRadiusSM,
-      border: `${unit(lineWidth)} solid ${colorSplit}`,
+      border: `${unit(lineWidth)} ${lineType} ${colorSplit}`,
       position: 'relative',
       overflow: 'hidden',
       cursor: 'inherit',
@@ -133,7 +134,7 @@ const genClearStyle = (
   };
 };
 
-const genStatusStyle = (token: ColorPickerToken): CSSObject => {
+const genStatusStyle: GenerateStyle<ColorPickerToken, CSSObject> = (token) => {
   const {
     componentCls,
     colorError,
@@ -164,7 +165,7 @@ const genStatusStyle = (token: ColorPickerToken): CSSObject => {
     },
   };
 };
-const genSizeStyle = (token: ColorPickerToken): CSSObject => {
+const genSizeStyle: GenerateStyle<ColorPickerToken, CSSObject> = (token) => {
   const {
     componentCls,
     controlHeightLG,
@@ -228,6 +229,7 @@ const genColorPickerStyle: GenerateStyle<ColorPickerToken> = (token) => {
     colorPickerPresetColorSize,
     colorPickerPreviewSize,
     lineWidth,
+    lineType,
     colorBorder,
     paddingXXS,
     fontSize,
@@ -272,7 +274,7 @@ const genColorPickerStyle: GenerateStyle<ColorPickerToken> = (token) => {
           minWidth: controlHeight,
           minHeight: controlHeight,
           borderRadius,
-          border: `${unit(lineWidth)} solid ${colorBorder}`,
+          border: `${unit(lineWidth)} ${lineType} ${colorBorder}`,
           cursor: 'pointer',
           display: 'inline-flex',
           alignItems: 'flex-start',

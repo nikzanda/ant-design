@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/uk_UA';
+import Pagination from '@rc-component/pagination/locale/uk_UA';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/uk_UA';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Будь ласка, оберіть',
     close: 'Закрити',
+    show: 'Показати',
+    hide: 'Приховати',
+    sortable: 'сортувальний',
   },
   Table: {
     filterTitle: 'Фільтрувати',
@@ -81,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Скопіювати',
     copied: 'Скопійовано',
     expand: 'Розширити',
+    collapse: 'Згорнути',
   },
   Form: {
     optional: '(опціонально)',
@@ -132,12 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Попередній перегляд',
-  },
   QRCode: {
     expired: 'QR-код закінчився',
     refresh: 'Оновити',
+    scanned: 'Відскановані',
+  },
+  ColorPicker: {
+    presetEmpty: 'Порожній',
+    transparent: 'Прозорий',
+    singleColor: 'Одноколірний',
+    gradientColor: 'Градієнтний колір',
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 
 import type { InternalPanelProps, PanelProps } from './interface';
 
@@ -7,11 +7,23 @@ export const InternalPanel = forwardRef<
   HTMLDivElement,
   React.PropsWithChildren<InternalPanelProps>
 >((props, ref) => {
-  const { prefixCls, className, children, size, style = {} } = props;
-  const panelClassName = classNames(
+  const {
+    prefixCls,
+    className,
+    children,
+    destroyOnHidden = false,
+    size,
+    style,
+    supportMotion,
+  } = props;
+
+  const isCollapsed = size === 0 || (typeof size === 'string' && Number.parseFloat(size) === 0);
+
+  const panelClassName = clsx(
     `${prefixCls}-panel`,
     {
-      [`${prefixCls}-panel-hidden`]: size === 0,
+      [`${prefixCls}-panel-hidden`]: isCollapsed,
+      [`${prefixCls}-panel-transition`]: supportMotion,
     },
     className,
   );
@@ -29,7 +41,7 @@ export const InternalPanel = forwardRef<
         flexGrow: hasSize ? 0 : 1,
       }}
     >
-      {children}
+      {!(destroyOnHidden && isCollapsed) && children}
     </div>
   );
 });

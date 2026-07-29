@@ -53,13 +53,13 @@ Some components use dynamic style to support wave effect. You can config `csp` p
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
 | componentDisabled | Config antd component `disabled` | boolean | - | 4.21.0 |
-| componentSize | Config antd component size | `small` \| `middle` \| `large` | - |  |
+| componentSize | Config antd component size | `small` \| `medium` \| `large` | - |  |
 | csp | Set [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) config | { nonce: string } | - |  |
 | direction | Set direction of layout. See [demo](#config-provider-demo-direction) | `ltr` \| `rtl` | `ltr` |  |
-| getPopupContainer | To set the container of the popup element. The default is to create a `div` element in `body` | function(triggerNode) | () => document.body |  |
-| getTargetContainer | Config Affix, Anchor scroll target container | () => HTMLElement | () => window | 4.2.0 |
+| getPopupContainer | To set the container of the popup element. The default is to create a `div` element in `body` | `(trigger?: HTMLElement) => HTMLElement \| ShadowRoot` | () => document.body |  |
+| getTargetContainer | Config Affix, Anchor scroll target container | `() => HTMLElement \| Window \| ShadowRoot` | () => window | 4.2.0 |
 | iconPrefixCls | Set icon prefix className | string | `anticon` | 4.11.0 |
-| locale | Language package setting, you can find the packages in [antd/locale](http://unpkg.com/antd/locale/) | object | - |  |
+| locale | Language package setting, you can find the packages in [antd/locale](https://unpkg.com/antd/locale/) | object | - |  |
 | popupMatchSelectWidth | Determine whether the dropdown menu and the select input are the same width. Default set `min-width` same as input. Will ignore when value less than select width. `false` will disable virtual scroll | boolean \| number | - | 5.5.0 |
 | popupOverflow | Select like component popup logic. Can set to show in viewport or follow window scroll | 'viewport' \| 'scroll' <InlinePopover previewURL="https://user-images.githubusercontent.com/5378891/230344474-5b9f7e09-0a5d-49e8-bae8-7d2abed6c837.png"></InlinePopover> | 'viewport' | 5.5.0 |
 | prefixCls | Set prefix className | string | `ant` |  |
@@ -68,10 +68,12 @@ Some components use dynamic style to support wave effect. You can config `csp` p
 | variant | Set variant of data entry components | `outlined` \| `filled` \| `borderless` | - | 5.19.0 |
 | virtual | Disable virtual scroll when set to `false` | boolean | - | 4.3.0 |
 | warning | Config warning level, when `strict` is `false`, it will aggregate deprecated information into a single message | { strict: boolean } | - | 5.10.0 |
+| ~~autoInsertSpaceInButton~~ | Button auto spacing config, please use `button={{ autoInsertSpace: boolean }}` instead | boolean | - | - |
+| ~~dropdownMatchSelectWidth~~ | Determine whether the dropdown menu and the select input are the same width, please use `popupMatchSelectWidth` instead | boolean | - | - |
 
 ### ConfigProvider.config() {#config}
 
-Setting `Modal`, `Message`, `Notification` static config. Not work on hooks.
+Setting `Modal`, `Message`, `Notification` static config. Does not work on hooks.
 
 ```tsx
 ConfigProvider.config({
@@ -102,82 +104,102 @@ const {
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
 | componentDisabled | antd component disabled state | boolean | - | 5.3.0 |
-| componentSize | antd component size state | `small` \| `middle` \| `large` | - | 5.3.0 |
+| componentSize | antd component size state | `small` \| `medium` \| `large` | - | 5.3.0 |
 
 ### Component Config
 
+The following config keys set common props for corresponding components or global effects. See the related APIs for details:
+
+- `affix`: [Affix](/components/affix#api) (supported since 6.0.0)
+- `alert`: [Alert](/components/alert#api) (supported since 5.7.0)
+- `anchor`: [Anchor](/components/anchor#api) (supported since 6.0.0)
+- `app`: [App](/components/app#api) (supported since 6.3.0)
+- `avatar`: [Avatar](/components/avatar#api) (supported since 5.7.0)
+- `badge`: [Badge](/components/badge#api) (supported since 5.7.0)
+- `borderBeam`: [BorderBeam](/components/border-beam#api) (supported since 6.4.0)
+- `breadcrumb`: [Breadcrumb](/components/breadcrumb#api) (supported since 5.7.0)
+- `button`: [Button](/components/button#api) (supported since 5.6.0)
+- `card`: [Card](/components/card#api) (supported since 5.14.0)
+- `cardMeta`: [Card.Meta](/components/card#cardmeta) (supported since 6.0.0)
+- `calendar`: [Calendar](/components/calendar#api) (supported since 6.0.0)
+- `carousel`: [Carousel](/components/carousel#api) (supported since 5.7.0)
+- `cascader`: [Cascader](/components/cascader#api) (supported since 5.13.0)
+- `checkbox`: [Checkbox](/components/checkbox#api) (supported since 6.0.0)
+- `collapse`: [Collapse](/components/collapse#api) (supported since 5.15.0)
+- `colorPicker`: [ColorPicker](/components/color-picker#api) (supported since 6.3.0)
+- `datePicker`: [DatePicker](/components/date-picker#api) (supported since 5.7.0)
+- `rangePicker`: [RangePicker](/components/date-picker#rangepicker) (supported since 5.11.0)
+- `descriptions`: [Descriptions](/components/descriptions#api) (supported since 5.23.0)
+- `divider`: [Divider](/components/divider#api) (supported since 5.10.0)
+- `drawer`: [Drawer](/components/drawer#api) (supported since 5.10.0)
+- `dropdown`: [Dropdown](/components/dropdown#api) (supported since 5.11.0)
+- `empty`: [Empty](/components/empty#api) (supported since 5.23.0)
+- `flex`: [Flex](/components/flex#api) (supported since 5.10.0)
+- `floatButton`: [FloatButton](/components/float-button#api) (supported since 6.0.0)
+- `floatButtonGroup`: [FloatButton.Group](/components/float-button#floatbuttongroup) (supported since 5.16.0)
+- `form`: [Form](/components/form#api) (supported since 4.8.0)
+- `image`: [Image](/components/image#api) (supported since 5.14.0)
+- `input`: [Input](/components/input#input) (supported since 4.2.0)
+- `inputNumber`: [InputNumber](/components/input-number#api) (supported since 5.19.0)
+- `otp`: [Input.OTP](/components/input#inputotp) (supported since 6.0.0)
+- `inputPassword`: [Input.Password](/components/input#inputpassword) (supported since 6.4.0)
+- `inputSearch`: [Input.Search](/components/input#inputsearch) (supported since 6.4.0)
+- `textArea`: [Input.TextArea](/components/input#inputtextarea) (supported since 5.15.0)
+- `layout`: [Layout](/components/layout#api) (supported since 5.7.0)
+- `list`: [List](/components/list#api) (supported since 5.7.0)
+- `masonry`: [Masonry](/components/masonry#api) (supported since 6.0.0)
+- `menu`: [Menu](/components/menu#api) (supported since 5.15.0)
+- `mentions`: [Mentions](/components/mentions#api) (supported since 5.13.0)
+- `message`: [Message](/components/message#api) (supported since 5.7.0)
+- `modal`: [Modal](/components/modal#api) (supported since 5.10.0)
+- `notification`: [Notification](/components/notification#api) (supported since 5.14.0)
+- `pagination`: [Pagination](/components/pagination#api) (supported since 6.0.0)
+- `progress`: [Progress](/components/progress#api) (supported since 5.7.0)
+- `radio`: [Radio](/components/radio#api) (supported since 6.0.0)
+- `rate`: [Rate](/components/rate#api) (supported since 5.7.0)
+- `result`: [Result](/components/result#api) (supported since 6.0.0)
+- `ribbon`: [Badge.Ribbon](/components/badge#badgeribbon) (supported since 6.0.0)
+- `skeleton`: [Skeleton](/components/skeleton#api) (supported since 6.0.0)
+- `segmented`: [Segmented](/components/segmented#api) (supported since 6.0.0)
+- `select`: [Select](/components/select#api) (supported since 5.13.0)
+- `slider`: [Slider](/components/slider#api) (supported since 5.23.0)
+- `switch`: [Switch](/components/switch#api) (supported since 6.0.0)
+- `space`: [Space](/components/space#api) (supported since 5.6.0)
+- `splitter`: [Splitter](/components/splitter#api) (supported since 5.21.0)
+- `spin`: [Spin](/components/spin#api) (supported since 5.20.0)
+- `statistic`: [Statistic](/components/statistic#api) (supported since 6.0.0)
+- `steps`: [Steps](/components/steps#api) (supported since 5.10.0)
+- `table`: [Table](/components/table#api) (supported since 6.2.0)
+- `tabs`: [Tabs](/components/tabs#api) (supported since 5.14.0)
+- `tag`: [Tag](/components/tag#api) (supported since 5.14.0)
+- `timeline`: [Timeline](/components/timeline#api) (supported since 6.0.0)
+- `timePicker`: [TimePicker](/components/time-picker#api) (supported since 5.13.0)
+- `tour`: [Tour](/components/tour#api) (supported since 5.14.0)
+- `tooltip`: [Tooltip](/components/tooltip#api) (supported since 6.1.0)
+- `popover`: [Popover](/components/popover#api) (supported since 5.23.0)
+- `popconfirm`: [Popconfirm](/components/popconfirm#api) (supported since 5.23.0)
+- `qrcode`: [QRCode](/components/qr-code#api) (supported since 6.0.0)
+- `transfer`: [Transfer](/components/transfer#api) (supported since 5.7.0)
+- `tree`: [Tree](/components/tree#api) (supported since 6.0.0)
+- `treeSelect`: [TreeSelect](/components/tree-select#api) (supported since 5.19.0)
+- `typography`: [Typography](/components/typography#api) (supported since 6.4.0)
+- `upload`: [Upload](/components/upload#api) (supported since 5.27.0)
+- `watermark`: [Watermark](/components/watermark#api) (supported since 6.0.0)
+- `wave`: [WaveConfig](#waveconfig) (supported since 5.8.0)
+
+### WaveConfig
+
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
-| alert | Set Alert common props | { className?: string, style?: React.CSSProperties, closeIcon?: React.ReactNode } | - | 5.7.0, `closeIcon`: 5.14.0 |
-| anchor | Set Anchor common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| avatar | Set Avatar common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| badge | Set Badge common props | { className?: string, style?: React.CSSProperties, classNames?: [BadgeProps\["classNames"\]](/components/badge#api), styles?: [BadgeProps\["styles"\]](/components/badge#api) } | - | 5.7.0 |
-| breadcrumb | Set Breadcrumb common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| button | Set Button common props | { className?: string, style?: React.CSSProperties, classNames?: [ButtonProps\["classNames"\]](/components/button#api), styles?: [ButtonProps\["styles"\]](/components/button#api), autoInsertSpace?: boolean, variant?: ButtonVariantType, color?: ButtonColorType, shape?: [ButtonProps\["shape"\]](/components/button#api) } | - | 5.6.0, `autoInsertSpace`: 5.17.0, `variant` and `color`: 5.25.0, `shape`: 5.27.0 |
-| card | Set Card common props | { className?: string, style?: React.CSSProperties, classNames?: [CardProps\["classNames"\]](/components/card#api), styles?: [CardProps\["styles"\]](/components/card#api) } | - | 5.7.0, `classNames` and `styles`: 5.14.0 |
-| calendar | Set Calendar common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| carousel | Set Carousel common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| cascader | Set Cascader common props | { className?: string, style?: React.CSSProperties, classNames?: [CascaderProps\["classNames"\]](/components/cascader#semantic-dom), styles?: [CascaderProps\["styles"\]](/components/cascader#semantic-dom) } | - | 5.7.0, `classNames` and `styles`: 5.25.0 |
-| checkbox | Set Checkbox common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| collapse | Set Collapse common props | { className?: string, style?: React.CSSProperties, expandIcon?: (props) => ReactNode } | - | 5.7.0, `expandIcon`: 5.15.0 |
-| colorPicker | Set ColorPicker common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| datePicker | Set datePicker common props | { className?: string, style?: React.CSSProperties, classNames?: [DatePickerConfig\["classNames"\]](/components/date-picker#semantic-dom), styles?: [DatePickerConfig\["styles"\]](/components/date-picker#semantic-dom) } | - | 5.7.0, `classNames` and `styles`: 5.25.0 |
-| rangePicker | Set rangePicker common props | { className?: string, style?: React.CSSProperties } | - | 5.11.0 |
-| descriptions | Set Descriptions common props | { className?: string, style?: React.CSSProperties, classNames?: [DescriptionsProps\["classNames"\]](/components/descriptions#api), styles?: [DescriptionsProps\["styles"\]](/components/descriptions#api) } | - | 5.7.0, `classNames` and `styles`: 5.23.0 |
-| divider | Set Divider common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| drawer | Set Drawer common props | { className?: string, style?: React.CSSProperties, classNames?: [DrawerProps\["classNames"\]](/components/drawer#api), styles?: [DrawerProps\["styles"\]](/components/drawer#api), closeIcon?: ReactNode } | - | 5.7.0, `classNames` and `styles`: 5.10.0, `closeIcon`: 5.14.0 |
-| dropdown | Set Dropdown common props | { className?: string, style?: React.CSSProperties } | - | 5.11.0 |
-| empty | Set Empty common props | { className?: string, style?: React.CSSProperties, classNames?: [EmptyProps\["classNames"\]](/components/empty#api), styles?: [EmptyProps\["styles"\]](/components/empty#api), image?: ReactNode } | - | 5.7.0, `classNames` and `styles`: 5.23.0, `image`: 5.27.0 |
-| flex | Set Flex common props | { className?: string, style?: React.CSSProperties, vertical?: boolean } | - | 5.10.0 |
-| floatButton | Set FloatButton common props | { backTopIcon?: React.ReactNode } | - | 5.27.0 |
-| floatButtonGroup | Set FloatButton.Group common props | { closeIcon?: React.ReactNode } | - | 5.16.0 |
-| form | Set Form common props | { className?: string, style?: React.CSSProperties, validateMessages?: [ValidateMessages](/components/form/#validatemessages), requiredMark?: boolean \| `optional`, scrollToFirstError?: boolean \| [Options](https://github.com/stipsan/scroll-into-view-if-needed/tree/ece40bd9143f48caf4b99503425ecb16b0ad8249#options) } | - | `requiredMark`: 4.8.0; `colon`: 4.18.0; `scrollToFirstError`: 5.2.0; `className` and `style`: 5.7.0 |
-| image | Set Image common props | { className?: string, style?: React.CSSProperties, preview?: { closeIcon?: React.ReactNode } } | - | 5.7.0, `closeIcon`: 5.14.0 |
-| input | Set Input common props | { autoComplete?: string, className?: string, style?: React.CSSProperties, allowClear?: boolean \| { clearIcon?: ReactNode } } | - | 4.2.0, `allowClear`: 5.15.0 |
-| textArea | Set TextArea common props | { autoComplete?: string, className?: string, style?: React.CSSProperties, allowClear?: boolean \| { clearIcon?: ReactNode } } | - | 5.15.0 |
-| layout | Set Layout common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| list | Set List common props | { className?: string, style?: React.CSSProperties, item?:{ classNames: [ListItemProps\["classNames"\]](/components/list#listitem), styles: [ListItemProps\["styles"\]](/components/list#listitem) } } | - | 5.7.0 |
-| menu | Set Menu common props | { className?: string, style?: React.CSSProperties, expandIcon?: ReactNode \| props => ReactNode } | - | 5.7.0, `expandIcon`: 5.15.0 |
-| mentions | Set Mentions common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| message | Set Message common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| modal | Set Modal common props | { className?: string, style?: React.CSSProperties, classNames?: [ModalProps\["classNames"\]](/components/modal#api), styles?: [ModalProps\["styles"\]](/components/modal#api), closeIcon?: React.ReactNode } | - | 5.7.0, `classNames` and `styles`: 5.10.0, `closeIcon`: 5.14.0 |
-| notification | Set Notification common props | { className?: string, style?: React.CSSProperties, closeIcon?: React.ReactNode } | - | 5.7.0, `closeIcon`: 5.14.0 |
-| pagination | Set Pagination common props | { showSizeChanger?: boolean, className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| progress | Set Progress common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| radio | Set Radio common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| rate | Set Rate common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| result | Set Result common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| skeleton | Set Skeleton common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| segmented | Set Segmented common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| select | Set Select common props | { className?: string, showSearch?: boolean, style?: React.CSSProperties, classNames?: [SelectProps\["classNames"\]](/components/select#api), styles?: [SelectProps\["styles"\]](/components/select#api) } | - | 5.7.0, `classNames` and `styles`: 5.25.0 |
-| slider | Set Slider common props | { className?: string, style?: React.CSSProperties, classNames?: [SliderProps\["classNames"\]](/components/slider#api), styles?: [SliderProps\["styles"\]](/components/slider#api) } | - | 5.7.0, `classNames` and `styles`: 5.23.0 |
-| switch | Set Switch common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| space | Set Space common props, ref [Space](/components/space) | { size: `small` \| `middle` \| `large` \| `number`, className?: string, style?: React.CSSProperties, classNames?: [SpaceProps\["classNames"\]](/components/space#api), styles?: [SpaceProps\["styles"\]](/components/space#api) } | - | 5.6.0 |
-| splitter | Set Splitter common props | { className?: string, style?: React.CSSProperties } | - | 5.21.0 |
-| spin | Set Spin common props | { className?: string, style?: React.CSSProperties, indicator?: React.ReactElement } | - | 5.7.0, `indicator`: 5.20.0 |
-| statistic | Set Statistic common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| steps | Set Steps common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| table | Set Table common props | { className?: string, style?: React.CSSProperties, expandable?: { expandIcon?: props => React.ReactNode } } | - | 5.7.0, `expandable`: 5.14.0 |
-| tabs | Set Tabs common props | { className?: string, style?: React.CSSProperties, indicator?: { size?: GetIndicatorSize, align?: `start` \| `center` \| `end` }, moreIcon?: ReactNode, addIcon?: ReactNode, removeIcon?: ReactNode } | - | 5.7.0, `moreIcon` and `addIcon`: 5.14.0, `removeIcon`: 5.15.0 |
-| tag | Set Tag common props | { className?: string, style?: React.CSSProperties, closeIcon?: React.ReactNode } | - | 5.7.0, `closeIcon`: 5.14.0 |
-| timeline | Set Timeline common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| timePicker | Set TimePicker common props | { className?: string, style?: React.CSSProperties, classNames?: [TimePickerConfig\["classNames"\]](/components/time-picker#semantic-dom), styles?: [TimePickerConfig\["styles"\]](/components/time-picker#semantic-dom) } | - | 5.7.0, `classNames` and `styles`: 5.25.0 |
-| tour | Set Tour common props | { closeIcon?: React.ReactNode } | - | 5.14.0 |
-| tooltip | Set Tooltip common props | { className?: string, style?: React.CSSProperties, classNames?:[Tooltip\["classNames"\]](/components/tooltip#api), styles?: [Tooltip\["styles"\]](/components/tooltip#api) } | - | 5.23.0 |
-| popover | Set Popover common props | { className?: string, style?: React.CSSProperties, classNames?:[Popover\["classNames"\]](/components/popover#api), styles?: [Popover\["styles"\]](/components/popover#api) } | - | 5.23.0 |
-| popconfirm | Set Popconfirm common props | { className?: string, style?: React.CSSProperties, classNames?:[Popconfirm\["classNames"\]](/components/popconfirm#api), styles?: [Popconfirm\["styles"\]](/components/popconfirm#api) } | - | 5.23.0 |
-| transfer | Set Transfer common props | { className?: string, style?: React.CSSProperties, selectionsIcon?: React.ReactNode } | - | 5.7.0, `selectionsIcon`: 5.14.0 |
-| tree | Set Tree common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| treeSelect | Set TreeSelect common props | { classNames?:[TreeSelect\["classNames"\]](/components/tree-select#api), styles?: [TreeSelect\["styles"\]](/components/tree-select#api) } | - | 5.25.0 |
-| typography | Set Typography common props | { className?: string, style?: React.CSSProperties } | - | 5.7.0 |
-| upload | Set Upload common props | { className?: string, style?: React.CSSProperties, customRequest?: [Upload\["customRequest"\]](/components/upload#api) } | - | 5.7.0, `customRequest`: 5.27.0 |
-| wave | Config wave effect | { disabled?: boolean, showEffect?: (node: HTMLElement, info: { className, token, component }) => void } | - | 5.8.0 |
+| disabled | Whether to disable wave effect | boolean | false |  |
+| showEffect | Customized wave effect | (node: HTMLElement, info: { className, token, component }) => void | - |  |
+| triggerType | The event that triggers wave effect | `click` \| `pointerdown` \| `pointerup` \| `mousedown` \| `mouseup` | `click` | 6.4.0 |
 
 ## FAQ
 
 ### How to contribute a new language? {#faq-add-locale}
 
-See [&lt;Adding new language&gt;](/docs/react/i18n#adding-newplanguage).
+See [&lt;Adding new language&gt;](/docs/react/i18n#adding-new-language).
 
 ### Date-related components locale is not working? {#faq-locale-not-work}
 

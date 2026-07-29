@@ -1,17 +1,15 @@
 import * as React from 'react';
 import type { JSX } from 'react';
 import EditOutlined from '@ant-design/icons/EditOutlined';
-import classNames from 'classnames';
-import ResizeObserver from 'rc-resize-observer';
-import type { AutoSizeType } from 'rc-textarea';
-import toArray from 'rc-util/lib/Children/toArray';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
-import useMergedState from 'rc-util/lib/hooks/useMergedState';
-import omit from 'rc-util/lib/omit';
-import { composeRef } from 'rc-util/lib/ref';
+import type { AutoSizeType } from '@rc-component/input';
+import ResizeObserver from '@rc-component/resize-observer';
+import { composeRef, omit, toArray, useControlledState, useLayoutEffect } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import type { GenerateSemantic } from '../../_util/hooks/useMergeSemantic/semanticType';
+import { isFunction, isReactRenderable } from '../../_util/is';
 import { isStyleSupport } from '../../_util/styleChecker';
-import { ConfigContext } from '../../config-provider';
+import type { DirectionType } from '../../config-provider';
 import useLocale from '../../locale/useLocale';
 import type { TooltipProps } from '../../tooltip';
 import Tooltip from '../../tooltip';
@@ -20,14 +18,50 @@ import useCopyClick from '../hooks/useCopyClick';
 import useMergedConfig from '../hooks/useMergedConfig';
 import usePrevious from '../hooks/usePrevious';
 import useTooltipProps from '../hooks/useTooltipProps';
+import { useTypographySemantic } from '../hooks/useTypographySemantic';
 import type { TypographyProps } from '../Typography';
-import Typography from '../Typography';
+import { InternalTypography } from '../Typography';
 import CopyBtn from './CopyBtn';
 import Ellipsis from './Ellipsis';
 import EllipsisTooltip from './EllipsisTooltip';
 import { isEleEllipsis, isValidText } from './util';
 
 export type BaseType = 'secondary' | 'success' | 'warning' | 'danger';
+
+export type TypographySemanticType = {
+  classNames?: {
+    root?: string;
+    actions?: string;
+    action?: string;
+    textarea?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    actions?: React.CSSProperties;
+    action?: React.CSSProperties;
+    textarea?: React.CSSProperties;
+  };
+};
+
+export interface BaseTypographyProps extends React.HTMLAttributes<HTMLElement> {
+  id?: string;
+  prefixCls?: string;
+  className?: string;
+  rootClassName?: string;
+  style?: React.CSSProperties;
+  classNames?: TypographySemanticAllType['classNamesAndFn'];
+  styles?: TypographySemanticAllType['stylesAndFn'];
+  children?: React.ReactNode;
+  'aria-label'?: string;
+  direction?: DirectionType;
+  /** @private */
+  component?: keyof JSX.IntrinsicElements;
+}
+
+export type TypographySemanticAllType = GenerateSemantic<
+  TypographySemanticType,
+  BaseTypographyProps
+>;
 
 export interface CopyConfig {
   text?: string | (() => string | Promise<string>);
@@ -36,6 +70,10 @@ export interface CopyConfig {
   tooltips?: React.ReactNode;
   format?: 'text/plain' | 'text/html';
   tabIndex?: number;
+}
+
+export interface ActionsConfig {
+  placement?: 'start' | 'end';
 }
 
 interface EditConfig {
@@ -66,8 +104,13 @@ export interface EllipsisConfig {
   tooltip?: React.ReactNode | TooltipProps;
 }
 
-export interface BlockProps<C extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements>
-  extends TypographyProps<C> {
+export interface BlockProps<
+  C extends keyof JSX.IntrinsicElements = keyof JSX.IntrinsicElements,
+> extends TypographyProps<C> {
+  /**
+   * @since 6.4.0
+   */
+  actions?: ActionsConfig;
   title?: string;
   editable?: boolean | EditConfig;
   copyable?: boolean | CopyConfig;
@@ -126,32 +169,40 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     prefixCls: customizePrefixCls,
     className,
     style,
+    classNames,
+    styles,
+    direction: typographyDirection,
     type,
     disabled,
     children,
     ellipsis,
     editable,
     copyable,
+    actions,
     component,
     title,
+    onMouseEnter,
+    onMouseLeave,
     ...restProps
   } = props;
-  const { getPrefixCls, direction } = React.useContext(ConfigContext);
   const [textLocale] = useLocale('Text');
 
   const typographyRef = React.useRef<HTMLElement>(null);
   const editIconRef = React.useRef<HTMLButtonElement>(null);
 
-  // ============================ MISC ============================
-  const prefixCls = getPrefixCls('typography', customizePrefixCls);
+  const [mergedClassNames, mergedStyles, prefixCls, direction] = useTypographySemantic(
+    customizePrefixCls,
+    classNames,
+    styles,
+    typographyDirection,
+    props,
+  );
 
   const textProps = omit(restProps, DECORATION_PROPS);
 
   // ========================== Editable ==========================
   const [enableEdit, editConfig] = useMergedConfig<EditConfig>(editable);
-  const [editing, setEditing] = useMergedState(false, {
-    value: editConfig.editing,
-  });
+  const [editing, setEditing] = useControlledState(false, editConfig.editing);
   const { triggerType = ['icon'] } = editConfig;
 
   const triggerEdit = (edit: boolean) => {
@@ -188,6 +239,8 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
   // ========================== Copyable ==========================
   const [enableCopy, copyConfig] = useMergedConfig<CopyConfig>(copyable);
 
+  const { placement = 'end' } = actions ?? {};
+
   const { copied, copyLoading, onClick: onCopyClick } = useCopyClick({ copyConfig, children });
 
   // ========================== Ellipsis ==========================
@@ -201,9 +254,10 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     expandable: false,
     symbol: (isExpanded) => (isExpanded ? textLocale?.collapse : textLocale?.expand),
   });
-  const [expanded, setExpanded] = useMergedState(ellipsisConfig.defaultExpanded || false, {
-    value: ellipsisConfig.expanded,
-  });
+  const [expanded, setExpanded] = useControlledState(
+    ellipsisConfig.defaultExpanded || false,
+    ellipsisConfig.expanded,
+  );
 
   const mergedEnableEllipsis =
     enableEllipsis && (!expanded || ellipsisConfig.expandable === 'collapsible');
@@ -244,7 +298,7 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     }
 
     return isLineClampSupport;
-  }, [needMeasureEllipsis, isTextOverflowSupport, isLineClampSupport]);
+  }, [needMeasureEllipsis, rows, isLineClampSupport, isTextOverflowSupport]);
 
   // We use effect to change from css ellipsis to js ellipsis.
   // To make SSR still can see the ellipsis.
@@ -252,7 +306,12 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     setCssEllipsis(canUseCssEllipsis && mergedEnableEllipsis);
   }, [canUseCssEllipsis, mergedEnableEllipsis]);
 
-  const isMergedEllipsis = mergedEnableEllipsis && (cssEllipsis ? isNativeEllipsis : isJsEllipsis);
+  const tooltipProps = useTooltipProps(ellipsisConfig.tooltip, editConfig.text, children);
+  const needNativeEllipsisMeasure = cssEllipsis && !!tooltipProps.title;
+
+  const isMergedEllipsis =
+    mergedEnableEllipsis &&
+    (cssEllipsis ? needNativeEllipsisMeasure && isNativeEllipsis : isJsEllipsis);
 
   const cssTextOverflow = mergedEnableEllipsis && rows === 1 && cssEllipsis;
   const cssLineClamp = mergedEnableEllipsis && rows > 1 && cssEllipsis;
@@ -264,6 +323,8 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
   };
 
   const [ellipsisWidth, setEllipsisWidth] = React.useState(0);
+  const [isHoveringOperations, setIsHoveringOperations] = React.useState(false);
+  const [isHoveringTypography, setIsHoveringTypography] = React.useState(false);
   const onResize = ({ offsetWidth }: { offsetWidth: number }) => {
     setEllipsisWidth(offsetWidth);
   };
@@ -282,14 +343,21 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
   React.useEffect(() => {
     const textEle = typographyRef.current;
 
-    if (enableEllipsis && cssEllipsis && textEle) {
+    if (enableEllipsis && needNativeEllipsisMeasure && textEle) {
       const currentEllipsis = isEleEllipsis(textEle);
 
       if (isNativeEllipsis !== currentEllipsis) {
         setIsNativeEllipsis(currentEllipsis);
       }
     }
-  }, [enableEllipsis, cssEllipsis, children, cssLineClamp, isNativeVisible, ellipsisWidth]);
+  }, [
+    enableEllipsis,
+    needNativeEllipsisMeasure,
+    children,
+    cssLineClamp,
+    isNativeVisible,
+    ellipsisWidth,
+  ]);
 
   // https://github.com/ant-design/ant-design/issues/36786
   // Use IntersectionObserver to check if element is invisible
@@ -298,13 +366,12 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     if (
       typeof IntersectionObserver === 'undefined' ||
       !textEle ||
-      !cssEllipsis ||
+      !needNativeEllipsisMeasure ||
       !mergedEnableEllipsis
     ) {
       return;
     }
 
-    /* eslint-disable-next-line compat/compat */
     const observer = new IntersectionObserver(() => {
       setIsNativeVisible(!!textEle.offsetParent);
     });
@@ -313,17 +380,15 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
     return () => {
       observer.disconnect();
     };
-  }, [cssEllipsis, mergedEnableEllipsis]);
+  }, [needNativeEllipsisMeasure, mergedEnableEllipsis]);
 
   // ========================== Tooltip ===========================
-  const tooltipProps = useTooltipProps(ellipsisConfig.tooltip, editConfig.text, children);
-
   const topAriaLabel = React.useMemo(() => {
     if (!enableEllipsis || cssEllipsis) {
       return undefined;
     }
     return [editConfig.text, children, title, tooltipProps.title].find(isValidText);
-  }, [enableEllipsis, cssEllipsis, title, tooltipProps.title, isMergedEllipsis]);
+  }, [enableEllipsis, cssEllipsis, title, tooltipProps.title, isMergedEllipsis, editConfig.text]);
 
   // =========================== Render ===========================
   // >>>>>>>>>>> Editing input
@@ -342,6 +407,8 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
         maxLength={editConfig.maxLength}
         autoSize={editConfig.autoSize}
         enterIcon={editConfig.enterIcon}
+        classNames={mergedClassNames}
+        styles={mergedStyles}
       />
     );
   }
@@ -354,11 +421,15 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
       <button
         type="button"
         key="expand"
-        className={`${prefixCls}-${expanded ? 'collapse' : 'expand'}`}
+        className={clsx(
+          `${prefixCls}-${expanded ? 'collapse' : 'expand'}`,
+          mergedClassNames.action,
+        )}
+        style={mergedStyles.action}
         onClick={(e) => onExpandClick(e!, { expanded: !expanded })}
         aria-label={expanded ? textLocale.collapse : textLocale?.expand}
       >
-        {typeof symbol === 'function' ? symbol(expanded) : symbol}
+        {isFunction(symbol) ? symbol(expanded) : symbol}
       </button>
     ) : null;
   };
@@ -379,7 +450,8 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
         <button
           type="button"
           ref={editIconRef}
-          className={`${prefixCls}-edit`}
+          className={clsx(`${prefixCls}-edit`, mergedClassNames.action)}
+          style={mergedStyles.action}
           onClick={onEditClick}
           aria-label={ariaLabel}
           tabIndex={tabIndex}
@@ -405,16 +477,38 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
         locale={textLocale}
         onCopy={onCopyClick}
         loading={copyLoading}
-        iconOnly={children === null || children === undefined}
+        iconOnly={!isReactRenderable(children)}
+        className={mergedClassNames.action}
+        style={mergedStyles.action}
       />
     );
   };
 
-  const renderOperations = (canEllipsis: boolean) => [
-    canEllipsis && renderExpand(),
-    renderEdit(),
-    renderCopy(),
-  ];
+  const renderOperations = (canEllipsis: boolean) => {
+    const expandNode = canEllipsis && renderExpand();
+    const editNode = renderEdit();
+    const copyNode = renderCopy();
+
+    if (!expandNode && !editNode && !copyNode) {
+      return null;
+    }
+
+    return (
+      <span
+        key="operations"
+        className={clsx(`${prefixCls}-actions`, mergedClassNames.actions, {
+          [`${prefixCls}-actions-start`]: placement === 'start',
+        })}
+        style={mergedStyles.actions}
+        onMouseEnter={() => setIsHoveringOperations(true)}
+        onMouseLeave={() => setIsHoveringOperations(false)}
+      >
+        {expandNode}
+        {editNode}
+        {copyNode}
+      </span>
+    );
+  };
 
   const renderEllipsis = (canEllipsis: boolean) => [
     canEllipsis && !expanded && (
@@ -423,7 +517,6 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
       </span>
     ),
     ellipsisConfig.suffix,
-    renderOperations(canEllipsis),
   ];
 
   return (
@@ -433,19 +526,31 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
           tooltipProps={tooltipProps}
           enableEllipsis={mergedEnableEllipsis}
           isEllipsis={isMergedEllipsis}
+          open={isHoveringTypography && !isHoveringOperations}
         >
-          <Typography
-            className={classNames(
+          <InternalTypography
+            onMouseEnter={(e) => {
+              setIsHoveringTypography(true);
+              onMouseEnter?.(e);
+            }}
+            onMouseLeave={(e) => {
+              setIsHoveringTypography(false);
+              onMouseLeave?.(e);
+            }}
+            className={clsx(
               {
                 [`${prefixCls}-${type}`]: type,
                 [`${prefixCls}-disabled`]: disabled,
                 [`${prefixCls}-ellipsis`]: enableEllipsis,
                 [`${prefixCls}-ellipsis-single-line`]: cssTextOverflow,
                 [`${prefixCls}-ellipsis-multiple-line`]: cssLineClamp,
+                [`${prefixCls}-link`]: component === 'a',
               },
               className,
             )}
-            prefixCls={customizePrefixCls}
+            classNames={mergedClassNames}
+            styles={mergedStyles}
+            prefixCls={prefixCls}
             style={{
               ...style,
               WebkitLineClamp: cssLineClamp ? rows : undefined,
@@ -465,12 +570,14 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
               width={ellipsisWidth}
               onEllipsis={onJsEllipsis}
               expanded={expanded}
+              measureDeps={[placement]}
               miscDeps={[
                 copied,
                 expanded,
                 copyLoading,
                 enableEdit,
                 enableCopy,
+                placement,
                 textLocale,
                 ...DECORATION_PROPS.map((key) => props[key as keyof BlockProps]),
               ]}
@@ -479,6 +586,7 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
                 wrapperDecorations(
                   props,
                   <>
+                    {placement === 'start' ? renderOperations(canEllipsis) : null}
                     {node.length > 0 && canEllipsis && !expanded && topAriaLabel ? (
                       <span key="show-content" aria-hidden>
                         {node}
@@ -487,11 +595,12 @@ const Base = React.forwardRef<HTMLElement, BlockProps>((props, ref) => {
                       node
                     )}
                     {renderEllipsis(canEllipsis)}
+                    {placement === 'start' ? null : renderOperations(canEllipsis)}
                   </>,
                 )
               }
             </Ellipsis>
-          </Typography>
+          </InternalTypography>
         </EllipsisTooltip>
       )}
     </ResizeObserver>

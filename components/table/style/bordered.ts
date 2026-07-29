@@ -2,10 +2,12 @@ import { unit } from '@ant-design/cssinjs';
 import type { CSSObject } from '@ant-design/cssinjs';
 
 import type { GenerateStyle } from '../../theme/internal';
+import { genCssVar } from '../../theme/util/genStyleUtils';
 import type { TableToken } from './index';
 
 const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
   const {
+    antCls,
     componentCls,
     lineWidth,
     lineType,
@@ -16,19 +18,17 @@ const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
     calc,
   } = token;
   const tableBorder = `${unit(lineWidth)} ${lineType} ${tableBorderColor}`;
+  const [varName, varRef] = genCssVar(antCls, 'table');
 
   const getSizeBorderStyle = (
-    size: 'small' | 'middle',
+    size: 'small' | 'medium',
     paddingVertical: number,
     paddingHorizontal: number,
   ) => ({
     [`&${componentCls}-${size}`]: {
       [`> ${componentCls}-container`]: {
         [`> ${componentCls}-content, > ${componentCls}-body`]: {
-          [`
-            > table > tbody > tr > th,
-            > table > tbody > tr > td
-          `]: {
+          '> table > tbody > tr > th, > table > tbody > tr > td': {
             [`> ${componentCls}-expanded-row-fixed`]: {
               margin: `${unit(calc(paddingVertical).mul(-1).equal())}
               ${unit(calc(calc(paddingHorizontal).add(lineWidth)).mul(-1).equal())}`,
@@ -41,6 +41,8 @@ const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
 
   return {
     [`${componentCls}-wrapper`]: {
+      [varName('nested-border-top')]: tableBorder,
+
       [`${componentCls}${componentCls}-bordered`]: {
         // ============================ Title =============================
         [`> ${componentCls}-title`]: {
@@ -53,68 +55,65 @@ const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
           borderInlineStart: tableBorder,
           borderTop: tableBorder,
 
-          [`
-            > ${componentCls}-content,
-            > ${componentCls}-header,
-            > ${componentCls}-body,
-            > ${componentCls}-summary
-          `]: {
-            '> table': {
-              // ============================= Cell =============================
-              [`
-                > thead > tr > th,
-                > thead > tr > td,
-                > tbody > tr > th,
-                > tbody > tr > td,
-                > tfoot > tr > th,
-                > tfoot > tr > td
-              `]: {
-                borderInlineEnd: tableBorder,
-              },
+          '&:first-child': {
+            borderTop: varRef('nested-border-top', tableBorder),
+          },
 
-              // ============================ Header ============================
-              '> thead': {
-                '> tr:not(:last-child) > th': {
-                  borderBottom: tableBorder,
-                },
+          [`> ${componentCls}-header${componentCls}-sticky-holder`]: {
+            marginTop: calc(lineWidth).mul(-1).equal(),
+            borderTop: tableBorder,
+          },
 
-                '> tr > th::before': {
-                  backgroundColor: 'transparent !important',
-                },
-              },
-
-              // Fixed right should provides additional border
-              [`
-                > thead > tr,
-                > tbody > tr,
-                > tfoot > tr
-              `]: {
-                [`> ${componentCls}-cell-fix-right-first::after`]: {
-                  borderInlineEnd: tableBorder,
-                },
-              },
-
-              // ========================== Expandable ==========================
-              [`
-                > tbody > tr > th,
-                > tbody > tr > td
-              `]: {
-                [`> ${componentCls}-expanded-row-fixed`]: {
-                  margin: `${unit(calc(tablePaddingVertical).mul(-1).equal())} ${unit(
-                    calc(calc(tablePaddingHorizontal).add(lineWidth)).mul(-1).equal(),
-                  )}`,
-                  '&::after': {
-                    position: 'absolute',
-                    top: 0,
-                    insetInlineEnd: lineWidth,
-                    bottom: 0,
+          [`> ${componentCls}-content, > ${componentCls}-header, > ${componentCls}-body, > ${componentCls}-summary`]:
+            {
+              '> table': {
+                // ============================= Cell =============================
+                '> thead > tr > th, > thead > tr > td, > tbody > tr > th, > tbody > tr > td, > tfoot > tr > th, > tfoot > tr > td':
+                  {
                     borderInlineEnd: tableBorder,
-                    content: '""',
+                  },
+
+                // ============================ Header ============================
+                '> thead': {
+                  '> tr:not(:last-child) > th': {
+                    borderBottom: tableBorder,
+                  },
+
+                  '> tr > th::before': {
+                    backgroundColor: 'transparent !important',
+                  },
+                },
+
+                // Fixed right should provides additional border
+                // Only add separator border when there are multiple fixed-right columns
+                // (i.e. fix-right-first is not also fix-right-last), otherwise the
+                // ::after border doubles up with the cell's own borderInlineEnd and
+                // creates a spurious extra vertical line. See #56287.
+                '> thead > tr, > tbody > tr, > tfoot > tr': {
+                  [`> ${componentCls}-cell-fix-right-first:not(${componentCls}-cell-fix-right-last)::after`]:
+                    {
+                      borderInlineEnd: tableBorder,
+                    },
+                },
+
+                // ========================== Expandable ==========================
+                '> tbody > tr > th, > tbody > tr > td': {
+                  [`> ${componentCls}-expanded-row-fixed`]: {
+                    margin: `${unit(calc(tablePaddingVertical).mul(-1).equal())} ${unit(
+                      calc(calc(tablePaddingHorizontal).add(lineWidth)).mul(-1).equal(),
+                    )}`,
+                    '&::after': {
+                      position: 'absolute',
+                      top: 0,
+                      insetInlineEnd: lineWidth,
+                      bottom: 0,
+                      borderInlineEnd: tableBorder,
+                      content: '""',
+                    },
                   },
                 },
               },
             },
-          },
         },
 
         // ============================ Scroll ============================
@@ -135,7 +134,7 @@ const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
 
         // ============================ Size ============================
         ...getSizeBorderStyle(
-          'middle',
+          'medium',
           token.tablePaddingVerticalMiddle,
           token.tablePaddingHorizontalMiddle,
         ),
@@ -154,9 +153,11 @@ const genBorderedStyle: GenerateStyle<TableToken, CSSObject> = (token) => {
 
       // ============================ Nested ============================
       [`${componentCls}-cell`]: {
-        [`${componentCls}-container:first-child`]: {
-          // :first-child to avoid the case when bordered and title is set
-          borderTop: 0,
+        [`
+          > ${componentCls}-wrapper:only-child,
+          > ${componentCls}-expanded-row-fixed > ${componentCls}-wrapper:only-child
+        `]: {
+          [varName('nested-border-top')]: 0,
         },
         // https://github.com/ant-design/ant-design/issues/35577
         '&-scrollbar:not([rowspan])': {

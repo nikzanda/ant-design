@@ -4,9 +4,9 @@ import { unit } from '@ant-design/cssinjs';
 
 import { AggregationColor } from '../../color-picker/color';
 import { isBright } from '../../color-picker/components/ColorPresets';
+import { PresetColors } from '../../theme/interface';
 import type { FullToken, GenStyleFn, GetDefaultToken, PresetColorKey } from '../../theme/internal';
 import { getLineHeight, mergeToken } from '../../theme/internal';
-import { PresetColors } from '../../theme/interface';
 import getAlphaColor from '../../theme/util/getAlphaColor';
 
 /** Component only token. Which will handle additional calculation of alias token */
@@ -92,6 +92,7 @@ export interface ComponentToken {
    */
   defaultActiveBorderColor: string;
   /**
+   * @deprecated use `colorBorderDisabled` instead
    * @desc 禁用状态边框颜色
    * @descEN Border color of disabled button
    */
@@ -153,16 +154,19 @@ export interface ComponentToken {
   /**
    * @desc 按钮纵向内间距
    * @descEN Vertical padding of button
+   * @deprecated not used
    */
   paddingBlock: CSSProperties['paddingBlock'];
   /**
    * @desc 大号按钮纵向内间距
    * @descEN Vertical padding of large button
+   * @deprecated not used
    */
   paddingBlockLG: CSSProperties['paddingBlock'];
   /**
    * @desc 小号按钮纵向内间距
    * @descEN Vertical padding of small button
+   * @deprecated not used
    */
   paddingBlockSM: CSSProperties['paddingBlock'];
   /**
@@ -180,11 +184,6 @@ export interface ComponentToken {
    * @descEN Icon size of small button which only contains icon
    */
   onlyIconSizeSM: number | string;
-  /**
-   * @desc 按钮组边框颜色
-   * @descEN Border color of button group
-   */
-  groupBorderColor: string;
   /**
    * @desc 链接按钮悬浮态背景色
    * @descEN Background color of link button when hover
@@ -213,18 +212,31 @@ export interface ComponentToken {
   /**
    * @desc 按钮内容字体行高
    * @descEN Line height of button content
+   * @deprecated not used
    */
   contentLineHeight: number;
   /**
    * @desc 大号按钮内容字体行高
    * @descEN Line height of large button content
+   * @deprecated not used
    */
   contentLineHeightLG: number;
   /**
    * @desc 小号按钮内容字体行高
    * @descEN Line height of small button content
+   * @deprecated not used
    */
   contentLineHeightSM: number;
+  /**
+   * @desc type='default' 禁用状态下的背景颜色
+   * @descE background color when type='default' is disabled
+   */
+  defaultBgDisabled: string;
+  /**
+   * @desc type='dashed' 禁用状态下的背景颜色
+   * @descE background color when type='dashed' is disabled
+   */
+  dashedBgDisabled: string;
 }
 
 type ShadowColorMap = {
@@ -235,7 +247,25 @@ type ShadowColorMap = {
   [Key in `${PresetColorKey}ShadowColor`]: string;
 };
 
-export interface ButtonToken extends FullToken<'Button'>, ShadowColorMap {
+type PresetColorHoverActiveMap = {
+  [Key in `${PresetColorKey}Hover` | `${PresetColorKey}Active`]: string;
+};
+
+type GroupToken = {
+  /**
+   * @desc 按钮组边框颜色
+   * @descEN Border color of button group
+   * @internal Button.Group 已废弃相关token不应该在显示在文档上
+   */
+
+  groupBorderColor: string;
+};
+
+export interface ButtonToken
+  extends FullToken<'Button'>,
+    ShadowColorMap,
+    PresetColorHoverActiveMap,
+    GroupToken {
   /**
    * @desc 按钮横向内边距
    * @descEN Horizontal padding of button
@@ -253,15 +283,14 @@ export interface ButtonToken extends FullToken<'Button'>, ShadowColorMap {
   buttonIconOnlyFontSize: number | string;
 }
 
-export const prepareToken: (token: Parameters<GenStyleFn<'Button'>>[0]) => ButtonToken = (
-  token,
-) => {
-  const { paddingInline, onlyIconSize } = token;
+export const prepareToken = (token: Parameters<GenStyleFn<'Button'>>[0]) => {
+  const { paddingInline, onlyIconSize, borderColorDisabled } = token;
 
   const buttonToken = mergeToken<ButtonToken>(token, {
     buttonPaddingHorizontal: paddingInline,
     buttonPaddingVertical: 0,
     buttonIconOnlyFontSize: onlyIconSize,
+    colorBorderDisabled: borderColorDisabled,
   });
 
   return buttonToken;
@@ -279,12 +308,14 @@ export const prepareComponentToken: GetDefaultToken<'Button'> = (token) => {
     : '#fff';
 
   const shadowColorTokens = PresetColors.reduce<CSSObject>(
-    (prev: CSSObject, colorKey: PresetColorKey) => ({
+    (prev, colorKey) => ({
       ...prev,
       [`${colorKey}ShadowColor`]: `0 ${unit(token.controlOutlineWidth)} 0 ${getAlphaColor(token[`${colorKey}1`], token.colorBgContainer)}`,
     }),
     {},
   );
+  const defaultBgDisabled = token.colorBgContainerDisabled;
+  const dashedBgDisabled = token.colorBgContainerDisabled;
 
   return {
     ...shadowColorTokens,
@@ -295,7 +326,7 @@ export const prepareComponentToken: GetDefaultToken<'Button'> = (token) => {
     dangerShadow: `0 ${token.controlOutlineWidth}px 0 ${token.colorErrorOutline}`,
     primaryColor: token.colorTextLightSolid,
     dangerColor: token.colorTextLightSolid,
-    borderColorDisabled: token.colorBorder,
+    borderColorDisabled: token.colorBorderDisabled,
     defaultGhostColor: token.colorBgContainer,
     ghostBg: 'transparent',
     defaultGhostBorderColor: token.colorBgContainer,
@@ -340,5 +371,7 @@ export const prepareComponentToken: GetDefaultToken<'Button'> = (token) => {
       (token.controlHeightLG - contentFontSizeLG * contentLineHeightLG) / 2 - token.lineWidth,
       0,
     ),
+    defaultBgDisabled,
+    dashedBgDisabled,
   };
 };

@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/ja_JP';
+import Pagination from '@rc-component/pagination/locale/ja_JP';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/ja_JP';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: '選んでください',
     close: '閉じる',
+    show: '表示',
+    hide: '非表示',
+    sortable: '並べ替え可能',
   },
   Table: {
     filterTitle: 'フィルター',
@@ -80,8 +83,8 @@ const localeValues: Locale = {
     edit: '編集',
     copy: 'コピー',
     copied: 'コピーされました',
-    expand: '拡大する',
-    collapse: '崩壊',
+    expand: '展開する',
+    collapse: '折り畳む',
   },
   Form: {
     optional: '(オプション)',
@@ -132,9 +135,6 @@ const localeValues: Locale = {
         mismatch: '${label}はパターン${pattern}と一致しません',
       },
     },
-  },
-  Image: {
-    preview: 'プレビュー',
   },
   QRCode: {
     expired: 'QRコードの有効期限が切れました',

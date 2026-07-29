@@ -20,7 +20,9 @@
 
   const isEnabled = always || enabledCondition.every(Boolean);
 
-  if (!isEnabled) return;
+  if (!isEnabled) {
+    return;
+  }
 
   const prefixCls = 'antd-mirror-notify';
   const primaryColor = '#1677ff';
@@ -91,7 +93,7 @@
       content: '';
       position: absolute;
       top: 0;
-      left: 0;
+      inset-inline-start: 0;
       height: 100%;
       width: var(--progress, 0%);
       background-color: ${primaryColor};

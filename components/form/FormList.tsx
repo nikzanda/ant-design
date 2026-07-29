@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { List } from 'rc-field-form';
-import type { StoreValue, ValidatorRule } from 'rc-field-form/lib/interface';
+import { List } from '@rc-component/form';
+import type { StoreValue, ValidatorRule } from '@rc-component/form';
 
-import { devUseWarning } from '../_util/warning';
+import { isNumber } from '../_util/is';
+import { useDevWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
 import { FormItemPrefixContext } from './context';
 
 export interface FormListFieldData {
   name: number;
   key: number;
-  /** @deprecated No need anymore Use key instead */
-  fieldKey?: number;
 }
 
 export interface FormListOperation {
@@ -37,11 +36,10 @@ const FormList: React.FC<FormListProps> = ({
   ...props
 }) => {
   if (process.env.NODE_ENV !== 'production') {
-    const warning = devUseWarning('Form.List');
+    const warning = useDevWarning('Form.List');
 
     warning(
-      typeof props.name === 'number' ||
-        (Array.isArray(props.name) ? !!props.name.length : !!props.name),
+      isNumber(props.name) || (Array.isArray(props.name) ? !!props.name.length : !!props.name),
       'usage',
       'Miss `name` prop.',
     );

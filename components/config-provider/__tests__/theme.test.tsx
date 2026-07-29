@@ -1,65 +1,41 @@
-import React from 'react';
-import kebabCase from 'lodash/kebabCase';
-import canUseDom from 'rc-util/lib/Dom/canUseDom';
+import React, { useEffect } from 'react';
 
 import ConfigProvider from '..';
-import { Button, InputNumber, Select } from '../..';
-import { resetWarned } from '../../_util/warning';
-import { render } from '../../../tests/utils';
+import { Button, InputNumber, Select, Space } from '../..';
+import { render, waitFakeTimer } from '../../../tests/utils';
+import Modal from '../../modal';
 import theme from '../../theme';
 import type { GlobalToken } from '../../theme/internal';
 import { useToken } from '../../theme/internal';
 
 const { defaultAlgorithm, darkAlgorithm, compactAlgorithm } = theme;
 
-/* eslint-disable-next-line no-var */
-var mockCanUseDom = true;
-
-jest.mock('rc-util/lib/Dom/canUseDom', () => () => mockCanUseDom);
-
 describe('ConfigProvider.Theme', () => {
-  beforeEach(() => {
-    mockCanUseDom = true;
-  });
-
-  const colorList = ['primaryColor', 'successColor', 'warningColor', 'errorColor', 'infoColor'];
-
-  colorList.forEach((colorName) => {
-    it(colorName, () => {
-      ConfigProvider.config({
-        prefixCls: 'bamboo',
-        theme: {
-          [colorName]: '#0000FF',
-        },
-      });
-
-      const styles = Array.from(document.querySelectorAll<HTMLStyleElement>('style'));
-      const themeStyle = styles.find((style) =>
-        style.getAttribute('rc-util-key')?.includes('-dynamic-theme'),
-      );
-      expect(themeStyle).toBeTruthy();
-
-      expect(themeStyle?.innerHTML).toContain(`--bamboo-${kebabCase(colorName)}: rgb(0,0,255)`);
-    });
-  });
-
-  it('warning for SSR', () => {
-    resetWarned();
-
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    mockCanUseDom = false;
-    expect(canUseDom()).toBeFalsy();
+  it('ConfigProvider.config should work', async () => {
+    jest.useFakeTimers();
 
     ConfigProvider.config({
       theme: {
-        infoColor: 'red',
+        token: {
+          colorPrimary: '#00B96B',
+        },
       },
     });
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Warning: [antd: ConfigProvider] SSR do not support dynamic theme with css variables.',
-    );
-    errorSpy.mockRestore();
+    const Demo: React.FC = () => {
+      useEffect(() => {
+        Modal.confirm({ title: 'Hello World!' });
+      }, []);
+      return null;
+    };
+
+    render(<Demo />);
+
+    await waitFakeTimer();
+
+    expect(document.querySelector('.ant-modal-css-var')).toHaveStyle({
+      '--ant-color-primary': '#00b96b',
+    });
   });
 
   it('algorithm should work', () => {
@@ -100,6 +76,8 @@ describe('ConfigProvider.Theme', () => {
         sizeSM: 8,
         sizeXS: 4,
         sizeXXS: 4,
+        controlHeight: 28,
+        controlHeightSM: 21,
       }),
     );
   });
@@ -135,6 +113,21 @@ describe('ConfigProvider.Theme', () => {
         (style) => style.includes('.ant-input-number') && style.includes('width:50.1234px'),
       ),
     ).toBeTruthy();
+  });
+
+  it('should support Addon component token', () => {
+    const { container } = render(
+      <ConfigProvider theme={{ components: { Addon: { colorText: '#0000FF', algorithm: true } } }}>
+        <Space.Compact>
+          <Space.Addon className="test-addon">Addon Content</Space.Addon>
+        </Space.Compact>
+      </ConfigProvider>,
+    );
+
+    const addon = container.querySelector('.test-addon')!;
+    expect(addon).toHaveStyle({
+      '--ant-color-text': '#0000FF',
+    });
   });
 
   it('hashed should be true if not changed', () => {
@@ -211,7 +204,7 @@ describe('ConfigProvider.Theme', () => {
     };
 
     render(
-      <ConfigProvider theme={{ hashed: true, cssVar: true }}>
+      <ConfigProvider theme={{ hashed: true }}>
         <ConfigProvider theme={{ inherit: false }}>
           <Demo />
         </ConfigProvider>
@@ -235,7 +228,7 @@ describe('ConfigProvider.Theme', () => {
       expect(button).toHaveClass('foo');
       expect(button).toHaveStyle({
         '--ant-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--ant-button-default-shadow)',
+        '--ant-btn-shadow': 'var(--ant-button-default-shadow)',
         'border-radius': 'var(--ant-border-radius)',
       });
     });
@@ -258,14 +251,14 @@ describe('ConfigProvider.Theme', () => {
       expect(fooBtn).toHaveClass('foo');
       expect(fooBtn).toHaveStyle({
         '--ant-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--ant-button-default-shadow)',
+        '--ant-btn-shadow': 'var(--ant-button-default-shadow)',
         'border-radius': 'var(--ant-border-radius)',
       });
 
       expect(barBtn).toHaveClass('bar');
       expect(barBtn).toHaveStyle({
         '--bar-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--bar-button-default-shadow)',
+        '--ant-btn-shadow': 'var(--bar-button-default-shadow)',
         'border-radius': 'var(--bar-border-radius)',
       });
     });
@@ -273,6 +266,9 @@ describe('ConfigProvider.Theme', () => {
     it('prefix follow prefixCls by default', () => {
       const { container } = render(
         <>
+          <ConfigProvider prefixCls="ak">
+            <Button className="button-ak">Button</Button>
+          </ConfigProvider>
           <ConfigProvider prefixCls="foo" theme={{ cssVar: { key: 'foo' }, hashed: true }}>
             <Button className="button-foo">Button</Button>
           </ConfigProvider>
@@ -295,11 +291,23 @@ describe('ConfigProvider.Theme', () => {
         </>,
       );
 
+      const akBtn = container.querySelector('.button-ak')!;
+      expect(akBtn).toHaveClass('css-var-root');
+      expect(akBtn).toHaveStyle({
+        '--ak-btn-shadow': 'var(--ak-button-default-shadow)',
+        'border-radius': 'var(--ak-border-radius)',
+      });
+      expect(
+        Array.from(document.querySelectorAll('style[data-css-hash]')).some(({ innerHTML }) =>
+          innerHTML.includes('--ak-color-text'),
+        ),
+      ).toBeTruthy();
+
       const fooBtn = container.querySelector('.button-foo')!;
       expect(fooBtn).toHaveClass('foo');
       expect(fooBtn).toHaveStyle({
         '--foo-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--foo-button-default-shadow)',
+        '--foo-btn-shadow': 'var(--foo-button-default-shadow)',
         'border-radius': 'var(--foo-border-radius)',
       });
 
@@ -307,7 +315,7 @@ describe('ConfigProvider.Theme', () => {
       expect(barBtn).toHaveClass('bar');
       expect(barBtn).toHaveStyle({
         '--bar-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--bar-button-default-shadow)',
+        '--bar-btn-shadow': 'var(--bar-button-default-shadow)',
         'border-radius': 'var(--bar-border-radius)',
       });
 
@@ -315,7 +323,7 @@ describe('ConfigProvider.Theme', () => {
       expect(bananaBtn).toHaveClass('banana');
       expect(bananaBtn).toHaveStyle({
         '--banana-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--banana-button-default-shadow)',
+        '--banana-btn-shadow': 'var(--banana-button-default-shadow)',
         'border-radius': 'var(--banana-border-radius)',
       });
 
@@ -323,7 +331,7 @@ describe('ConfigProvider.Theme', () => {
       expect(catBtn).toHaveClass('apple');
       expect(catBtn).toHaveStyle({
         '--cat-color-text': 'rgba(0,0,0,0.88)',
-        boxShadow: 'var(--cat-button-default-shadow)',
+        '--apple-btn-shadow': 'var(--cat-button-default-shadow)',
         'border-radius': 'var(--cat-border-radius)',
       });
     });

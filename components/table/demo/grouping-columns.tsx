@@ -13,7 +13,6 @@ const useStyle = createStyles(({ css, token }) => {
           ${antCls}-table-content {
             scrollbar-width: thin;
             scrollbar-color: #eaeaea transparent;
-            scrollbar-gutter: stable;
           }
         }
       }
@@ -39,7 +38,7 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: 'name',
     key: 'name',
     width: 100,
-    fixed: 'left',
+    fixed: 'start',
     filters: [
       {
         text: 'Joe',
@@ -113,7 +112,7 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: 'gender',
     key: 'gender',
     width: 80,
-    fixed: 'right',
+    fixed: 'end',
   },
 ];
 
@@ -137,7 +136,7 @@ const App: React.FC = () => {
       columns={columns}
       dataSource={dataSource}
       bordered
-      size="middle"
+      size="medium"
       scroll={{ x: 'calc(700px + 50%)', y: 47 * 5 }}
     />
   );

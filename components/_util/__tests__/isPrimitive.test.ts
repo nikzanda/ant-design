@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/new-for-builtins */
 /* eslint-disable no-new-wrappers */
-import isPrimitive from '../isPrimitive';
+import { isPrimitive } from '../is';
 
 describe('isPrimitive', () => {
   it('should return true for primitive types', () => {
@@ -12,7 +12,7 @@ describe('isPrimitive', () => {
     expect(isPrimitive(false)).toBe(true);
     expect(isPrimitive(null)).toBe(true);
     expect(isPrimitive(undefined)).toBe(true);
-    expect(isPrimitive(NaN)).toBe(true);
+    expect(isPrimitive(Number.NaN)).toBe(true);
     expect(isPrimitive(Infinity)).toBe(true);
     expect(isPrimitive(Symbol('test'))).toBe(true);
     expect(isPrimitive(BigInt(123))).toBe(true);

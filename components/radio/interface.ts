@@ -1,10 +1,12 @@
 import type * as React from 'react';
 
+import type { Orientation } from '../_util/hooks';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
 import type { AbstractCheckboxProps } from '../checkbox/Checkbox';
 import type { AbstractCheckboxGroupProps } from '../checkbox/Group';
 import type { SizeType } from '../config-provider/SizeContext';
 
-export type { CheckboxRef as RadioRef } from 'rc-checkbox';
+export type { CheckboxRef as RadioRef } from '@rc-component/checkbox';
 export type RadioGroupButtonStyle = 'outline' | 'solid';
 export type RadioGroupOptionType = 'default' | 'button';
 
@@ -20,10 +22,12 @@ export interface RadioGroupProps extends AbstractCheckboxGroupProps {
   children?: React.ReactNode;
   id?: string;
   optionType?: RadioGroupOptionType;
+  orientation?: Orientation;
   buttonStyle?: RadioGroupButtonStyle;
   onFocus?: React.FocusEventHandler<HTMLDivElement>;
   onBlur?: React.FocusEventHandler<HTMLDivElement>;
   block?: boolean;
+  vertical?: boolean;
 }
 
 export interface RadioGroupContextProps {
@@ -41,6 +45,21 @@ export interface RadioGroupContextProps {
   block?: boolean;
 }
 
+export type RadioSemanticType = {
+  classNames?: {
+    root?: string;
+    icon?: string;
+    label?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    icon?: React.CSSProperties;
+    label?: React.CSSProperties;
+  };
+};
+
+export type RadioSemanticAllType = GenerateSemantic<RadioSemanticType, RadioProps>;
+
 export interface RadioProps extends AbstractCheckboxProps<RadioChangeEvent> {
   /**
    * Control the appearance for Radio to display as button or not
@@ -49,6 +68,8 @@ export interface RadioProps extends AbstractCheckboxProps<RadioChangeEvent> {
    * @internal
    */
   optionType?: RadioGroupOptionType;
+  classNames?: RadioSemanticAllType['classNamesAndFn'];
+  styles?: RadioSemanticAllType['stylesAndFn'];
 }
 
 export interface RadioChangeEventTarget extends RadioProps {

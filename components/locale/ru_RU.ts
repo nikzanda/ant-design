@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/ru_RU';
+import Pagination from '@rc-component/pagination/locale/ru_RU';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/ru_RU';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Пожалуйста выберите',
     close: 'Закрыть',
+    show: 'Показать',
+    hide: 'Скрыть',
+    sortable: 'сортируемый',
   },
   Table: {
     filterTitle: 'Фильтр',
@@ -133,12 +136,10 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Предпросмотр',
-  },
   QRCode: {
     expired: 'QR-код устарел',
     refresh: 'Обновить',
+    scanned: 'Отсканировано',
   },
   ColorPicker: {
     presetEmpty: 'Пустой',

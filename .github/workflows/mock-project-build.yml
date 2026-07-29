@@ -11,6 +11,9 @@ concurrency:
   group: unique
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   pr-check-ci:
     if: github.repository == 'ant-design/ant-design'
@@ -18,11 +21,11 @@ jobs:
     name: Build Project
     steps:
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: oven-sh/setup-bun@v2
+      - uses: utooland/setup-utoo@e7aa4d726a17f79f68aed736476ea5bd68f8ba52 # v1
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~tmpProj/yarn.lock
           key: primes-${{ runner.os }}-${{ github.run_id }}
@@ -40,7 +43,7 @@ jobs:
 
       - name: Download success lock file as `success.lock`
         if: ${{ failure() }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~tmpProj/yarn.lock
           key: primes-${{ runner.os }}-${{ github.run_id }}
@@ -52,9 +55,9 @@ jobs:
 
       - name: 🎨 Diff Report
         if: ${{ failure() }}
-        run: bunx diff-yarn-lock --source=~tmpProj/yarn.lock --target=~tmpProj/yarn.lock.failed
+        run: utx diff-yarn-lock --source=~tmpProj/yarn.lock --target=~tmpProj/yarn.lock.failed
 
-      - uses: actions-cool/ci-notice@v1
+      - uses: actions-cool/ci-notice@89af4a933717226a062cbf65c439beda5eb8aa5d # v1
         if: ${{ failure() }}
         with:
           notice-types: dingding

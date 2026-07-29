@@ -1,5 +1,5 @@
 import * as React from 'react';
-import useMergedState from 'rc-util/lib/hooks/useMergedState';
+import { useControlledState } from '@rc-component/util';
 
 import ConfigProvider, { ConfigContext } from '../config-provider';
 import type { AnyObject } from './type';
@@ -33,9 +33,7 @@ const genPurePanel = <ComponentProps extends BaseProps = BaseProps>(
     const holderRef = React.useRef<HTMLDivElement>(null);
     const [popupHeight, setPopupHeight] = React.useState(0);
     const [popupWidth, setPopupWidth] = React.useState(0);
-    const [open, setOpen] = useMergedState(false, {
-      value: props.open,
-    });
+    const [open, setOpen] = useControlledState(false, props.open);
 
     const { getPrefixCls } = React.useContext(ConfigContext);
     const prefixCls = getPrefixCls(defaultPrefixCls || 'select', customizePrefixCls);
@@ -67,7 +65,7 @@ const genPurePanel = <ComponentProps extends BaseProps = BaseProps>(
           resizeObserver.disconnect();
         };
       }
-    }, []);
+    }, [prefixCls]);
 
     let mergedProps: WrapProps = {
       ...props,
@@ -76,7 +74,6 @@ const genPurePanel = <ComponentProps extends BaseProps = BaseProps>(
         margin: 0,
       },
       open,
-      visible: open,
       getPopupContainer: () => holderRef.current!,
     };
 
@@ -84,14 +81,15 @@ const genPurePanel = <ComponentProps extends BaseProps = BaseProps>(
       mergedProps = postProps(mergedProps);
     }
     if (alignPropName) {
-      Object.assign(mergedProps, {
+      mergedProps = {
+        ...mergedProps,
         [alignPropName]: {
           overflow: {
             adjustX: false,
             adjustY: false,
           },
         },
-      });
+      };
     }
     const mergedStyle: React.CSSProperties = {
       paddingBottom: popupHeight,

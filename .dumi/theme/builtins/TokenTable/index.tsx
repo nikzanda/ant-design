@@ -4,14 +4,15 @@ import type { TableProps } from 'antd';
 import { Table } from 'antd';
 import { createStyles } from 'antd-style';
 import { getDesignToken } from 'antd-token-previewer';
-import tokenMeta from 'antd/es/version/token-meta.json';
 
 import useLocale from '../../../hooks/useLocale';
 import BezierVisualizer from '../../common/BezierVisualizer';
 import ColorChunk from '../ColorChunk';
+import { tokenMeta } from '../versionToken';
+import type { GlobalTokenSource } from '../versionToken';
 
 type TokenTableProps = {
-  type: 'seed' | 'map' | 'alias';
+  type: GlobalTokenSource;
   lang: 'zh' | 'en';
 };
 
@@ -39,14 +40,14 @@ const locales = {
   },
 };
 
-const useStyle = createStyles(({ token, css }) => ({
+const useStyle = createStyles(({ css, cssVar, token }) => ({
   codeSpan: css`
     margin: 0 1px;
     padding: 0.2em 0.4em;
     font-size: 0.9em;
     background: ${token.siteMarkdownCodeBg};
-    border: 1px solid ${token.colorSplit};
-    border-radius: ${token.borderRadiusSM}px;
+    border: ${cssVar.lineWidth} ${cssVar.lineType} ${cssVar.colorSplit};
+    border-radius: ${cssVar.borderRadiusSM};
     font-family: monospace;
   `,
 }));
@@ -117,7 +118,15 @@ const TokenTable: FC<TokenTableProps> = ({ type }) => {
     [type, lang],
   );
 
-  return <Table dataSource={data} columns={columns} pagination={false} bordered />;
+  return (
+    <Table<TokenData>
+      bordered
+      rowKey={(record) => record.name}
+      dataSource={data}
+      columns={columns}
+      pagination={false}
+    />
+  );
 };
 
 export default TokenTable;

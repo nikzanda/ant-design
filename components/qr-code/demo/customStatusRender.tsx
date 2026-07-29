@@ -20,7 +20,7 @@ const customStatusRender: QRCodeProps['statusRender'] = (info) => {
       );
     case 'loading':
       return (
-        <Space direction="vertical">
+        <Space vertical>
           <Spin />
           <p>Loading...</p>
         </Space>
@@ -37,7 +37,7 @@ const customStatusRender: QRCodeProps['statusRender'] = (info) => {
 };
 
 const App: React.FC = () => (
-  <Flex gap="middle" wrap>
+  <Flex gap="medium" wrap>
     <QRCode value={value} status="loading" statusRender={customStatusRender} />
     <QRCode
       value={value}

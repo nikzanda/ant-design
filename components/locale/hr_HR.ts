@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/hr_HR';
+import Pagination from '@rc-component/pagination/locale/hr_HR';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/hr_HR';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Molimo označite',
     close: 'Zatvori',
+    show: 'Prikaži',
+    hide: 'Sakrij',
+    sortable: 'sortibilan',
   },
   Table: {
     filterTitle: 'Filter meni',
@@ -32,6 +35,9 @@ const localeValues: Locale = {
     triggerDesc: 'Kliknite za sortiranje silazno',
     triggerAsc: 'Kliknite za sortiranje uzlazno',
     cancelSort: 'Kliknite da biste otkazali sortiranje',
+    filterCheckAll: 'Odaberite sve stavke',
+    filterSearchPlaceholder: 'Traži u filterima',
+    selectNone: 'Izbriši sve podatke',
   },
   Tour: {
     Next: 'Slijedeći',
@@ -58,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Odaberite sve podatke',
     removeAll: 'Uklonite sve podatke',
     selectInvert: 'Obrni trenutnu stranicu',
+    deselectAll: 'Poništi odabir svih podataka',
   },
   Upload: {
     uploading: 'Upload u tijeku...',
@@ -77,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Kopiraj',
     copied: 'Kopiranje uspješno',
     expand: 'Proširi',
+    collapse: 'Sažimanje',
   },
   Form: {
     optional: '(neobavezno)',
@@ -128,8 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Pregled',
+  QRCode: {
+    expired: 'QR kod je istekao',
+    refresh: 'Osvježi',
+    scanned: 'Skenirano',
+  },
+  ColorPicker: {
+    presetEmpty: 'Prazna',
+    transparent: 'Prozirno',
+    singleColor: 'Jedna boja',
+    gradientColor: 'Gradijent boje',
   },
 };
 

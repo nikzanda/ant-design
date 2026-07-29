@@ -4,15 +4,13 @@ import { createJSONEditor, Mode } from 'vanilla-jsoneditor';
 
 const Editor: React.FC<JSONEditorPropsOptional> = (props) => {
   const editorRef = useRef<JsonEditor>(null);
-  const container = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (container.current) {
+    if (containerRef.current) {
       editorRef.current = createJSONEditor({
-        target: container.current,
-        props: {
-          mode: Mode.text,
-        },
+        target: containerRef.current,
+        props: { mode: Mode.text },
       });
     }
     return () => {
@@ -22,9 +20,9 @@ const Editor: React.FC<JSONEditorPropsOptional> = (props) => {
 
   useEffect(() => {
     editorRef.current?.updateProps(props);
-  }, [props.content]);
+  }, [props]);
 
-  return <div ref={container} className="vanilla-jsoneditor-react" />;
+  return <div ref={containerRef} className="vanilla-jsoneditor-react" />;
 };
 
 export default Editor;

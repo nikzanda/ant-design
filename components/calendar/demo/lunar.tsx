@@ -2,12 +2,13 @@ import React from 'react';
 import { Calendar, Col, Radio, Row, Select } from 'antd';
 import type { CalendarProps } from 'antd';
 import { createStyles } from 'antd-style';
-import classNames from 'classnames';
+import type { DefaultOptionType } from 'antd/es/select';
+import { clsx } from 'clsx';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { HolidayUtil, Lunar } from 'lunar-typescript';
 
-const useStyle = createStyles(({ token, css, cx }) => {
+const useStyle = createStyles(({ cssVar, token, css, cx }) => {
   const lunar = css`
     color: ${token.colorTextTertiary};
     font-size: ${token.fontSizeSM}px;
@@ -21,7 +22,7 @@ const useStyle = createStyles(({ token, css, cx }) => {
   return {
     wrapper: css`
       width: 450px;
-      border: 1px solid ${token.colorBorderSecondary};
+      border: ${token.lineWidth}px ${token.lineType} ${token.colorBorderSecondary};
       border-radius: ${token.borderRadiusOuter};
       padding: 5px;
     `,
@@ -38,18 +39,18 @@ const useStyle = createStyles(({ token, css, cx }) => {
         max-width: 40px;
         max-height: 40px;
         background: transparent;
-        transition: background-color 300ms;
+        transition: background-color ${cssVar.motionDurationSlow};
         border-radius: ${token.borderRadiusOuter}px;
-        border: 1px solid transparent;
+        border: ${token.lineWidth}px ${token.lineType} transparent;
         box-sizing: border-box;
       }
       &:hover:before {
-        background: rgba(0, 0, 0, 0.04);
+        background: ${token.controlItemBgHover};
       }
     `,
     today: css`
       &:before {
-        border: 1px solid ${token.colorPrimary};
+        border: ${token.lineWidth}px ${token.lineType} ${token.colorPrimary};
       }
     `,
     text: css`
@@ -80,7 +81,7 @@ const useStyle = createStyles(({ token, css, cx }) => {
       border-radius: ${token.borderRadiusOuter}px;
       padding: 5px 0;
       &:hover {
-        background: rgba(0, 0, 0, 0.04);
+        background: ${token.controlItemBgHover};
       }
     `,
     monthCellCurrent: css`
@@ -99,17 +100,15 @@ const App: React.FC = () => {
   const { styles } = useStyle({ test: true });
 
   const [selectDate, setSelectDate] = React.useState<Dayjs>(() => dayjs());
-  const [panelDateDate, setPanelDate] = React.useState<Dayjs>(() => dayjs());
+  const [panelDate, setPanelDate] = React.useState<Dayjs>(() => dayjs());
 
   const onPanelChange = (value: Dayjs, mode: CalendarProps<Dayjs>['mode']) => {
     console.log(value.format('YYYY-MM-DD'), mode);
     setPanelDate(value);
   };
 
-  const onDateChange: CalendarProps<Dayjs>['onSelect'] = (value, selectInfo) => {
-    if (selectInfo.source === 'date') {
-      setSelectDate(value);
-    }
+  const onDateChange: CalendarProps<Dayjs>['onSelect'] = (value) => {
+    setSelectDate(value);
   };
 
   const cellRender: CalendarProps<Dayjs>['fullCellRender'] = (date, info) => {
@@ -122,16 +121,16 @@ const App: React.FC = () => {
     if (info.type === 'date') {
       return React.cloneElement(info.originNode, {
         ...(info.originNode as React.ReactElement<any>).props,
-        className: classNames(styles.dateCell, {
+        className: clsx(styles.dateCell, {
           [styles.current]: selectDate.isSame(date, 'date'),
           [styles.today]: date.isSame(dayjs(), 'date'),
         }),
         children: (
           <div className={styles.text}>
             <span
-              className={classNames({
+              className={clsx({
                 [styles.weekend]: isWeekend,
-                gray: !panelDateDate.isSame(date, 'month'),
+                gray: !panelDate.isSame(date, 'month'),
               })}
             >
               {date.get('date')}
@@ -151,7 +150,7 @@ const App: React.FC = () => {
       const month = d2.getMonthInChinese();
       return (
         <div
-          className={classNames(styles.monthCell, {
+          className={clsx(styles.monthCell, {
             [styles.monthCellCurrent]: selectDate.isSame(date, 'month'),
           })}
         >
@@ -182,11 +181,11 @@ const App: React.FC = () => {
         headerRender={({ value, type, onChange, onTypeChange }) => {
           const start = 0;
           const end = 12;
-          const monthOptions = [];
+          const monthOptions: DefaultOptionType[] = [];
 
           let current = value.clone();
           const localeData = value.localeData();
-          const months = [];
+          const months: dayjs.MonthNames[] = [];
           for (let i = 0; i < 12; i++) {
             current = current.month(i);
             months.push(localeData.monthsShort(current));
@@ -201,7 +200,7 @@ const App: React.FC = () => {
 
           const year = value.year();
           const month = value.month();
-          const options = [];
+          const options: DefaultOptionType[] = [];
           for (let i = year - 10; i < year + 10; i += 1) {
             options.push({
               label: getYearLabel(i),

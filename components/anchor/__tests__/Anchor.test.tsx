@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { resetWarned } from 'rc-util/lib/warning';
+import { warning } from '@rc-component/util';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 import Anchor from '..';
+import mountTest from '../../../tests/shared/mountTest';
+import rtlTest from '../../../tests/shared/rtlTest';
 import { act, fireEvent, render, waitFakeTimer } from '../../../tests/utils';
 import Button from '../../button';
 import type { AnchorDirection } from '../Anchor';
+
+const { resetWarned } = warning;
 
 const { Link } = Anchor;
 
@@ -20,6 +24,8 @@ const getHashUrl = () => `Anchor-API-${idCounter++}`;
 
 jest.mock('scroll-into-view-if-needed', () => jest.fn());
 describe('Anchor Render', () => {
+  mountTest(Anchor);
+  rtlTest(Anchor);
   const getBoundingClientRectMock = jest.spyOn(
     HTMLHeadingElement.prototype,
     'getBoundingClientRect',
@@ -90,25 +96,21 @@ describe('Anchor Render', () => {
         ]}
       />,
     );
-    expect(container.querySelectorAll('.ant-anchor .ant-anchor-link').length).toBe(5);
-    const linkTitles = Array.from(container.querySelector('.ant-anchor')?.childNodes!).map((n) =>
-      (n as HTMLElement).querySelector('.ant-anchor-link-title'),
+    expect(container.querySelectorAll<HTMLElement>('.ant-anchor .ant-anchor-link').length).toBe(5);
+    const linkTitles = Array.from(container.querySelector('.ant-anchor')?.childNodes ?? []).map(
+      (n) => (n as HTMLElement).querySelector<HTMLAnchorElement>('.ant-anchor-link-title'),
     );
-    expect((linkTitles[1] as HTMLAnchorElement).href).toContain('#anchor-demo-basic');
-    expect((linkTitles[2] as HTMLAnchorElement).href).toContain('#anchor-demo-static');
-    expect((linkTitles[3] as HTMLAnchorElement).href).toContain('#api');
+    expect(linkTitles[1]?.href).toContain('#anchor-demo-basic');
+    expect(linkTitles[2]?.href).toContain('#anchor-demo-static');
+    expect(linkTitles[3]?.href).toContain('#api');
     expect(
-      (
-        container.querySelector(
-          '.ant-anchor .ant-anchor-link .ant-anchor-link .ant-anchor-link-title',
-        ) as HTMLAnchorElement
+      container.querySelector<HTMLAnchorElement>(
+        '.ant-anchor .ant-anchor-link .ant-anchor-link .ant-anchor-link-title',
       )?.href,
     ).toContain('#anchor-props');
     expect(
-      (
-        container.querySelector(
-          '.ant-anchor .ant-anchor-link .ant-anchor-link .ant-anchor-link .ant-anchor-link-title',
-        ) as HTMLAnchorElement
+      container.querySelector<HTMLAnchorElement>(
+        '.ant-anchor .ant-anchor-link .ant-anchor-link .ant-anchor-link .ant-anchor-link-title',
       )?.href,
     ).toContain('#link-props');
     expect(asFragment().firstChild).toMatchSnapshot();
@@ -118,31 +120,19 @@ describe('Anchor Render', () => {
     const { container, asFragment } = render(
       <Anchor
         items={[
-          {
-            key: '1',
-            href: '#anchor-demo-basic',
-            title: 'Item Basic Demo',
-          },
-          {
-            key: '2',
-            href: '#anchor-demo-static',
-            title: 'Static demo',
-          },
-          {
-            key: '3',
-            href: '#api',
-            title: 'API',
-          },
+          { key: '1', href: '#anchor-demo-basic', title: 'Item Basic Demo' },
+          { key: '2', href: '#anchor-demo-static', title: 'Static demo' },
+          { key: '3', href: '#api', title: 'API' },
         ]}
       />,
     );
-    expect(container.querySelectorAll('.ant-anchor .ant-anchor-link').length).toBe(3);
-    const linkTitles = Array.from(container.querySelector('.ant-anchor')?.childNodes!).map((n) =>
-      (n as HTMLElement).querySelector('.ant-anchor-link-title'),
+    expect(container.querySelectorAll<HTMLElement>('.ant-anchor .ant-anchor-link').length).toBe(3);
+    const linkTitles = Array.from(container.querySelector('.ant-anchor')?.childNodes ?? []).map(
+      (n) => (n as HTMLElement).querySelector<HTMLAnchorElement>('.ant-anchor-link-title'),
     );
-    expect((linkTitles[1] as HTMLAnchorElement).href).toContain('#anchor-demo-basic');
-    expect((linkTitles[2] as HTMLAnchorElement).href).toContain('#anchor-demo-static');
-    expect((linkTitles[3] as HTMLAnchorElement).href).toContain('#api');
+    expect(linkTitles[1]?.href).toContain('#anchor-demo-basic');
+    expect(linkTitles[2]?.href).toContain('#anchor-demo-static');
+    expect(linkTitles[3]?.href).toContain('#api');
     expect(asFragment().firstChild).toMatchSnapshot();
   });
 
@@ -185,7 +175,7 @@ describe('Anchor Render', () => {
     const link = container.querySelector(`a[href="http://www.example.com/#${hash}"]`)!;
     fireEvent.click(link);
     await waitFakeTimer();
-    expect(link.classList).toContain('ant-anchor-link-title-active');
+    expect(link).toHaveClass('ant-anchor-link-title-active');
   });
 
   it('scrolls the page when clicking a link', async () => {
@@ -280,6 +270,9 @@ describe('Anchor Render', () => {
     expect(scrollToSpy).toHaveBeenCalled();
     expect(pushStateSpy).not.toHaveBeenCalled();
     expect(replaceStateSpy).not.toHaveBeenCalled();
+    scrollToSpy.mockRestore();
+    pushStateSpy.mockRestore();
+    replaceStateSpy.mockRestore();
   });
 
   it('targetOffset prop', async () => {
@@ -341,6 +334,89 @@ describe('Anchor Render', () => {
     expect(scrollToSpy).toHaveBeenLastCalledWith(0, 800);
   });
 
+  // https://github.com/ant-design/ant-design/issues/45634
+  it('targetOffset can be set per Anchor.Link and fallback to global', async () => {
+    const hash = getHashUrl();
+
+    const scrollToSpy = jest.spyOn(window, 'scrollTo');
+    const root = createDiv();
+    render(<h1 id={hash}>Hello</h1>, { container: root });
+    const { container } = render(
+      <Anchor
+        targetOffset={100}
+        items={[
+          { key: 'link1', href: `#${hash}`, title: 'Link 1', targetOffset: 50 },
+          { key: 'link2', href: `#${hash}`, title: 'Link 2' },
+          { key: 'link3', href: `#${hash}`, title: 'Link 3' },
+        ]}
+      />,
+    );
+
+    fireEvent.click(container.querySelector('a[title="Link 1"]')!);
+    await waitFakeTimer();
+    expect(scrollToSpy).toHaveBeenLastCalledWith(0, 950);
+
+    fireEvent.click(container.querySelector('a[title="Link 2"]')!);
+    await waitFakeTimer();
+    expect(scrollToSpy).toHaveBeenLastCalledWith(0, 900);
+
+    const { container: container3 } = render(
+      <Anchor items={[{ key: 'link3', href: `#${hash}`, title: 'Link 3' }]} />,
+    );
+    fireEvent.click(container3.querySelector('a[title="Link 3"]')!);
+    await waitFakeTimer();
+    expect(scrollToSpy).toHaveBeenLastCalledWith(0, 1000);
+  });
+
+  it('should use link-level targetOffset when detecting active link during scroll', async () => {
+    const hash1 = getHashUrl();
+    const hash2 = getHashUrl();
+
+    const root = createDiv();
+    render(
+      <div>
+        <h1 id={hash1}>Section 1</h1>
+        <h1 id={hash2}>Section 2</h1>
+      </div>,
+      { container: root },
+    );
+
+    const originalGetBoundingClientRect = HTMLHeadingElement.prototype.getBoundingClientRect;
+    HTMLHeadingElement.prototype.getBoundingClientRect = jest.fn().mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      if (this.id === hash1) {
+        return { width: 100, height: 100, top: 60 } as DOMRect;
+      }
+      if (this.id === hash2) {
+        return { width: 100, height: 100, top: 160 } as DOMRect;
+      }
+      return { width: 100, height: 100, top: 1000 } as DOMRect;
+    });
+
+    const onChange = jest.fn();
+    render(
+      <Anchor
+        targetOffset={100}
+        onChange={onChange}
+        items={[
+          { key: hash1, href: `#${hash1}`, title: hash1, targetOffset: 50 },
+          { key: hash2, href: `#${hash2}`, title: hash2 },
+        ]}
+      />,
+    );
+
+    expect(onChange).toHaveBeenCalled();
+
+    fireEvent.scroll(window);
+
+    await waitFakeTimer();
+
+    expect(onChange).toHaveBeenCalled();
+
+    HTMLHeadingElement.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+  });
+
   it('onClick event', () => {
     const hash = getHashUrl();
     let event;
@@ -379,7 +455,7 @@ describe('Anchor Render', () => {
 
   it('replaces item href in browser history (external href)', () => {
     const replaceStateSpy = jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-    const pushStateSpy = jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    const pushStateSpy = jest.spyOn(window.history, 'pushState').mockImplementation(() => {});
     const hash = getHashUrl();
     const href = `http://www.example.com/#${hash}`;
     const title = hash;
@@ -737,11 +813,9 @@ describe('Anchor Render', () => {
         />,
       );
       expect(container.querySelectorAll('.ant-anchor-ink').length).toBe(1);
-      expect(
-        container
-          .querySelector('.ant-anchor-wrapper')
-          ?.classList.contains('ant-anchor-wrapper-horizontal'),
-      ).toBeTruthy();
+      expect(container.querySelector('.ant-anchor-wrapper')).toHaveClass(
+        'ant-anchor-wrapper-horizontal',
+      );
     });
 
     it('nested children via items should be filtered out when direction is horizontal', () => {
@@ -818,7 +892,7 @@ describe('Anchor Render', () => {
       const link = container.querySelector(`a[href="http://www.example.com/#${hash}"]`)!;
       fireEvent.click(link);
       await waitFakeTimer();
-      expect(link.classList).toContain('ant-anchor-link-title-active');
+      expect(link).toHaveClass('ant-anchor-link-title-active');
     });
 
     it('scrolls the page when clicking a link', async () => {
@@ -910,6 +984,72 @@ describe('Anchor Render', () => {
       fireEvent.click(link);
       expect(container.querySelector(`.ant-anchor-link-title-active`)?.textContent).toBe('title');
     });
+  });
+
+  it('should cancel previous scroll animation when clicking different links rapidly', async () => {
+    const hash1 = getHashUrl();
+    const hash2 = getHashUrl();
+    const hash3 = getHashUrl();
+    const root = createDiv();
+    const scrollToSpy = jest.spyOn(window, 'scrollTo');
+    render(
+      <div>
+        <div id={hash1}>Section 1</div>
+        <div id={hash2}>Section 2</div>
+        <div id={hash3}>Section 3</div>
+      </div>,
+      { container: root },
+    );
+
+    const { container } = render(
+      <Anchor
+        items={[
+          { key: hash1, href: `#${hash1}`, title: hash1 },
+          { key: hash2, href: `#${hash2}`, title: hash2 },
+          { key: hash3, href: `#${hash3}`, title: hash3 },
+        ]}
+      />,
+    );
+
+    fireEvent.click(container.querySelector(`a[href="#${hash1}"]`)!);
+    fireEvent.click(container.querySelector(`a[href="#${hash2}"]`)!);
+    fireEvent.click(container.querySelector(`a[href="#${hash3}"]`)!);
+    await waitFakeTimer();
+
+    expect(scrollToSpy).toHaveBeenCalled();
+  });
+
+  it('should not scroll when clicking the same active link during animation', async () => {
+    const hash = getHashUrl();
+    const root = createDiv();
+    const scrollToSpy = jest.spyOn(window, 'scrollTo');
+    render(<div id={hash}>Section</div>, { container: root });
+
+    const { container } = render(<Anchor items={[{ key: hash, href: `#${hash}`, title: hash }]} />);
+
+    const link = container.querySelector(`a[href="#${hash}"]`)!;
+
+    fireEvent.click(link);
+    const firstCallCount = scrollToSpy.mock.calls.length;
+    fireEvent.click(link);
+    expect(scrollToSpy).toHaveBeenCalledTimes(firstCallCount);
+
+    await waitFakeTimer();
+  });
+
+  it('should properly cleanup scroll animation on unmount', async () => {
+    const hash = getHashUrl();
+    const root = createDiv();
+
+    render(<div id={hash}>Section</div>, { container: root });
+
+    const { container, unmount } = render(
+      <Anchor items={[{ key: hash, href: `#${hash}`, title: hash }]} />,
+    );
+
+    fireEvent.click(container.querySelector(`a[href="#${hash}"]`)!);
+    unmount();
+    await waitFakeTimer();
   });
 
   describe('warning', () => {
@@ -1011,40 +1151,36 @@ describe('Anchor Render', () => {
             <Anchor
               direction={direction}
               items={[
-                {
-                  title: 'part-1',
-                  href: 'part-1',
-                  key: 'part-1',
-                },
-                {
-                  title: 'part-2',
-                  href: 'part-2',
-                  key: 'part-2',
-                },
+                { title: 'part-1', href: 'part-1', key: 'part-1' },
+                { title: 'part-2', href: 'part-2', key: 'part-2' },
               ]}
             />
           </div>
         );
       };
-      const wrapper = await render(<Foo />);
-      (await wrapper.findByText('part-1')).click();
+      const { container, findByText } = await render(<Foo />);
+      (await findByText('part-1')).click();
       await waitFakeTimer();
-      const ink = wrapper.container.querySelector<HTMLSpanElement>('.ant-anchor-ink')!;
-      const toggleButton = wrapper.container.querySelector('button')!;
+      const inkElement = container.querySelector<HTMLSpanElement>('.ant-anchor-ink');
+      const toggleButton = container.querySelector<HTMLElement>('button');
 
-      fireEvent.click(toggleButton);
-      act(() => jest.runAllTimers());
-      expect(!!ink.style.left).toBe(true);
-      expect(!!ink.style.width).toBe(true);
-      expect(ink.style.top).toBe('');
-      expect(ink.style.height).toBe('');
+      expect(toggleButton).toBeInTheDocument();
 
-      fireEvent.click(toggleButton);
+      fireEvent.click(toggleButton!);
       act(() => jest.runAllTimers());
-      expect(!!ink.style.top).toBe(true);
-      expect(!!ink.style.height).toBe(true);
-      expect(ink.style.left).toBe('');
-      expect(ink.style.width).toBe('');
+
+      expect(inkElement).toHaveStyle({
+        left: '0px',
+        width: '0px',
+      });
+
+      fireEvent.click(toggleButton!);
+      act(() => jest.runAllTimers());
+
+      expect(inkElement).toHaveStyle({
+        top: '0px',
+        height: '0px',
+      });
     });
   });
 });

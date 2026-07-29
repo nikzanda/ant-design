@@ -37,10 +37,10 @@ const treeData = [
   },
 ];
 const App: React.FC = () => {
-  const [placement, SetPlacement] = useState<SelectCommonPlacement>('topLeft');
+  const [placement, setPlacement] = useState<SelectCommonPlacement>('topLeft');
 
   const placementChange = (e: RadioChangeEvent) => {
-    SetPlacement(e.target.value);
+    setPlacement(e.target.value);
   };
 
   return (
@@ -57,7 +57,13 @@ const App: React.FC = () => {
       <TreeSelect
         showSearch
         styles={{
-          popup: { root: { maxHeight: 400, overflow: 'auto', minWidth: 300 } },
+          popup: {
+            root: {
+              maxHeight: 400,
+              overflow: 'auto',
+              minWidth: 300,
+            },
+          },
         }}
         placeholder="Please select"
         popupMatchSelectWidth={false}

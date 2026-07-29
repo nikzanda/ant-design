@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
+import type { CheckboxGroupProps } from '..';
+import Checkbox from '..';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
 import { fireEvent, render } from '../../../tests/utils';
 import Collapse from '../../collapse';
 import Input from '../../input';
 import Table from '../../table';
-import type { CheckboxGroupProps } from '../index';
-import Checkbox from '../index';
 
 describe('CheckboxGroup', () => {
   mountTest(Checkbox.Group);
@@ -64,7 +64,7 @@ describe('CheckboxGroup', () => {
     const { container } = render(<Checkbox.Group name="checkboxgroup" options={['Yes', 'No']} />);
     Array.from(container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')).forEach(
       (el) => {
-        expect(el.getAttribute('name')).toEqual('checkboxgroup');
+        expect(el.getAttribute('name')).toBe('checkboxgroup');
       },
     );
   });
@@ -102,7 +102,7 @@ describe('CheckboxGroup', () => {
     );
     fireEvent.click(container.querySelectorAll('.ant-checkbox-input')[0]);
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls[0][0].target.value).toEqual('my');
+    expect(onChange.mock.calls[0][0].target.value).toBe('my');
   });
 
   // https://github.com/ant-design/ant-design/issues/16376
@@ -274,5 +274,19 @@ describe('CheckboxGroup', () => {
       <Checkbox.Group options={[{ label: 'bamboo', id: 'bamboo', value: 'bamboo' }]} />,
     );
     expect(container.querySelector('#bamboo')).toBeTruthy();
+  });
+
+  describe('role prop', () => {
+    it('should set default role', () => {
+      const { container } = render(<Checkbox.Group options={['Apple', 'Pear', 'Orange']} />);
+      expect(container.firstChild).toHaveAttribute('role', 'group');
+    });
+
+    it('should set passed role', () => {
+      const { container } = render(
+        <Checkbox.Group options={['Apple', 'Pear', 'Orange']} role="checkbox" />,
+      );
+      expect(container.firstChild).toHaveAttribute('role', 'checkbox');
+    });
   });
 });

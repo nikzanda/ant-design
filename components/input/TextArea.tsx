@@ -1,10 +1,16 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
-import classNames from 'classnames';
-import type { TextAreaProps as RcTextAreaProps, TextAreaRef as RcTextAreaRef } from 'rc-textarea';
-import RcTextArea from 'rc-textarea';
+import type {
+  TextAreaProps as RcTextAreaProps,
+  TextAreaRef as RcTextAreaRef,
+} from '@rc-component/input';
+import { TextArea as RcTextArea } from '@rc-component/input';
+import { clsx } from 'clsx';
 
-import getAllowClear from '../_util/getAllowClear';
+import { useAllowClear } from '../_util/hooks';
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isFunction } from '../_util/is';
 import type { InputStatus } from '../_util/statusUtils';
 import { getMergedStatus, getStatusClassNames } from '../_util/statusUtils';
 import { devUseWarning } from '../_util/warning';
@@ -22,7 +28,24 @@ import { triggerFocus } from './Input';
 import { useSharedStyle } from './style';
 import useStyle from './style/textarea';
 
-export interface TextAreaProps extends Omit<RcTextAreaProps, 'suffix'> {
+export type TextAreaSemanticType = {
+  classNames?: {
+    root?: string;
+    textarea?: string;
+    clear?: string;
+    count?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    textarea?: React.CSSProperties;
+    clear?: React.CSSProperties;
+    count?: React.CSSProperties;
+  };
+};
+
+export type TextAreaSemanticAllType = GenerateSemantic<TextAreaSemanticType, TextAreaProps>;
+
+export interface TextAreaProps extends Omit<RcTextAreaProps, 'suffix' | 'classNames' | 'styles'> {
   /** @deprecated Use `variant` instead */
   bordered?: boolean;
   size?: SizeType;
@@ -33,12 +56,15 @@ export interface TextAreaProps extends Omit<RcTextAreaProps, 'suffix'> {
    * @default "outlined"
    */
   variant?: Variant;
+  classNames?: TextAreaSemanticAllType['classNamesAndFn'];
+  styles?: TextAreaSemanticAllType['stylesAndFn'];
 }
 
 export interface TextAreaRef {
   focus: (options?: InputFocusOptions) => void;
   blur: () => void;
   resizableTextArea?: RcTextAreaRef['resizableTextArea'];
+  nativeElement: HTMLElement | null;
 }
 
 const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
@@ -49,7 +75,7 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
     disabled: customDisabled,
     status: customStatus,
     allowClear,
-    classNames: classes,
+    classNames,
     rootClassName,
     className,
     style,
@@ -89,6 +115,17 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
   } = React.useContext(FormItemInputContext);
   const mergedStatus = getMergedStatus(contextStatus, customStatus);
 
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    TextAreaSemanticAllType['classNames'],
+    TextAreaSemanticAllType['styles'],
+    TextAreaProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props,
+  });
+
   // ===================== Ref ======================
   const innerRef = React.useRef<RcTextAreaRef>(null);
 
@@ -98,14 +135,15 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
       triggerFocus(innerRef.current?.resizableTextArea?.textArea, option);
     },
     blur: () => innerRef.current?.blur(),
+    nativeElement: innerRef.current?.nativeElement || null,
   }));
 
   const prefixCls = getPrefixCls('input', customizePrefixCls);
 
   // ==================== Style =====================
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapSharedCSSVar, hashId, cssVarCls] = useSharedStyle(prefixCls, rootClassName);
-  const [wrapCSSVar] = useStyle(prefixCls, rootCls);
+  const [hashId, cssVarCls] = useSharedStyle(prefixCls, rootClassName);
+  useStyle(prefixCls, rootCls);
 
   // ================= Compact Item =================
   const { compactSize, compactItemClassnames } = useCompactItemContext(prefixCls, direction);
@@ -115,7 +153,11 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
 
   const [variant, enableVariantCls] = useVariant('textArea', customVariant, bordered);
 
-  const mergedAllowClear = getAllowClear(allowClear ?? contextAllowClear);
+  const mergedAllowClear = useAllowClear({
+    allowClear,
+    contextAllowClear,
+    componentName: 'TextArea',
+  });
 
   // ==================== Resize ====================
   // https://github.com/ant-design/ant-design/issues/51594
@@ -140,9 +182,8 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
     onResize?.(size);
 
     // Change to dirty since this maybe from the `resize: both` style
-    if (isMouseDown && typeof getComputedStyle === 'function') {
+    if (isMouseDown && isFunction(getComputedStyle)) {
       const ele = innerRef.current?.nativeElement?.querySelector('textarea');
-
       if (ele && getComputedStyle(ele).resize === 'both') {
         setResizeDirty(true);
       }
@@ -150,65 +191,62 @@ const TextArea = forwardRef<TextAreaRef, TextAreaProps>((props, ref) => {
   };
 
   // ==================== Render ====================
-  return wrapSharedCSSVar(
-    wrapCSSVar(
-      <RcTextArea
-        autoComplete={contextAutoComplete}
-        {...rest}
-        style={{ ...contextStyle, ...style }}
-        styles={{ ...contextStyles, ...styles }}
-        disabled={mergedDisabled}
-        allowClear={mergedAllowClear}
-        className={classNames(
-          cssVarCls,
-          rootCls,
-          className,
-          rootClassName,
-          compactItemClassnames,
-          contextClassName,
-          // Only for wrapper
-          resizeDirty && `${prefixCls}-textarea-affix-wrapper-resize-dirty`,
-        )}
-        classNames={{
-          ...classes,
-          ...contextClassNames,
-          textarea: classNames(
-            {
-              [`${prefixCls}-sm`]: mergedSize === 'small',
-              [`${prefixCls}-lg`]: mergedSize === 'large',
-            },
-            hashId,
-            classes?.textarea,
-            contextClassNames.textarea,
-            isMouseDown && `${prefixCls}-mouse-active`,
-          ),
-          variant: classNames(
-            {
-              [`${prefixCls}-${variant}`]: enableVariantCls,
-            },
-            getStatusClassNames(prefixCls, mergedStatus),
-          ),
-          affixWrapper: classNames(
-            `${prefixCls}-textarea-affix-wrapper`,
-            {
-              [`${prefixCls}-affix-wrapper-rtl`]: direction === 'rtl',
-              [`${prefixCls}-affix-wrapper-sm`]: mergedSize === 'small',
-              [`${prefixCls}-affix-wrapper-lg`]: mergedSize === 'large',
-              [`${prefixCls}-textarea-show-count`]: showCount || props.count?.show,
-            },
-            hashId,
-          ),
-        }}
-        prefixCls={prefixCls}
-        suffix={
-          hasFeedback && <span className={`${prefixCls}-textarea-suffix`}>{feedbackIcon}</span>
-        }
-        showCount={showCount}
-        ref={innerRef}
-        onResize={onInternalResize}
-        onMouseDown={onInternalMouseDown}
-      />,
-    ),
+  return (
+    <RcTextArea
+      autoComplete={contextAutoComplete}
+      {...rest}
+      style={mergedStyles.root}
+      styles={mergedStyles}
+      disabled={mergedDisabled}
+      allowClear={mergedAllowClear}
+      className={clsx(
+        cssVarCls,
+        rootCls,
+        className,
+        rootClassName,
+        compactItemClassnames,
+        contextClassName,
+        mergedClassNames.root,
+        // Only for wrapper
+        {
+          [`${prefixCls}-textarea-affix-wrapper-resize-dirty`]: resizeDirty,
+        },
+      )}
+      classNames={{
+        ...mergedClassNames,
+        textarea: clsx(
+          {
+            [`${prefixCls}-sm`]: mergedSize === 'small',
+            [`${prefixCls}-lg`]: mergedSize === 'large',
+          },
+          hashId,
+          mergedClassNames.textarea,
+          isMouseDown && `${prefixCls}-mouse-active`,
+        ),
+        variant: clsx(
+          {
+            [`${prefixCls}-${variant}`]: enableVariantCls,
+          },
+          getStatusClassNames(prefixCls, mergedStatus),
+        ),
+        affixWrapper: clsx(
+          `${prefixCls}-textarea-affix-wrapper`,
+          {
+            [`${prefixCls}-affix-wrapper-rtl`]: direction === 'rtl',
+            [`${prefixCls}-affix-wrapper-sm`]: mergedSize === 'small',
+            [`${prefixCls}-affix-wrapper-lg`]: mergedSize === 'large',
+            [`${prefixCls}-textarea-show-count`]: showCount || props.count?.show,
+          },
+          hashId,
+        ),
+      }}
+      prefixCls={prefixCls}
+      suffix={hasFeedback && <span className={`${prefixCls}-textarea-suffix`}>{feedbackIcon}</span>}
+      showCount={showCount}
+      ref={innerRef}
+      onResize={onInternalResize}
+      onMouseDown={onInternalMouseDown}
+    />
   );
 });
 

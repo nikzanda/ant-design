@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Slider, Switch, Typography } from 'antd';
+import { Slider, Switch, Typography } from 'antd';
 
 const { Text, Paragraph } = Typography;
 
@@ -8,10 +8,10 @@ const templateStr =
 
 const text = `this is a multiline
   text that has many
-  lines and 
+  lines and
     - render like this
     - and this
-    
+
   and that`;
 
 const App: React.FC = () => {
@@ -23,9 +23,13 @@ const App: React.FC = () => {
   const [display, setDisplay] = useState('none');
 
   React.useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setDisplay('block');
     }, 100);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -82,17 +86,13 @@ const App: React.FC = () => {
 
       <div style={{ display }}>
         <Text style={{ width: 100 }} ellipsis={{ tooltip: 'I am ellipsis now!' }}>
-          默认display none 样式的超长文字， 悬停tooltip失效了
+          默认 display none 样式的超长文字， 悬停 tooltip 失效了
         </Text>
       </div>
 
       <Typography.Paragraph
         style={{ width: 300 }}
-        ellipsis={{
-          rows: 3,
-          expandable: true,
-          symbol: <Button>Open</Button>,
-        }}
+        ellipsis={{ rows: 3, expandable: true, symbol: <span>Open</span> }}
       >
         {templateStr.slice(0, 60)}
         <span style={{ fontSize: '5em' }}>ANTD</span>
@@ -108,6 +108,22 @@ const App: React.FC = () => {
       <Text style={{ width: 100, whiteSpace: 'nowrap' }} ellipsis copyable>
         {templateStr}
       </Text>
+
+      <div style={{ marginTop: 24 }}>
+        <div style={{ marginBottom: 8, fontSize: 12, color: '#666' }}>
+          <strong>Debug: copyable + ellipsis tooltips</strong>
+          <br />
+          1. Hover the text → ellipsis tooltip (full content) should show.
+          <br />
+          2. Hover the copy button → only &quot;Copy&quot; / &quot;Copied&quot; tooltip should show.
+          <br />
+          3. Move from copy button back to the text (without leaving the block) → ellipsis tooltip
+          should show again.
+        </div>
+        <Text style={{ width: 280, display: 'block' }} ellipsis={{ tooltip: true }} copyable>
+          {templateStr}
+        </Text>
+      </div>
     </>
   );
 };

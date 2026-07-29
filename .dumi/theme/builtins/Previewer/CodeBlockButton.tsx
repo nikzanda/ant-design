@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { App, Tooltip } from 'antd';
 import { FormattedMessage } from 'dumi';
@@ -27,17 +27,19 @@ const CodeBlockButton: React.FC<CodeBlockButtonProps> = ({ title, dependencies =
 
   const [locale] = useLocale(locales);
 
-  const codeBlockPrefillConfig = {
-    title: `${title} - antd@${dependencies.antd}`,
-    js: `${
-      /import React(\D*)from 'react';/.test(jsx) ? '' : `import React from 'react';\n`
-    }import { createRoot } from 'react-dom/client';\n${jsx.replace(
-      /export default/,
-      'const ComponentDemo =',
-    )}\n\ncreateRoot(mountNode).render(<ComponentDemo />);\n`,
-    css: '',
-    json: JSON.stringify({ name: 'antd-demo', dependencies }, null, 2),
-  };
+  const codeBlockPrefillConfig = useMemo(() => {
+    return {
+      title: `${title} - antd@${dependencies.antd}`,
+      js: `${
+        /import React(\D*)from 'react';/.test(jsx) ? '' : `import React from 'react';\n`
+      }import { createRoot } from 'react-dom/client';\n${jsx.replace(
+        /export default/,
+        'const ComponentDemo =',
+      )}\n\ncreateRoot(mountNode).render(<ComponentDemo />);\n`,
+      css: '',
+      json: JSON.stringify({ name: 'antd-demo', dependencies }, null, 2),
+    };
+  }, [dependencies, jsx, title]);
 
   const openHituCodeBlockFn = React.useCallback(() => {
     setLoading(false);
@@ -52,15 +54,14 @@ const CodeBlockButton: React.FC<CodeBlockButtonProps> = ({ title, dependencies =
 
   const handleClick = () => {
     const scriptId = 'hitu-code-block-js';
-    const existScript = document.getElementById(scriptId) as HTMLScriptElement | null;
-    // @ts-ignore
+    const existScript = document.getElementById(scriptId) as HTMLScriptElement;
     if (existScript?.dataset.loaded) {
       openHituCodeBlockFn();
       return;
     }
     setLoading(true);
     const script = document.createElement('script');
-    script.src = `https://renderoffice.alipayobjects.com/p/yuyan/180020010001206410/parseFileData-v1.0.1.js?t=${Date.now()}`;
+    script.src = `https://renderoffice.alipayobjects.com/p/yuyan/180020010001206410/parseFileData-v1.1.0.js?t=${Date.now()}`;
     script.async = true;
     script.id = scriptId;
     script.onload = () => {
@@ -86,7 +87,7 @@ const CodeBlockButton: React.FC<CodeBlockButtonProps> = ({ title, dependencies =
   );
 };
 
-const SuspenseCodeBlockButton: React.FC<React.ComponentProps<typeof CodeBlockButton>> = (props) => (
+const SuspenseCodeBlockButton: React.FC<CodeBlockButtonProps> = (props) => (
   <Suspense fallback={null}>
     <CodeBlockButton {...props} />
   </Suspense>

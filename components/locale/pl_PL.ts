@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/pl_PL';
+import Pagination from '@rc-component/pagination/locale/pl_PL';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/pl_PL';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Wybierz',
     close: 'Zamknij',
+    show: 'Pokaż',
+    hide: 'Ukryj',
+    sortable: 'sortowalne',
   },
   Table: {
     filterTitle: 'Menu filtra',
@@ -61,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Wybierz wszystkie',
     removeAll: 'Usuń wszystkie',
     selectInvert: 'Odwróć wybór',
+    deselectAll: 'Odznacz wszystkie dane',
   },
   Upload: {
     uploading: 'Wysyłanie...',
@@ -80,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Kopiuj',
     copied: 'Skopiowany',
     expand: 'Rozwiń',
+    collapse: 'Zwiń',
   },
   Form: {
     optional: '(opcjonalne)',
@@ -131,8 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Podgląd',
+  QRCode: {
+    expired: 'Kod QR wygasł',
+    refresh: 'Odśwież',
+    scanned: 'Zeskanowano',
+  },
+  ColorPicker: {
+    presetEmpty: 'Pusty',
+    transparent: 'Przezroczysty',
+    singleColor: 'Pojedynczy kolor',
+    gradientColor: 'Kolor gradientowy',
   },
 };
 

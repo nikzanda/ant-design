@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
+import { render } from '@rc-component/util';
 
 import { AppConfigContext } from '../app/context';
 import ConfigProvider, { ConfigContext, globalConfig, warnContext } from '../config-provider';
-import { unstableSetRender } from '../config-provider/UnstableContext';
 import type {
   ArgsProps,
   ConfigOptions,
@@ -11,6 +11,7 @@ import type {
   NoticeType,
   TypeOpen,
 } from './interface';
+import PureList from './PureList';
 import PurePanel from './PurePanel';
 import useMessage, { useInternalMessage } from './useMessage';
 import { wrapPromiseFn } from './util';
@@ -43,24 +44,17 @@ interface TypeTask {
   skipped?: boolean;
 }
 
-type Task =
-  | OpenTask
-  | TypeTask
-  | {
-      type: 'destroy';
-      key?: React.Key;
-      skipped?: boolean;
-    };
+type Task = OpenTask | TypeTask | { type: 'destroy'; key?: React.Key; skipped?: boolean };
 
 let taskQueue: Task[] = [];
 
 let defaultGlobalConfig: ConfigOptions = {};
 
 function getGlobalContext() {
-  const { getContainer, duration, rtl, maxCount, top } = defaultGlobalConfig;
+  const { getContainer, duration, rtl, maxCount, top, stack } = defaultGlobalConfig;
   const mergedContainer = getContainer?.() || document.body;
 
-  return { getContainer: () => mergedContainer, duration, rtl, maxCount, top };
+  return { getContainer: () => mergedContainer, duration, rtl, maxCount, top, stack };
 }
 
 interface GlobalHolderRef {
@@ -132,13 +126,10 @@ const flushMessageQueue = () => {
 
     // Delay render to avoid sync issue
     act(() => {
-      const reactRender = unstableSetRender();
-
-      reactRender(
+      render(
         <GlobalHolderWrapper
           ref={(node) => {
             const { instance, sync } = node || {};
-
             // React 18 test env will throw if call immediately in ref
             Promise.resolve().then(() => {
               if (!newMessage.instance && instance) {
@@ -300,6 +291,8 @@ interface BaseMethods {
   useMessage: typeof useMessage;
   /** @private Internal Component. Do not use in your production. */
   _InternalPanelDoNotUseOrYouWillBeFired: typeof PurePanel;
+  /** @private Internal Component. Do not use in your production. */
+  _InternalListDoNotUseOrYouWillBeFired: typeof PureList;
 }
 
 interface MessageMethods {
@@ -318,6 +311,7 @@ const baseStaticMethods: BaseMethods = {
   config: setMessageGlobalConfig,
   useMessage,
   _InternalPanelDoNotUseOrYouWillBeFired: PurePanel,
+  _InternalListDoNotUseOrYouWillBeFired: PureList,
 };
 
 const staticMethods = baseStaticMethods as MessageMethods & BaseMethods;
@@ -331,7 +325,7 @@ methods.forEach((type: keyof MessageMethods) => {
 // ==============================================================================
 const noop = () => {};
 
-let _actWrapper: (wrapper: any) => void = noop;
+let _actWrapper: (wrapper: (fn: () => void) => void) => void = noop;
 if (process.env.NODE_ENV === 'test') {
   _actWrapper = (wrapper) => {
     act = wrapper;

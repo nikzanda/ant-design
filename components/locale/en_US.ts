@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/en_US';
+import Pagination from '@rc-component/pagination/locale/en_US';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/en_US';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Please select',
     close: 'Close',
+    sortable: 'sortable',
+    show: 'Show',
+    hide: 'Hide',
   },
   Table: {
     filterTitle: 'Filter menu',
@@ -132,9 +135,6 @@ const localeValues: Locale = {
         mismatch: '${label} does not match the pattern ${pattern}',
       },
     },
-  },
-  Image: {
-    preview: 'Preview',
   },
   QRCode: {
     expired: 'QR code expired',

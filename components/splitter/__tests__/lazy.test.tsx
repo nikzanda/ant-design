@@ -1,14 +1,18 @@
 import React from 'react';
+import { spyElementPrototypes, warning } from '@rc-component/util';
 import { createEvent, fireEvent, render } from '@testing-library/react';
-import { Splitter } from 'antd';
-import { spyElementPrototypes } from 'rc-util/lib/test/domHook';
-import { resetWarned } from 'rc-util/lib/warning';
 
+import Splitter from '..';
 import { triggerResize, waitFakeTimer } from '../../../tests/utils';
-import { PanelProps, SplitterProps } from '../interface';
+import type { PanelProps, SplitterProps } from '../interface';
 
-const SplitterDemo = ({ items = [{}, {}], ...props }: { items?: PanelProps[] } & SplitterProps) => (
-  <Splitter {...props}>
+const { resetWarned } = warning;
+
+const SplitterDemo: React.FC<{ items?: PanelProps[] } & SplitterProps> = ({
+  items = [{}, {}],
+  ...rest
+}) => (
+  <Splitter {...rest}>
     {items?.map((item, idx) => {
       const key = `panel-${idx}`;
       return <Splitter.Panel key={key} {...item} />;
@@ -135,6 +139,37 @@ describe('Splitter lazy', () => {
 
     // mask should hide
     expect(container.querySelector('.ant-splitter-mask')).toBeFalsy();
+  });
+
+  it('should not move preview when adjacent panels have zero size', async () => {
+    const onResize = jest.fn();
+    const onResizeEnd = jest.fn();
+    const { container } = render(
+      <SplitterDemo
+        items={[{ defaultSize: 0 }, { defaultSize: 0 }, {}]}
+        onResize={onResize}
+        onResizeEnd={onResizeEnd}
+        lazy
+      />,
+    );
+
+    await resizeSplitter();
+
+    const dragger = container.querySelector<HTMLElement>('.ant-splitter-bar-dragger')!;
+    const downEvent = createEvent.mouseDown(dragger);
+    Object.defineProperty(downEvent, 'pageX', { value: 0 });
+    fireEvent(dragger, downEvent);
+
+    const moveEvent = createEvent.mouseMove(window);
+    Object.defineProperty(moveEvent, 'pageX', { value: 1000 });
+    fireEvent(window, moveEvent);
+
+    const preview = container.querySelector<HTMLElement>('.ant-splitter-bar-preview')!;
+    expect(preview.style.getPropertyValue('--ant-splitter-bar-preview-offset')).toBe('0px');
+    expect(onResize).not.toHaveBeenCalled();
+
+    fireEvent.mouseUp(window);
+    expect(onResizeEnd).toHaveBeenCalledWith([0, 0, 100]);
   });
 
   it('should work with touch events when lazy', async () => {

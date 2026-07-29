@@ -39,7 +39,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <Flex gap="middle">
+    <Flex gap="medium">
       <Watermark {...watermarkProps}>
         <Typography>
           <Paragraph>
@@ -67,6 +67,7 @@ const App: React.FC = () => {
           </Paragraph>
         </Typography>
         <img
+          draggable={false}
           style={{ zIndex: 10, width: '100%', maxWidth: 800, position: 'relative' }}
           src="https://gw.alipayobjects.com/mdn/rms_08e378/afts/img/A*zx7LTI_ECSAAAAAAAAAAAABkARQnAQ"
           alt="img"
@@ -87,7 +88,7 @@ const App: React.FC = () => {
         }}
       >
         <Form.Item name="content" label="Content">
-          <Input placeholder="请输入" />
+          <Input placeholder="Please enter" />
         </Form.Item>
         <Form.Item name="color" label="Color">
           <ColorPicker />

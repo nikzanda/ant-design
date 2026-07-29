@@ -1,6 +1,6 @@
 import React from 'react';
-import { render as testLibRender } from '@testing-library/react';
 import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
+import { render as testLibRender } from '@testing-library/react';
 
 import notification from '..';
 import { act, fireEvent, pureRender, render } from '../../../tests/utils';
@@ -30,7 +30,7 @@ describe('notification.hooks', () => {
               type="button"
               onClick={() => {
                 api.open({
-                  message: null,
+                  title: null,
                   description: (
                     <Context.Consumer>
                       {(name) => <span className="hook-test-result">{name}</span>}
@@ -52,7 +52,7 @@ describe('notification.hooks', () => {
 
     fireEvent.click(container.querySelector('button')!);
     expect(document.querySelectorAll('.my-test-notification-notice')).toHaveLength(1);
-    expect(document.querySelector('.hook-test-result')!.textContent).toEqual('bamboo');
+    expect(document.querySelector('.hook-test-result')!.textContent).toBe('bamboo');
   });
 
   it('should work with success', () => {
@@ -68,7 +68,7 @@ describe('notification.hooks', () => {
               type="button"
               onClick={() => {
                 api.success({
-                  message: null,
+                  title: null,
                   description: (
                     <Context.Consumer>
                       {(name) => <span className="hook-test-result">{name}</span>}
@@ -90,7 +90,7 @@ describe('notification.hooks', () => {
     fireEvent.click(container.querySelector('button')!);
     expect(document.querySelectorAll('.my-test-notification-notice')).toHaveLength(1);
     expect(document.querySelectorAll('.anticon-check-circle')).toHaveLength(1);
-    expect(document.querySelector('.hook-test-result')!.textContent).toEqual('bamboo');
+    expect(document.querySelector('.hook-test-result')!.textContent).toBe('bamboo');
   });
 
   it('should be same hook', () => {
@@ -101,7 +101,7 @@ describe('notification.hooks', () => {
       const [api] = notification.useNotification();
       React.useEffect(() => {
         count += 1;
-        expect(count).toEqual(1);
+        expect(count).toBe(1);
         forceUpdate([]);
       }, [api]);
 
@@ -118,7 +118,7 @@ describe('notification.hooks', () => {
 
         React.useEffect(() => {
           api.info({
-            message: null,
+            title: null,
             description: <div className="bamboo" />,
           });
         }, []);
@@ -140,7 +140,7 @@ describe('notification.hooks', () => {
 
         if (!calledRef.current) {
           api.info({
-            message: null,
+            title: null,
             description: <div className="bamboo" />,
           });
           calledRef.current = true;
@@ -181,7 +181,7 @@ describe('notification.hooks', () => {
 
       React.useEffect(() => {
         api.info({
-          message: null,
+          title: null,
           description: 'test',
         });
       }, []);
@@ -203,7 +203,7 @@ describe('notification.hooks', () => {
           <a
             onClick={() => {
               api.info({
-                message: null,
+                title: null,
                 description: 'test',
               });
             }}
@@ -219,7 +219,7 @@ describe('notification.hooks', () => {
     fireEvent.click(container.querySelector('a')!);
 
     function getNoticeCount() {
-      return Array.from(document.querySelectorAll('.ant-notification-notice-wrapper')).filter(
+      return Array.from(document.querySelectorAll('.ant-notification-notice')).filter(
         (node) => !node.classList.contains('ant-notification-fade-leave'),
       ).length;
     }
@@ -245,7 +245,7 @@ describe('notification.hooks', () => {
         React.useEffect(() => {
           api.info({
             className,
-            message: 'Notification Title',
+            title: 'Notification Title',
             duration: 0,
           });
         }, []);

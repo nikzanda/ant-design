@@ -21,12 +21,12 @@ describe('Spin', () => {
 
   it('should only affect the spin element when set style to a nested <Spin>xx</Spin>', () => {
     const { container } = render(
-      <Spin style={{ background: 'red' }}>
+      <Spin style={{ padding: 20 }}>
         <div>content</div>
       </Spin>,
     );
-    expect(container.querySelector<HTMLElement>('.ant-spin-nested-loading')?.style.length).toBe(0);
-    expect(container.querySelector<HTMLElement>('.ant-spin')?.style.background).toBe('red');
+    // After refactoring, the root element is the spin element itself
+    expect(container.querySelector<HTMLElement>('.ant-spin')).toHaveStyle({ padding: '20px' });
   });
 
   it('should not apply nested styles when full screen', () => {
@@ -35,7 +35,7 @@ describe('Spin', () => {
         <div>content</div>
       </Spin>,
     );
-    expect(container.querySelector<HTMLElement>('ant-spin-nested-loading')).toBeNull();
+    expect(container.querySelector<HTMLElement>('.ant-spin-nested-loading')).toBeNull();
   });
 
   it("should render custom indicator when it's set", () => {
@@ -70,30 +70,6 @@ describe('Spin', () => {
   it('should render 0', () => {
     const { container } = render(<Spin>{0}</Spin>);
     expect(container.querySelector('.ant-spin-container')?.textContent).toBe('0');
-  });
-
-  it('warning tip without nest', () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    const { container } = render(<Spin tip="Not Show" />);
-    expect(container.querySelector('.ant-spin-text')).toBeFalsy();
-
-    expect(errSpy).toHaveBeenCalledWith(
-      'Warning: [antd: Spin] `tip` only work in nest or fullscreen pattern.',
-    );
-
-    errSpy.mockRestore();
-  });
-
-  it('should not warn tip with fullscreen', () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    const { container } = render(<Spin fullscreen tip="Fullscreen" />);
-    expect(container.querySelector('.ant-spin-fullscreen')).toBeTruthy();
-
-    expect(errSpy).not.toHaveBeenCalled();
-
-    errSpy.mockRestore();
   });
 
   it('right style when fullscreen', () => {
@@ -132,6 +108,121 @@ describe('Spin', () => {
       );
       const { container } = render(<Spin indicator={<MyIndicator />} percent={23} />);
       expect(container.querySelector('.custom-indicator')?.textContent).toBe('23');
+    });
+  });
+
+  it('custom styles', () => {
+    const customStyles = {
+      root: { background: 'rgb(255, 0, 0)' },
+      indicator: { color: 'rgb(0, 0, 255)' },
+      mask: { background: 'rgb(0, 255, 0)' },
+    };
+    const customClassNames = {
+      root: 'custom-root',
+      indicator: 'custom-indicator',
+      mask: 'custom-mask',
+    };
+    const { container } = render(<Spin styles={customStyles} classNames={customClassNames} />);
+    const { container: fullscreenContainer } = render(
+      <Spin fullscreen styles={customStyles} classNames={customClassNames} />,
+    );
+    expect(container.querySelector('.custom-root'))?.toHaveStyle('background: rgb(255, 0, 0)');
+    expect(fullscreenContainer.querySelector('.custom-mask'))?.toHaveStyle(
+      'background: rgb(0, 255, 0)',
+    );
+    expect(fullscreenContainer.querySelector('.custom-indicator'))?.toHaveStyle(
+      'color: rgb(0, 0, 255)',
+    );
+  });
+
+  describe('deprecated API warnings', () => {
+    it('should warn when using deprecated tip prop', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(
+        <Spin tip="Loading...">
+          <div>content</div>
+        </Spin>,
+      );
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `tip` is deprecated. Please use `description` instead.',
+      );
+
+      errSpy.mockRestore();
+    });
+
+    it('should warn when using deprecated tip in classNames', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<Spin classNames={{ tip: 'custom-tip' }} />);
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `classNames.tip and styles.tip` is deprecated. Please use `classNames.description and styles.description` instead.',
+      );
+
+      errSpy.mockRestore();
+    });
+
+    it('should warn when using deprecated tip in styles', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<Spin styles={{ tip: { color: 'blue' } }} />);
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `classNames.tip and styles.tip` is deprecated. Please use `classNames.description and styles.description` instead.',
+      );
+
+      errSpy.mockRestore();
+    });
+
+    it('should warn when using deprecated mask in classNames', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<Spin classNames={{ mask: 'custom-mask' }} />);
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `classNames.mask and styles.mask` is deprecated. Please use `classNames.root and styles.root` instead.',
+      );
+
+      errSpy.mockRestore();
+    });
+
+    it('should warn when using deprecated mask in styles', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      render(<Spin styles={{ mask: { background: 'red' } }} />);
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `classNames.mask and styles.mask` is deprecated. Please use `classNames.root and styles.root` instead.',
+      );
+
+      errSpy.mockRestore();
+    });
+
+    it('should use description instead of tip', () => {
+      const { container } = render(
+        <Spin description="Loading...">
+          <div>content</div>
+        </Spin>,
+      );
+
+      expect(container.querySelector('.ant-spin-description')?.textContent).toBe('Loading...');
+    });
+
+    it('should warning when using wrapperClassName', () => {
+      const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      render(
+        <Spin wrapperClassName="custom-wrapper">
+          <div>content</div>
+        </Spin>,
+      );
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Spin] `wrapperClassName` is deprecated. Please use `classNames.root` instead.',
+      );
+
+      errSpy.mockRestore();
     });
   });
 });

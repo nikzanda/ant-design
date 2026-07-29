@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/el_GR';
+import Pagination from '@rc-component/pagination/locale/el_GR';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/el_GR';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Παρακαλώ επιλέξτε',
     close: 'Κλείσιμο',
+    show: 'Εμφάνιση',
+    hide: 'Απόκρυψη',
+    sortable: 'διαλογήσιμος',
   },
   Table: {
     filterTitle: 'Μενού φίλτρων',
@@ -61,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Επιλογή όλων των δεδομένων',
     removeAll: 'Αφαίρεση όλων των δεδομένων',
     selectInvert: 'Αντιστροφή τρέχουσας σελίδας',
+    deselectAll: 'Καταργήστε την επιλογή όλων των δεδομένων',
   },
   Upload: {
     uploading: 'Μεταφόρτωση...',
@@ -131,9 +135,6 @@ const localeValues: Locale = {
         mismatch: 'Το ${label} δεν ταιριάζει με το μοτίβο ${pattern}',
       },
     },
-  },
-  Image: {
-    preview: 'Προεπισκόπηση',
   },
   QRCode: {
     expired: 'Ο κωδικός QR έληξε',

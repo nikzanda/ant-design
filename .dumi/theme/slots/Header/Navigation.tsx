@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { MenuOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
-import { createStyles, css } from 'antd-style';
+import { ConfigProvider, Menu } from 'antd';
+import { createStyles } from 'antd-style';
 import { FormattedMessage, useFullSidebarData, useLocation } from 'dumi';
 
 import useLocale from '../../../hooks/useLocale';
@@ -29,39 +29,37 @@ const locales = {
 };
 
 // ============================= Style =============================
-const useStyle = createStyles(({ token }) => {
-  const { antCls, iconCls, fontFamily, fontSize, headerHeight, colorPrimary } = token;
-
+const useStyle = createStyles(({ cssVar, token, css }) => {
   return {
     nav: css`
       height: 100%;
-      font-size: ${fontSize}px;
-      font-family: Avenir, ${fontFamily}, sans-serif;
+      font-size: ${cssVar.fontSize};
+      font-family: Avenir, ${cssVar.fontFamily}, sans-serif;
       border: 0 !important;
 
-      &${antCls}-menu-horizontal {
+      &${token.antCls}-menu-horizontal {
         border-bottom: none;
 
-        & > ${antCls}-menu-item, & > ${antCls}-menu-submenu {
-          min-width: ${40 + 12 * 2}px;
-          height: ${headerHeight}px;
-          padding-inline-end: ${token.paddingSM}px;
-          padding-inline-start: ${token.paddingSM}px;
-          line-height: ${headerHeight}px;
+        & > ${token.antCls}-menu-item, & > ${token.antCls}-menu-submenu {
+          min-width: ${40 + 8 * 2}px;
+          height: ${token.headerHeight}px;
+          padding-inline-end: 8px;
+          padding-inline-start: 8px;
+          line-height: ${token.headerHeight}px;
         }
 
-        & ${antCls}-menu-submenu-title ${iconCls} {
+        & ${token.antCls}-menu-submenu-title ${token.iconCls} {
           margin: 0;
         }
 
-        & > ${antCls}-menu-item-selected {
+        & > ${token.antCls}-menu-item-selected {
           a {
-            color: ${colorPrimary};
+            color: ${cssVar.colorPrimary};
           }
         }
       }
 
-      & > ${antCls}-menu-item, & > ${antCls}-menu-submenu {
+      & > ${token.antCls}-menu-item, & > ${token.antCls}-menu-submenu {
         text-align: center;
       }
     `,
@@ -189,7 +187,7 @@ const HeaderNavigation: React.FC<NavigationProps> = (props) => {
       ? {
           key: 'mirror',
           label: (
-            <a href="https://ant-design.antgroup.com" target="_blank" rel="noreferrer">
+            <a href="https://ant-design.antgroup.com" target="_blank" rel="noopener noreferrer">
               国内镜像
             </a>
           ),
@@ -199,13 +197,22 @@ const HeaderNavigation: React.FC<NavigationProps> = (props) => {
   ].filter(Boolean);
 
   return (
-    <Menu
-      mode={menuMode}
-      selectedKeys={[activeMenuItem]}
-      className={styles.nav}
-      disabledOverflow
-      items={items}
-    />
+    // Use `transparent` style since the header already has background
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: 'transparent',
+        },
+      }}
+    >
+      <Menu
+        mode={menuMode}
+        selectedKeys={[activeMenuItem]}
+        className={styles.nav}
+        disabledOverflow
+        items={items}
+      />
+    </ConfigProvider>
   );
 };
 

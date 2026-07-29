@@ -1,16 +1,10 @@
+import type { CSSObject } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 
-import {
-  genBasicInputStyle,
-  genInputGroupStyle,
-  genPlaceholderStyle,
-  initInputToken,
-} from '../../input/style';
+import { genBasicInputStyle, genPlaceholderStyle, initInputToken } from '../../input/style';
 import {
   genBorderlessStyle,
-  genFilledGroupStyle,
   genFilledStyle,
-  genOutlinedGroupStyle,
   genOutlinedStyle,
   genUnderlinedStyle,
 } from '../../input/style/variants';
@@ -18,33 +12,13 @@ import { resetComponent, resetIcon } from '../../style';
 import { genCompactItemStyle } from '../../style/compact-item';
 import type { GenerateStyle } from '../../theme/internal';
 import { genStyleHooks, mergeToken } from '../../theme/internal';
+import { genCssVar } from '../../theme/util/genStyleUtils';
 import type { ComponentToken, InputNumberToken } from './token';
 import { prepareComponentToken } from './token';
 
 export type { ComponentToken };
 
-export const genRadiusStyle = (
-  { componentCls, borderRadiusSM, borderRadiusLG }: InputNumberToken,
-  size: 'lg' | 'sm',
-) => {
-  const borderRadius = size === 'lg' ? borderRadiusLG : borderRadiusSM;
-  return {
-    [`&-${size}`]: {
-      [`${componentCls}-handler-wrap`]: {
-        borderStartEndRadius: borderRadius,
-        borderEndEndRadius: borderRadius,
-      },
-      [`${componentCls}-handler-up`]: {
-        borderStartEndRadius: borderRadius,
-      },
-      [`${componentCls}-handler-down`]: {
-        borderEndEndRadius: borderRadius,
-      },
-    },
-  };
-};
-
-const genInputNumberStyles: GenerateStyle<InputNumberToken> = (token: InputNumberToken) => {
+const genInputNumberStyles: GenerateStyle<InputNumberToken> = (token) => {
   const {
     componentCls,
     lineWidth,
@@ -52,14 +26,13 @@ const genInputNumberStyles: GenerateStyle<InputNumberToken> = (token: InputNumbe
     borderRadius,
     inputFontSizeSM,
     inputFontSizeLG,
-    controlHeightLG,
-    controlHeightSM,
     colorError,
     paddingInlineSM,
     paddingBlockSM,
     paddingBlockLG,
     paddingInlineLG,
     colorIcon,
+    colorTextDisabled,
     motionDurationMid,
     handleHoverColor,
     handleOpacity,
@@ -67,61 +40,84 @@ const genInputNumberStyles: GenerateStyle<InputNumberToken> = (token: InputNumbe
     paddingBlock,
     handleBg,
     handleActiveBg,
-    colorTextDisabled,
+    inputAffixPadding,
     borderRadiusSM,
-    borderRadiusLG,
     controlWidth,
     handleBorderColor,
     filledHandleBg,
     lineHeightLG,
-    calc,
+    antCls,
   } = token;
 
+  const borderStyle = `${unit(lineWidth)} ${lineType} ${handleBorderColor}`;
+
+  const [varName, varRef] = genCssVar(antCls, 'input-number');
+
   return [
+    // ==========================================================
+    // ==                         Base                         ==
+    // ==========================================================
     {
       [componentCls]: {
         ...resetComponent(token),
         ...genBasicInputStyle(token),
 
-        display: 'inline-block',
+        [varName('input-padding-block')]: unit(paddingBlock),
+        [varName('input-padding-inline')]: unit(paddingInline),
+
+        display: 'inline-flex',
         width: controlWidth,
         margin: 0,
-        padding: 0,
+        paddingBlock: 0,
         borderRadius,
 
-        // Variants
+        // ======================= Variants =======================
         ...genOutlinedStyle(token, {
-          [`${componentCls}-handler-wrap`]: {
+          [`${componentCls}-actions`]: {
             background: handleBg,
-            [`${componentCls}-handler-down`]: {
-              borderBlockStart: `${unit(lineWidth)} ${lineType} ${handleBorderColor}`,
+            [`${componentCls}-action-down`]: {
+              borderBlockStart: borderStyle,
             },
           },
         }),
         ...genFilledStyle(token, {
-          [`${componentCls}-handler-wrap`]: {
+          [`${componentCls}-actions`]: {
             background: filledHandleBg,
-            [`${componentCls}-handler-down`]: {
-              borderBlockStart: `${unit(lineWidth)} ${lineType} ${handleBorderColor}`,
+            [`${componentCls}-action-down`]: {
+              borderBlockStart: borderStyle,
             },
           },
-
           '&:focus-within': {
-            [`${componentCls}-handler-wrap`]: {
+            [`${componentCls}-actions`]: {
               background: handleBg,
             },
           },
         }),
         ...genUnderlinedStyle(token, {
-          [`${componentCls}-handler-wrap`]: {
+          [`${componentCls}-actions`]: {
             background: handleBg,
-            [`${componentCls}-handler-down`]: {
-              borderBlockStart: `${unit(lineWidth)} ${lineType} ${handleBorderColor}`,
+            [`${componentCls}-action-down`]: {
+              borderBlockStart: borderStyle,
             },
           },
         }),
         ...genBorderlessStyle(token),
 
+        // InputNumber 两层结构：borderless 补偿只加在内层 input 的 CSS 变量上，避免外层+内层双重 padding 导致高度异常
+        [`&${componentCls}-borderless`]: {
+          paddingBlock: 0,
+          [varName('input-padding-block')]: unit(token.calc(paddingBlock).add(lineWidth).equal()),
+        },
+        [`&${componentCls}-borderless${componentCls}-sm`]: {
+          paddingBlock: 0,
+          [varName('input-padding-block')]: unit(token.calc(paddingBlockSM).add(lineWidth).equal()),
+        },
+        [`&${componentCls}-borderless${componentCls}-lg`]: {
+          paddingBlock: 0,
+          [varName('input-padding-block')]: unit(token.calc(paddingBlockLG).add(lineWidth).equal()),
+        },
+
+        // ========================= RTL ==========================
         '&-rtl': {
           direction: 'rtl',
 
@@ -130,360 +126,232 @@ const genInputNumberStyles: GenerateStyle<InputNumberToken> = (token: InputNumbe
           },
         },
 
-        '&-lg': {
-          padding: 0,
-          fontSize: inputFontSizeLG,
-          lineHeight: lineHeightLG,
-          borderRadius: borderRadiusLG,
-
-          [`input${componentCls}-input`]: {
-            height: calc(controlHeightLG).sub(calc(lineWidth).mul(2)).equal(),
-            padding: `${unit(paddingBlockLG)} ${unit(paddingInlineLG)}`,
-          },
-        },
-
-        '&-sm': {
-          padding: 0,
-          fontSize: inputFontSizeSM,
-          borderRadius: borderRadiusSM,
-
-          [`input${componentCls}-input`]: {
-            height: calc(controlHeightSM).sub(calc(lineWidth).mul(2)).equal(),
-            padding: `${unit(paddingBlockSM)} ${unit(paddingInlineSM)}`,
-          },
-        },
-
         // ===================== Out Of Range =====================
-        '&-out-of-range': {
-          [`${componentCls}-input-wrap`]: {
-            input: {
-              color: colorError,
-            },
+        [`&${componentCls}-out-of-range`]: {
+          [`${componentCls}-input`]: {
+            color: colorError,
           },
         },
 
-        // Style for input-group: input with label, with button or dropdown...
-        '&-group': {
+        // ======================== Input =========================
+        [`${componentCls}-input`]: {
           ...resetComponent(token),
-          ...genInputGroupStyle(token),
+          width: '100%',
+          paddingBlock: varRef('input-padding-block'),
+          textAlign: 'start',
+          backgroundColor: 'transparent',
+          border: 0,
+          borderRadius: 0,
+          outline: 0,
+          transition: `all ${motionDurationMid} linear`,
+          appearance: 'textfield',
+          fontSize: 'inherit',
+          lineHeight: 'inherit',
+          ...genPlaceholderStyle(token.colorTextPlaceholder),
 
-          '&-wrapper': {
-            display: 'inline-block',
-            textAlign: 'start',
-            verticalAlign: 'top', // https://github.com/ant-design/ant-design/issues/6403
-
-            [`${componentCls}-affix-wrapper`]: {
-              width: '100%',
+          '&[type="number"]::-webkit-inner-spin-button, &[type="number"]::-webkit-outer-spin-button':
+            {
+              margin: 0,
+              appearance: 'none',
             },
-
-            // Size
-            '&-lg': {
-              [`${componentCls}-group-addon`]: {
-                borderRadius: borderRadiusLG,
-                fontSize: token.fontSizeLG,
-              },
-            },
-            '&-sm': {
-              [`${componentCls}-group-addon`]: {
-                borderRadius: borderRadiusSM,
-              },
-            },
-
-            // Variants
-            ...genOutlinedGroupStyle(token),
-            ...genFilledGroupStyle(token),
-
-            // Fix the issue of using icons in Space Compact mode
-            // https://github.com/ant-design/ant-design/issues/45764
-            [`&:not(${componentCls}-compact-first-item):not(${componentCls}-compact-last-item)${componentCls}-compact-item`]:
-              {
-                [`${componentCls}, ${componentCls}-group-addon`]: {
-                  borderRadius: 0,
-                },
-              },
-
-            [`&:not(${componentCls}-compact-last-item)${componentCls}-compact-first-item`]: {
-              [`${componentCls}, ${componentCls}-group-addon`]: {
-                borderStartEndRadius: 0,
-                borderEndEndRadius: 0,
-              },
-            },
-
-            [`&:not(${componentCls}-compact-first-item)${componentCls}-compact-last-item`]: {
-              [`${componentCls}, ${componentCls}-group-addon`]: {
-                borderStartStartRadius: 0,
-                borderEndStartRadius: 0,
-              },
-            },
-          },
-        },
-
-        [`&-disabled ${componentCls}-input`]: {
-          cursor: 'not-allowed',
-        },
-
-        [componentCls]: {
-          '&-input': {
-            ...resetComponent(token),
-            width: '100%',
-            padding: `${unit(paddingBlock)} ${unit(paddingInline)}`,
-            textAlign: 'start',
-            backgroundColor: 'transparent',
-            border: 0,
-            borderRadius,
-            outline: 0,
-            transition: `all ${motionDurationMid} linear`,
-            appearance: 'textfield',
-            fontSize: 'inherit',
-            ...genPlaceholderStyle(token.colorTextPlaceholder),
-
-            '&[type="number"]::-webkit-inner-spin-button, &[type="number"]::-webkit-outer-spin-button':
-              {
-                margin: 0,
-                appearance: 'none',
-              },
-          },
         },
         [`&:hover ${componentCls}-handler-wrap, &-focused ${componentCls}-handler-wrap`]: {
           width: token.handleWidth,
           opacity: 1,
         },
+
+        // ======================= Disabled =======================
+        [`&-disabled ${componentCls}-input`]: {
+          cursor: 'not-allowed',
+          color: token.colorTextDisabled,
+        },
       },
     },
 
-    // Handler
+    // ==========================================================
+    // ==                        Action                        ==
+    // ==========================================================
     {
       [componentCls]: {
-        [`${componentCls}-handler-wrap`]: {
-          position: 'absolute',
-          insetBlockStart: 0,
-          insetInlineEnd: 0,
-          width: token.handleVisibleWidth,
-          opacity: handleOpacity,
-          height: '100%',
-          borderStartStartRadius: 0,
-          borderStartEndRadius: borderRadius,
-          borderEndEndRadius: borderRadius,
-          borderEndStartRadius: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          transition: `all ${motionDurationMid}`,
+        // ======================= Shared =======================
+        [`${componentCls}-action`]: {
+          ...resetIcon(),
+
+          userSelect: 'none',
           overflow: 'hidden',
-
-          // Fix input number inside Menu makes icon too large
-          // We arise the selector priority by nest selector here
-          // https://github.com/ant-design/ant-design/issues/14367
-          [`${componentCls}-handler`]: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 'auto',
-            height: '40%',
-
-            [`
-              ${componentCls}-handler-up-inner,
-              ${componentCls}-handler-down-inner
-            `]: {
-              marginInlineEnd: 0,
-              fontSize: token.handleFontSize,
-            },
-          },
-        },
-
-        [`${componentCls}-handler`]: {
-          height: '50%',
-          overflow: 'hidden',
-          color: colorIcon,
           fontWeight: 'bold',
           lineHeight: 0,
           textAlign: 'center',
           cursor: 'pointer',
-          borderInlineStart: `${unit(lineWidth)} ${lineType} ${handleBorderColor}`,
           transition: `all ${motionDurationMid} linear`,
-          '&:active': {
-            background: handleActiveBg,
-          },
 
-          // Hover
-          '&:hover': {
-            height: `60%`,
+          // Active: change background not disabled only;
+          [`&:active:not(${componentCls}-action-up-disabled):not(${componentCls}-action-down-disabled)`]:
+            {
+              background: handleActiveBg,
+            },
 
-            [`
-              ${componentCls}-handler-up-inner,
-              ${componentCls}-handler-down-inner
-            `]: {
+          // Hover: change color not disabled only;
+          [`&:hover:not(${componentCls}-action-up-disabled):not(${componentCls}-action-down-disabled)`]:
+            {
               color: handleHoverColor,
+            },
+
+          [`&${componentCls}-action-up-disabled, &${componentCls}-action-down-disabled`]: {
+            cursor: 'not-allowed',
+            color: colorTextDisabled,
+          },
+        },
+
+        // ===================== Input Mode =====================
+        '&-mode-input': {
+          overflow: 'hidden',
+
+          [`${componentCls}-actions`]: {
+            position: 'absolute',
+            insetBlockStart: 0,
+            insetInlineEnd: 0,
+            width: token.handleVisibleWidth,
+            opacity: handleOpacity,
+            height: '100%',
+            borderRadius: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            transition: `all ${motionDurationMid}`,
+            overflow: 'hidden',
+
+            // Fix input number inside Menu makes icon too large
+            // We arise the selector priority by nest selector here
+            // https://github.com/ant-design/ant-design/issues/14367
+            [`${componentCls}-action`]: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 'auto',
+              height: '40%',
+              marginInlineEnd: 0,
+              fontSize: token.handleFontSize,
             },
           },
 
-          '&-up-inner, &-down-inner': {
-            ...resetIcon(),
+          [`&:hover ${componentCls}-actions, &-focused ${componentCls}-actions`]: {
+            width: token.handleWidth,
+            opacity: 1,
+          },
 
+          [`${componentCls}-action`]: {
             color: colorIcon,
-            transition: `all ${motionDurationMid} linear`,
-            userSelect: 'none',
+            height: '50%',
+            borderInlineStart: borderStyle,
+
+            // Hover: change height not disabled only;
+            [`&:hover:not(${componentCls}-action-up-disabled):not(${componentCls}-action-down-disabled)`]:
+              {
+                height: `60%`,
+              },
+          },
+
+          [`&${componentCls}-disabled, &${componentCls}-readonly`]: {
+            [`${componentCls}-actions`]: {
+              display: 'none',
+            },
           },
         },
 
-        [`${componentCls}-handler-up`]: {
-          borderStartEndRadius: borderRadius,
-        },
+        // ==================== Spinner Mode ====================
+        [`&${componentCls}-mode-spinner`]: {
+          padding: 0,
+          width: 'auto',
 
-        [`${componentCls}-handler-down`]: {
-          borderEndEndRadius: borderRadius,
-        },
+          [`${componentCls}-action`]: {
+            flex: 'none',
+            paddingInline: varRef('input-padding-inline'),
 
-        ...genRadiusStyle(token, 'lg'),
-        ...genRadiusStyle(token, 'sm'),
+            '&-up': {
+              borderInlineStart: borderStyle,
+            },
 
-        // Disabled
-        '&-disabled, &-readonly': {
-          [`${componentCls}-handler-wrap`]: {
-            display: 'none',
+            '&-down': {
+              borderInlineEnd: borderStyle,
+            },
           },
 
           [`${componentCls}-input`]: {
-            color: 'inherit',
+            textAlign: 'center',
+            paddingInline: varRef('input-padding-inline'),
           },
         },
+      },
+    },
 
-        [`
-          ${componentCls}-handler-up-disabled,
-          ${componentCls}-handler-down-disabled
-        `]: {
-          cursor: 'not-allowed',
+    // ==========================================================
+    // ==                         Size                         ==
+    // ==========================================================
+    {
+      [componentCls]: {
+        '&-lg': {
+          [varName('input-padding-block')]: unit(paddingBlockLG),
+          [varName('input-padding-inline')]: unit(paddingInlineLG),
+
+          paddingBlock: 0,
+          fontSize: inputFontSizeLG,
+          lineHeight: lineHeightLG,
         },
 
-        [`
-          ${componentCls}-handler-up-disabled:hover &-handler-up-inner,
-          ${componentCls}-handler-down-disabled:hover &-handler-down-inner
-        `]: {
-          color: colorTextDisabled,
+        '&-sm': {
+          [varName('input-padding-block')]: unit(paddingBlockSM),
+          [varName('input-padding-inline')]: unit(paddingInlineSM),
+
+          paddingBlock: 0,
+          fontSize: inputFontSizeSM,
+          borderRadius: borderRadiusSM,
+        },
+      },
+    },
+
+    // ==========================================================
+    // ==                      Pre/Suffix                      ==
+    // ==========================================================
+    {
+      [componentCls]: {
+        [`${componentCls}-prefix, ${componentCls}-suffix`]: {
+          display: 'flex',
+          flex: 'none',
+          alignItems: 'center',
+          alignSelf: 'center',
+          pointerEvents: 'none',
+        },
+
+        [`${componentCls}-prefix`]: {
+          marginInlineEnd: inputAffixPadding,
+        },
+
+        [`${componentCls}-suffix`]: {
+          height: '100%',
+          marginInlineStart: inputAffixPadding,
+          transition: `margin ${motionDurationMid}`,
+        },
+
+        [`&:hover:not(${componentCls}-without-controls)`]: {
+          [`${componentCls}-suffix`]: {
+            marginInlineEnd: token.handleWidth,
+          },
         },
       },
     },
   ];
 };
 
-const genAffixWrapperStyles: GenerateStyle<InputNumberToken> = (token: InputNumberToken) => {
-  const {
-    componentCls,
-    paddingBlock,
-    paddingInline,
-    inputAffixPadding,
-    controlWidth,
-    borderRadiusLG,
-    borderRadiusSM,
-    paddingInlineLG,
-    paddingInlineSM,
-    paddingBlockLG,
-    paddingBlockSM,
-    motionDurationMid,
-  } = token;
+const genCompatibleStyles: GenerateStyle<InputNumberToken, CSSObject> = (token) => {
+  const { componentCls, antCls } = token;
 
   return {
-    [`${componentCls}-affix-wrapper`]: {
-      [`input${componentCls}-input`]: {
-        padding: `${unit(paddingBlock)} 0`,
+    [`${componentCls}-addon`]: {
+      [`&:has(${antCls}-select)`]: {
+        border: 0,
+        padding: 0,
       },
-
-      ...genBasicInputStyle(token),
-      // or number handler will cover form status
-      position: 'relative',
-      display: 'inline-flex',
-      alignItems: 'center',
-      width: controlWidth,
-      padding: 0,
-      paddingInlineStart: paddingInline,
-
-      '&-lg': {
-        borderRadius: borderRadiusLG,
-        paddingInlineStart: paddingInlineLG,
-
-        [`input${componentCls}-input`]: {
-          padding: `${unit(paddingBlockLG)} 0`,
-        },
-      },
-
-      '&-sm': {
-        borderRadius: borderRadiusSM,
-        paddingInlineStart: paddingInlineSM,
-
-        [`input${componentCls}-input`]: {
-          padding: `${unit(paddingBlockSM)} 0`,
-        },
-      },
-
-      [`&:not(${componentCls}-disabled):hover`]: {
-        zIndex: 1,
-      },
-
-      '&-focused, &:focus': {
-        zIndex: 1,
-      },
-
-      [`&-disabled > ${componentCls}-disabled`]: {
-        background: 'transparent',
-      },
-
-      [`> div${componentCls}`]: {
-        width: '100%',
-        border: 'none',
-        outline: 'none',
-
-        [`&${componentCls}-focused`]: {
-          boxShadow: 'none !important',
-        },
-      },
-
-      '&::before': {
-        display: 'inline-block',
-        width: 0,
-        visibility: 'hidden',
-        content: '"\\a0"',
-      },
-
-      [`${componentCls}-handler-wrap`]: {
-        zIndex: 2,
-      },
-
-      [componentCls]: {
-        position: 'static',
-        color: 'inherit',
-
-        '&-prefix, &-suffix': {
-          display: 'flex',
-          flex: 'none',
-          alignItems: 'center',
-          pointerEvents: 'none',
-        },
-
-        '&-prefix': {
-          marginInlineEnd: inputAffixPadding,
-        },
-
-        '&-suffix': {
-          insetBlockStart: 0,
-          insetInlineEnd: 0,
-          height: '100%',
-          marginInlineEnd: paddingInline,
-          marginInlineStart: inputAffixPadding,
-          transition: `margin ${motionDurationMid}`,
-        },
-      },
-
-      [`&:hover ${componentCls}-handler-wrap, &-focused ${componentCls}-handler-wrap`]: {
-        width: token.handleWidth,
-        opacity: 1,
-      },
-      [`&:not(${componentCls}-affix-wrapper-without-controls):hover ${componentCls}-suffix`]: {
-        marginInlineEnd: token.calc(token.handleWidth).add(paddingInline).equal(),
-      },
-    },
-    // 覆盖 affix-wrapper borderRadius！
-    [`${componentCls}-underlined`]: {
-      borderRadius: 0,
     },
   };
 };
@@ -494,7 +362,7 @@ export default genStyleHooks(
     const inputNumberToken = mergeToken<InputNumberToken>(token, initInputToken(token));
     return [
       genInputNumberStyles(inputNumberToken),
-      genAffixWrapperStyles(inputNumberToken),
+      genCompatibleStyles(inputNumberToken),
       // =====================================================
       // ==             Space Compact                       ==
       // =====================================================

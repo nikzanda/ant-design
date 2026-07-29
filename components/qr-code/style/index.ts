@@ -1,3 +1,4 @@
+import type { CSSObject } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 import { FastColor } from '@ant-design/fast-color';
 
@@ -20,12 +21,12 @@ interface QRCodeToken extends FullToken<'QRCode'> {
   QRCodeTextColor: string;
   /**
    * @desc QRCode 遮罩背景颜色
-   * @descEN Mask background color of QRCode
+   * @descEN Cover background color of QRCode
    */
-  QRCodeMaskBackgroundColor: string;
+  QRCodeCoverBackgroundColor: string;
 }
 
-const genQRCodeStyle: GenerateStyle<QRCodeToken> = (token) => {
+const genQRCodeStyle: GenerateStyle<QRCodeToken, CSSObject> = (token) => {
   const { componentCls, lineWidth, lineType, colorSplit } = token;
   return {
     [componentCls]: {
@@ -40,7 +41,7 @@ const genQRCodeStyle: GenerateStyle<QRCodeToken> = (token) => {
       position: 'relative',
       overflow: 'hidden',
 
-      [`& > ${componentCls}-mask`]: {
+      [`& > ${componentCls}-cover`]: {
         position: 'absolute',
         insetBlockStart: 0,
         insetInlineStart: 0,
@@ -53,7 +54,7 @@ const genQRCodeStyle: GenerateStyle<QRCodeToken> = (token) => {
         height: '100%',
         color: token.colorText,
         lineHeight: token.lineHeight,
-        background: token.QRCodeMaskBackgroundColor,
+        background: token.QRCodeCoverBackgroundColor,
         textAlign: 'center',
         [`& > ${componentCls}-expired, & > ${componentCls}-scanned`]: {
           color: token.QRCodeTextColor,
@@ -80,7 +81,7 @@ const genQRCodeStyle: GenerateStyle<QRCodeToken> = (token) => {
 };
 
 export const prepareComponentToken: GetDefaultToken<'QRCode'> = (token) => ({
-  QRCodeMaskBackgroundColor: new FastColor(token.colorBgContainer).setA(0.96).toRgbString(),
+  QRCodeCoverBackgroundColor: new FastColor(token.colorBgContainer).setA(0.96).toRgbString(),
 });
 
 export default genStyleHooks<'QRCode'>(

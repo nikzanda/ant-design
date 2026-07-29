@@ -1,13 +1,12 @@
 import React from 'react';
+import type RcTree from '@rc-component/tree';
 import debounce from 'lodash/debounce';
-import type RcTree from 'rc-tree';
-import type { Key } from 'rc-tree/lib/interface';
 
+import type { TreeProps } from '..';
+import Tree from '..';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
 import { act, fireEvent, render, waitFakeTimer } from '../../../tests/utils';
-import type { TreeProps } from '../index';
-import Tree from '../index';
 
 const { DirectoryTree, TreeNode } = Tree;
 
@@ -91,7 +90,7 @@ describe('Directory Tree', () => {
 
     describe('with state control', () => {
       const StateDirTree: React.FC<TreeProps> = (props) => {
-        const [expandedKeys, setExpandedKeys] = React.useState<Key[]>([]);
+        const [expandedKeys, setExpandedKeys] = React.useState<React.Key[]>([]);
         return (
           <DirectoryTree expandedKeys={expandedKeys} onExpand={setExpandedKeys} {...props}>
             <TreeNode key="0-0" title="parent">
@@ -173,6 +172,11 @@ describe('Directory Tree', () => {
 
   it('defaultExpandParent', () => {
     const { asFragment } = render(createTree({ defaultExpandParent: true }));
+    expect(asFragment().firstChild).toMatchSnapshot();
+  });
+
+  it('defaultExpandParent with false', () => {
+    const { asFragment } = render(createTree({ defaultExpandParent: false }));
     expect(asFragment().firstChild).toMatchSnapshot();
   });
 
@@ -320,6 +324,10 @@ describe('Directory Tree', () => {
         fieldNames: { key: 'id', title: 'label', children: 'child' },
       }),
     );
+
+    // https://github.com/ant-design/ant-design/issues/55418
+    expect(container.querySelectorAll('.ant-tree-node-content-wrapper-open').length).toBe(2);
+
     fireEvent.click(container.querySelectorAll('.ant-tree-node-content-wrapper')[0]);
     expect(onSelect.mock.calls[0][1].selectedNodes.length).toBe(1);
   });

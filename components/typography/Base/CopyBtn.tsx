@@ -2,12 +2,12 @@ import * as React from 'react';
 import CheckOutlined from '@ant-design/icons/CheckOutlined';
 import CopyOutlined from '@ant-design/icons/CopyOutlined';
 import LoadingOutlined from '@ant-design/icons/LoadingOutlined';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 
 import type { CopyConfig } from '.';
 import type { Locale } from '../../locale';
 import Tooltip from '../../tooltip';
-import { getNode, toList } from './util';
+import { getNode, toCopyConfigList } from './util';
 
 export interface CopyBtnProps extends Omit<CopyConfig, 'onCopy'> {
   prefixCls: string;
@@ -16,21 +16,27 @@ export interface CopyBtnProps extends Omit<CopyConfig, 'onCopy'> {
   onCopy: React.MouseEventHandler<HTMLButtonElement>;
   iconOnly: boolean;
   loading: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-const CopyBtn: React.FC<CopyBtnProps> = ({
-  prefixCls,
-  copied,
-  locale,
-  iconOnly,
-  tooltips,
-  icon,
-  tabIndex,
-  onCopy,
-  loading: btnLoading,
-}) => {
-  const tooltipNodes = toList(tooltips);
-  const iconNodes = toList(icon);
+const CopyBtn: React.FC<CopyBtnProps> = (props) => {
+  const {
+    prefixCls,
+    copied,
+    locale,
+    iconOnly,
+    tooltips,
+    icon,
+    tabIndex,
+    onCopy,
+    loading: btnLoading,
+    className,
+    style,
+  } = props;
+
+  const tooltipNodes = toCopyConfigList(tooltips);
+  const iconNodes = toCopyConfigList(icon);
   const { copied: copiedText, copy: copyText } = locale ?? {};
   const systemStr = copied ? copiedText : copyText;
   const copyTitle = getNode(tooltipNodes[copied ? 1 : 0], systemStr);
@@ -40,10 +46,11 @@ const CopyBtn: React.FC<CopyBtnProps> = ({
     <Tooltip title={copyTitle}>
       <button
         type="button"
-        className={classNames(`${prefixCls}-copy`, {
+        className={clsx(`${prefixCls}-copy`, className, {
           [`${prefixCls}-copy-success`]: copied,
           [`${prefixCls}-copy-icon-only`]: iconOnly,
         })}
+        style={style}
         onClick={onCopy}
         aria-label={ariaLabel}
         tabIndex={tabIndex}

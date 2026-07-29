@@ -16,22 +16,22 @@ export const generateColorPalettes: GenerateColorMap = (baseColor: string) => {
     8: colors[4],
     9: colors[5],
     10: colors[6],
-    // 8: colors[7],
-    // 9: colors[8],
-    // 10: colors[9],
   };
 };
 
 export const generateNeutralColorPalettes: GenerateNeutralColorMap = (
   bgBaseColor: string,
   textBaseColor: string,
+  shadowColor?: string,
 ) => {
   const colorBgBase = bgBaseColor || '#fff';
   const colorTextBase = textBaseColor || '#000';
+  const colorShadow = shadowColor || '#000';
 
   return {
     colorBgBase,
     colorTextBase,
+    colorShadow,
 
     colorText: getAlphaColor(colorTextBase, 0.88),
     colorTextSecondary: getAlphaColor(colorTextBase, 0.65),
@@ -54,6 +54,7 @@ export const generateNeutralColorPalettes: GenerateNeutralColorMap = (
     colorBgBlur: 'transparent',
 
     colorBorder: getSolidColor(colorBgBase, 15),
+    colorBorderDisabled: getSolidColor(colorBgBase, 15),
     colorBorderSecondary: getSolidColor(colorBgBase, 6),
   };
 };

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import type { RadioChangeEvent, TabsProps } from 'antd';
 import { Radio, Tabs } from 'antd';
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 const App: React.FC = () => {
-  const [size, setSize] = useState<'small' | 'middle' | 'large'>('small');
+  const [size, setSize] = useState<'small' | 'medium' | 'large'>('small');
   const [activeKey, setActiveKey] = useState('1');
   const [items, setItems] = useState<TabsProps['items']>([
     {
@@ -24,22 +24,25 @@ const App: React.FC = () => {
       children: 'Content of editable tab 3',
     },
   ]);
+  const newTabIndex = useRef(0);
 
   const add = () => {
-    const newKey = String((items || []).length + 1);
+    const newActiveKey = `newTab${newTabIndex.current++}`;
     setItems([
       ...(items || []),
       {
-        label: `Tab ${newKey}`,
-        key: newKey,
-        children: `Content of editable tab ${newKey}`,
+        label: 'New Tab',
+        key: newActiveKey,
+        children: 'Content of new Tab',
       },
     ]);
-    setActiveKey(newKey);
+    setActiveKey(newActiveKey);
   };
 
   const remove = (targetKey: TargetKey) => {
-    if (!items) return;
+    if (!items) {
+      return;
+    }
     const targetIndex = items.findIndex((item) => item.key === targetKey);
     const newItems = items.filter((item) => item.key !== targetKey);
 
@@ -68,7 +71,7 @@ const App: React.FC = () => {
     <div>
       <Radio.Group value={size} onChange={onChange} style={{ marginBottom: 16 }}>
         <Radio.Button value="small">Small</Radio.Button>
-        <Radio.Button value="middle">Middle</Radio.Button>
+        <Radio.Button value="medium">Medium</Radio.Button>
         <Radio.Button value="large">Large</Radio.Button>
       </Radio.Group>
       <Tabs

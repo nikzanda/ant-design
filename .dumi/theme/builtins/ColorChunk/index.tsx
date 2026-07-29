@@ -4,12 +4,12 @@ import type { ColorInput } from '@ant-design/fast-color';
 import { Popover } from 'antd';
 import { createStyles } from 'antd-style';
 
-const useStyle = createStyles(({ token, css }) => ({
+const useStyle = createStyles(({ css, cssVar, token }) => ({
   codeSpan: css`
     padding: 0.2em 0.4em;
     font-size: 0.9em;
     background: ${token.siteMarkdownCodeBg};
-    border-radius: ${token.borderRadius}px;
+    border-radius: ${cssVar.borderRadius};
     font-family: monospace;
   `,
   dot: css`
@@ -17,8 +17,8 @@ const useStyle = createStyles(({ token, css }) => ({
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    margin-inline-end: ${token.marginXXS}px;
-    border: 1px solid ${token.colorSplit};
+    margin-inline-end: ${cssVar.marginXXS};
+    border: ${cssVar.lineWidth} ${cssVar.lineType} ${cssVar.colorSplit};
   `,
 }));
 
@@ -43,19 +43,19 @@ const ColorChunk: React.FC<React.PropsWithChildren<ColorChunkProps>> = (props) =
   if (enablePopover) {
     dotNode = (
       <Popover
+        destroyOnHidden
         placement="left"
         content={<div hidden />}
         styles={{
-          body: {
+          container: {
             backgroundColor: dotColor,
             width: 120,
             height: 120,
             borderRadius: theme.borderRadiusLG,
           },
           root: {
-            '--antd-arrow-background-color': dotColor,
-            backgroundColor: 'transparent',
-          } as React.CSSProperties,
+            '--ant-tooltip-arrow-background-color': dotColor,
+          },
         }}
       >
         {dotNode}

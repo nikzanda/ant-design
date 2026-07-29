@@ -1,4 +1,5 @@
 // Style as confirm component
+import type { CSSObject } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 
 import { prepareComponentToken, prepareToken } from '.';
@@ -8,8 +9,7 @@ import { genSubStyleComponent } from '../../theme/internal';
 import type { GenerateStyle } from '../../theme/internal';
 
 // ============================= Confirm ==============================
-
-const genModalConfirmStyle: GenerateStyle<ModalToken> = (token) => {
+const genModalConfirmStyle: GenerateStyle<ModalToken, CSSObject> = (token) => {
   const {
     componentCls,
     titleFontSize,
@@ -70,6 +70,10 @@ const genModalConfirmStyle: GenerateStyle<ModalToken> = (token) => {
         maxWidth: `calc(100% - ${unit(token.marginSM)})`,
       },
 
+      [`${confirmComponentCls}-body-no-icon ${confirmComponentCls}-paragraph`]: {
+        maxWidth: '100%',
+      },
+
       // https://github.com/ant-design/ant-design/issues/48159
       [`${token.iconCls} + ${confirmComponentCls}-paragraph`]: {
         maxWidth: `calc(100% - ${unit(
@@ -84,7 +88,7 @@ const genModalConfirmStyle: GenerateStyle<ModalToken> = (token) => {
         lineHeight: titleLineHeight,
       },
 
-      [`${confirmComponentCls}-content`]: {
+      [`${confirmComponentCls}-container`]: {
         color: token.colorText,
         fontSize,
         lineHeight,

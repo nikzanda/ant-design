@@ -1,11 +1,12 @@
-import React, { useRef } from 'react';
-import { ConfigProvider } from 'antd';
+import React, { useRef, useState } from 'react';
 
 import type { TableProps, TableRef } from '..';
 import Table from '..';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
 import { fireEvent, render, waitFakeTimer } from '../../../tests/utils';
+import ConfigProvider from '../../config-provider';
+import Popover from '../../popover';
 
 const { Column, ColumnGroup } = Table;
 
@@ -67,25 +68,19 @@ describe('Table', () => {
       },
     ];
     rerender(<Table columns={newColumns} />);
-    expect(container.querySelector('th')?.textContent).toEqual('Title');
+    expect(container.querySelector('th')?.textContent).toBe('Title');
   });
 
   it('loading with Spin', async () => {
     jest.useFakeTimers();
-    const loading = {
-      spinning: false,
-      delay: 500,
-    };
-    const { container, rerender } = render(<Table loading={loading} />);
-    expect(container.querySelectorAll('.ant-spin')).toHaveLength(0);
-    expect(container.querySelector('.ant-table-placeholder')?.textContent).not.toEqual('');
-
-    loading.spinning = true;
-    rerender(<Table loading={loading} />);
-    expect(container.querySelectorAll('.ant-spin')).toHaveLength(0);
+    const { container, rerender } = render(<Table loading={{ spinning: false, delay: 500 }} />);
+    expect(container.querySelector('.ant-spin-section')).toBeFalsy();
+    expect(container.querySelector('.ant-table-placeholder')?.textContent).not.toBe('');
+    rerender(<Table loading={{ spinning: true, delay: 500 }} />);
+    expect(container.querySelector('.ant-spin-section')).toBeFalsy();
     await waitFakeTimer();
     rerender(<Table loading />);
-    expect(container.querySelectorAll('.ant-spin')).toHaveLength(1);
+    expect(container.querySelector('.ant-spin-section')).toBeTruthy();
     jest.clearAllTimers();
     jest.useRealTimers();
   });
@@ -238,6 +233,43 @@ describe('Table', () => {
       });
   });
 
+  it('supports column align with per-column override and special columns', () => {
+    const { container } = render(
+      <Table
+        columns={[
+          { title: 'Name', dataIndex: 'name' },
+          Table.EXPAND_COLUMN,
+          {
+            title: 'Info',
+            children: [{ title: 'Age', dataIndex: 'age', align: 'right' }],
+          },
+          Table.SELECTION_COLUMN,
+        ]}
+        dataSource={[
+          {
+            key: '1',
+            name: 'Jack',
+            age: 20,
+          },
+        ]}
+        column={{ align: 'center' }}
+        expandable={{ expandedRowRender: () => null }}
+        rowSelection={{}}
+        pagination={false}
+      />,
+    );
+
+    const cells = container.querySelectorAll('tbody tr')[0].querySelectorAll('td');
+
+    expect(cells).toHaveLength(4);
+    expect(cells[0]).toHaveStyle({ textAlign: 'center' });
+    expect(cells[0].textContent).toBe('Jack');
+    expect(cells[1].querySelector('.ant-table-row-expand-icon')).toBeTruthy();
+    expect(cells[2]).toHaveStyle({ textAlign: 'right' });
+    expect(cells[2].textContent).toBe('20');
+    expect(cells[3].querySelector('.ant-checkbox-input')).toBeTruthy();
+  });
+
   it('warn about rowKey when using index parameter', () => {
     warnSpy.mockReset();
     const columns: TableProps<any>['columns'] = [
@@ -252,6 +284,7 @@ describe('Table', () => {
       'Warning: [antd: Table] `index` parameter of `rowKey` function is deprecated. There is no guarantee that it will work as expected.',
     );
   });
+
   it('not warn about rowKey', () => {
     warnSpy.mockReset();
     const columns: TableProps<any>['columns'] = [
@@ -263,6 +296,45 @@ describe('Table', () => {
     ];
     render(<Table columns={columns} rowKey={(record) => record.key as string} />);
     expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('use global rowKey config', () => {
+    const { container } = render(
+      <ConfigProvider table={{ rowKey: 'id' }}>
+        <Table
+          dataSource={[
+            {
+              id: 666,
+              key: 'foobar',
+              name: 'Foobar',
+            },
+          ]}
+        />
+      </ConfigProvider>,
+    );
+    expect(container.querySelector<HTMLTableRowElement>('.ant-table-row')?.dataset.rowKey).toBe(
+      '666',
+    );
+  });
+
+  it('prefer rowKey prop over global rowKey config', () => {
+    const { container } = render(
+      <ConfigProvider table={{ rowKey: 'id' }}>
+        <Table
+          rowKey="name"
+          dataSource={[
+            {
+              id: 666,
+              key: 'foobar',
+              name: 'Foobar',
+            },
+          ]}
+        />
+      </ConfigProvider>,
+    );
+    expect(container.querySelector<HTMLTableRowElement>('.ant-table-row')?.dataset.rowKey).toBe(
+      'Foobar',
+    );
   });
 
   it('should support ref', () => {
@@ -356,6 +428,25 @@ describe('Table', () => {
     expect(container.querySelector('.ant-table')?.getAttribute('data-number')).toBe('123');
   });
 
+  // https://github.com/ant-design/ant-design/issues/44802
+  it('passes aria-* props to all tables with scroll', () => {
+    const { container } = render(
+      <Table
+        aria-label="label"
+        columns={[{ title: 'Name', dataIndex: 'name' }]}
+        dataSource={[{ key: '1', name: 'Bamboo' }]}
+        pagination={false}
+        scroll={{ x: 400, y: 100 }}
+      />,
+    );
+
+    const tables = Array.from(container.querySelectorAll('table'));
+    expect(tables.length).toBeGreaterThan(1);
+    tables.forEach((table) => {
+      expect(table).toHaveAttribute('aria-label', 'label');
+    });
+  });
+
   it('support wireframe', () => {
     const columns = [{ title: 'Name', key: 'name', dataIndex: 'name' }];
     const { container } = render(
@@ -398,6 +489,55 @@ describe('Table', () => {
     expect(container.querySelector('.ant-dropdown')).toBeTruthy();
   });
 
+  it('should not render duplicated controlled Popover in column title when scroll is enabled', async () => {
+    jest.useFakeTimers();
+
+    try {
+      const Demo = () => {
+        const [open, setOpen] = useState(false);
+
+        return (
+          <Table
+            pagination={false}
+            scroll={{ y: 200 }}
+            columns={[
+              {
+                key: 'name',
+                dataIndex: 'name',
+                title: (
+                  <Popover
+                    open={open}
+                    onOpenChange={setOpen}
+                    trigger="click"
+                    content={<button type="button">Popover Content</button>}
+                  >
+                    <button type="button">Name</button>
+                  </Popover>
+                ),
+              },
+            ]}
+            dataSource={[{ key: '1', name: 'Bamboo' }]}
+          />
+        );
+      };
+
+      const { container } = render(<Demo />);
+
+      fireEvent.click(container.querySelector('thead button')!);
+      await waitFakeTimer();
+
+      expect(document.body.querySelectorAll('.ant-popover')).toHaveLength(1);
+
+      fireEvent.click(document.body.querySelector('.ant-popover button')!);
+      await waitFakeTimer();
+
+      expect(document.body.querySelectorAll('.ant-popover')).toHaveLength(1);
+    } finally {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    }
+  });
+
   it('support reference', () => {
     const tblRef = React.createRef<TableRef>();
     const { container } = render(<Table ref={tblRef} />);
@@ -427,7 +567,7 @@ describe('Table', () => {
     ];
     const { container } = render(<Table columns={columns} />);
 
-    expect(container.querySelectorAll('.ant-table-thead th')[1].innerHTML).toEqual('title3');
+    expect(container.querySelectorAll('.ant-table-thead th')[1].innerHTML).toBe('title3');
     expect(container.querySelectorAll('.ant-table-thead th')).toHaveLength(2);
   });
 
@@ -461,13 +601,13 @@ describe('Table', () => {
 
     expect(
       container.querySelectorAll('.ant-table-thead tr')[0].querySelectorAll('th')[1].innerHTML,
-    ).toEqual('title3');
+    ).toBe('title3');
     expect(
       container.querySelectorAll('.ant-table-thead tr')[0].querySelectorAll('th'),
     ).toHaveLength(2);
     expect(
       container.querySelectorAll('.ant-table-thead tr')[1].querySelectorAll('th')[0].innerHTML,
-    ).toEqual('title3-2');
+    ).toBe('title3-2');
     expect(
       container.querySelectorAll('.ant-table-thead tr')[1].querySelectorAll('th'),
     ).toHaveLength(1);

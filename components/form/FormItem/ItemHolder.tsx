@@ -1,11 +1,10 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import type { Meta } from 'rc-field-form/lib/interface';
-import isVisible from 'rc-util/lib/Dom/isVisible';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
-import omit from 'rc-util/lib/omit';
+import type { Meta } from '@rc-component/form';
+import { isVisible, omit, useLayoutEffect } from '@rc-component/util';
+import { clsx } from 'clsx';
 
 import type { FormItemProps } from '.';
+import { isNonNullable } from '../../_util/is';
 import { Row } from '../../grid';
 import type { ReportMetaChange } from '../context';
 import { FormContext, NoStyleItemContext } from '../context';
@@ -62,7 +61,7 @@ export default function ItemHolder(props: ItemHolderProps) {
   const itemRef = React.useRef<HTMLDivElement>(null);
   const debounceErrors = useDebounce(errors);
   const debounceWarnings = useDebounce(warnings);
-  const hasHelp = help !== undefined && help !== null;
+  const hasHelp = isNonNullable(help);
   const hasError = !!(hasHelp || errors.length || warnings.length);
   const isOnScreen = !!itemRef.current && isVisible(itemRef.current);
   const [marginBottom, setMarginBottom] = React.useState<number | null>(null);
@@ -72,7 +71,7 @@ export default function ItemHolder(props: ItemHolderProps) {
       // The element must be part of the DOMTree to use getComputedStyle
       // https://stackoverflow.com/questions/35360711/getcomputedstyle-returns-a-cssstyledeclaration-but-all-properties-are-empty-on-a
       const itemStyle = getComputedStyle(itemRef.current);
-      setMarginBottom(parseInt(itemStyle.marginBottom, 10));
+      setMarginBottom(Number.parseInt(itemStyle.marginBottom, 10));
     }
   }, [hasError, isOnScreen]);
 
@@ -94,7 +93,7 @@ export default function ItemHolder(props: ItemHolderProps) {
   const mergedValidateStatus = getValidateState();
 
   // ======================== Render ========================
-  const itemClassName = classNames(itemPrefixCls, className, rootClassName, {
+  const itemClassName = clsx(itemPrefixCls, className, rootClassName, {
     [`${itemPrefixCls}-with-help`]: hasHelp || debounceErrors.length || debounceWarnings.length,
 
     // Status

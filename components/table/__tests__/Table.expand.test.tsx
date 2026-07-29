@@ -80,9 +80,10 @@ describe('Table.expand', () => {
     const { container } = render(<Table indentSize={0} columns={columns} dataSource={data} />);
 
     fireEvent.click(container.querySelector('.ant-table-row-expand-icon')!);
-    expect(container.querySelector<HTMLElement>('.indent-level-1')?.style.paddingLeft).toEqual(
-      '0px',
-    );
+
+    expect(container.querySelector<HTMLElement>('.indent-level-1')).toHaveStyle({
+      paddingLeft: '0px',
+    });
   });
 
   it('has right aria-expanded state', () => {
@@ -108,7 +109,7 @@ describe('Table.expand', () => {
       // header has td element (a11y): https://github.com/react-component/table/pull/859
       const tdNodeList = container.querySelectorAll('tbody td');
 
-      expect(tdNodeList[0].textContent).toEqual('bamboo');
+      expect(tdNodeList[0].textContent).toBe('bamboo');
       expect(tdNodeList[1].querySelector('.ant-table-row-expand-icon')).toBeTruthy();
     });
 
@@ -126,7 +127,7 @@ describe('Table.expand', () => {
       );
       const tdNodeList = container.querySelectorAll('tbody td');
       expect(tdNodeList[0].querySelector('.ant-checkbox-input')).toBeTruthy();
-      expect(tdNodeList[1].textContent).toEqual('bamboo');
+      expect(tdNodeList[1].textContent).toBe('bamboo');
       expect(tdNodeList[2].querySelector('.ant-table-row-expand-icon')).toBeTruthy();
     });
   });

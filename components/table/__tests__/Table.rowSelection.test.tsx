@@ -136,11 +136,52 @@ describe('Table.rowSelection', () => {
     const checkboxes = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
 
     expect(checkboxes[1].disabled).toBe(false);
-    expect(checkboxes[1].name).toEqual(data[0].name);
+    expect(checkboxes[1].name).toBe(data[0].name);
     expect(checkboxes[2].disabled).toBe(true);
-    expect(checkboxes[2].name).toEqual(data[1].name);
+    expect(checkboxes[2].name).toBe(data[1].name);
 
     expect(getIndeterminateSelection(container)).toEqual([2]);
+  });
+
+  it('should have default aria-label', () => {
+    const { container } = render(createTable({ rowSelection: {} }));
+    // Skip the header checkbox, start from body checkboxes
+    const checkboxes = container.querySelectorAll<HTMLInputElement>('tbody input[type="checkbox"]');
+
+    expect(checkboxes[0].getAttribute('aria-label')).toBe('Select row 1');
+    expect(checkboxes[1].getAttribute('aria-label')).toBe('Select row 2');
+    expect(checkboxes[2].getAttribute('aria-label')).toBe('Select row 3');
+  });
+
+  it('should support custom aria-label from getCheckboxProps', () => {
+    const rowSelection = {
+      getCheckboxProps: (record: any) => ({
+        'aria-label': `Select ${record.name}`,
+      }),
+    };
+    const { container } = render(createTable({ rowSelection }));
+    const checkboxes = container.querySelectorAll<HTMLInputElement>('tbody input[type="checkbox"]');
+
+    expect(checkboxes[0].getAttribute('aria-label')).toBe('Select Jack');
+    expect(checkboxes[1].getAttribute('aria-label')).toBe('Select Lucy');
+  });
+
+  it('should have default aria-label for radio type', () => {
+    const { container } = render(createTable({ rowSelection: { type: 'radio' } }));
+    const radios = container.querySelectorAll<HTMLInputElement>('tbody input[type="radio"]');
+
+    expect(radios[0].getAttribute('aria-label')).toBe('Select row 1');
+    expect(radios[1].getAttribute('aria-label')).toBe('Select row 2');
+    expect(radios[2].getAttribute('aria-label')).toBe('Select row 3');
+  });
+
+  it('should have selected aria-label when row is selected', () => {
+    const { container } = render(createTable({ rowSelection: { defaultSelectedRowKeys: [0, 1] } }));
+    const checkboxes = container.querySelectorAll<HTMLInputElement>('tbody input[type="checkbox"]');
+
+    expect(checkboxes[0].getAttribute('aria-label')).toBe('Row 1 selected');
+    expect(checkboxes[1].getAttribute('aria-label')).toBe('Row 2 selected');
+    expect(checkboxes[2].getAttribute('aria-label')).toBe('Select row 3');
   });
 
   it("make getCheckboxProps's `indeterminate` override selectedRowKeys' effect", () => {
@@ -773,7 +814,7 @@ describe('Table.rowSelection', () => {
     ).toBe(true);
   });
 
-  it('fix selection column on the left', () => {
+  it('fix selection column on the start', () => {
     const { container } = render(
       createTable({
         rowSelection: { fixed: true },
@@ -782,11 +823,11 @@ describe('Table.rowSelection', () => {
     );
 
     expect(container.querySelector('.ant-table-selection-column')).toHaveClass(
-      'ant-table-cell-fix-left',
+      'ant-table-cell-fix-start',
     );
   });
 
-  it('fix expand on th left when selection column fixed on the left', () => {
+  it('fix expand on th start when selection column fixed on the start', () => {
     const { container } = render(
       createTable({
         expandable: {
@@ -800,11 +841,11 @@ describe('Table.rowSelection', () => {
     );
 
     expect(container.querySelector('.ant-table-selection-column')).toHaveClass(
-      'ant-table-cell-fix-left',
+      'ant-table-cell-fix-start',
     );
   });
 
-  it('fix selection column on the left when any other column is fixed', () => {
+  it('fix selection column on the start when any other column is fixed', () => {
     const { container } = render(
       createTable({
         rowSelection: {},
@@ -812,7 +853,11 @@ describe('Table.rowSelection', () => {
           {
             title: 'Name',
             dataIndex: 'name',
-            fixed: 'left',
+            fixed: 'start',
+          },
+          {
+            title: 'Age',
+            dataIndex: 'age',
           },
         ],
         scroll: { x: 903 },
@@ -820,7 +865,7 @@ describe('Table.rowSelection', () => {
     );
 
     expect(container.querySelector('.ant-table-selection-column')).toHaveClass(
-      'ant-table-cell-fix-left',
+      'ant-table-cell-fix-start',
     );
   });
 
@@ -1100,7 +1145,7 @@ describe('Table.rowSelection', () => {
   it('select by checkbox to trigger stopPropagation', () => {
     const { container } = render(createTable());
     expect(() => {
-      fireEvent.click(container.querySelectorAll('span')[10]);
+      fireEvent.click(container.querySelectorAll('.ant-checkbox')[4]);
     }).not.toThrow();
   });
 
@@ -1247,9 +1292,7 @@ describe('Table.rowSelection', () => {
     };
     const { container } = render(
       <ConfigProvider getPopupContainer={(node) => node?.parentNode as HTMLElement}>
-        {createTable({
-          rowSelection,
-        })}
+        {createTable({ rowSelection })}
       </ConfigProvider>,
     );
     jest.useFakeTimers();
@@ -1271,7 +1314,7 @@ describe('Table.rowSelection', () => {
       />,
     );
 
-    const checkboxes = container.querySelectorAll('input');
+    const checkboxes = container.querySelectorAll<HTMLElement>('input');
     fireEvent.click(checkboxes[checkboxes.length - 1]);
 
     expect(onChange.mock.calls[0][1]).toEqual([expect.objectContaining({ name: 'bamboo' })]);
@@ -1829,6 +1872,37 @@ describe('Table.rowSelection', () => {
         <Table
           dataSource={dataSource}
           rowSelection={{ onChange, selectedRowKeys: undefined }}
+          rowKey="name"
+        />,
+      );
+
+      fireEvent.click(container.querySelector('tbody input')!);
+      expect(onChange).toHaveBeenCalledWith(['Jack'], [{ name: 'Jack' }], { type: 'single' });
+    });
+
+    it('works with preserveSelectedRowKeys after receive selectedRowKeys from [] to undefined', () => {
+      const onChange = jest.fn();
+      const dataSource = [{ name: 'Jack' }];
+      const { container, rerender } = render(
+        <Table
+          dataSource={dataSource}
+          rowSelection={{ onChange, selectedRowKeys: ['Jack'] }}
+          rowKey="name"
+        />,
+      );
+
+      rerender(
+        <Table
+          dataSource={dataSource}
+          rowSelection={{ onChange, selectedRowKeys: [] }}
+          rowKey="name"
+        />,
+      );
+
+      rerender(
+        <Table
+          dataSource={dataSource}
+          rowSelection={{ onChange, preserveSelectedRowKeys: true }}
           rowKey="name"
         />,
       );

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
+import { useLayoutEffect } from '@rc-component/util';
 
-import useForceUpdate from '../../_util/hooks/useForceUpdate';
+import { useForceUpdate } from '../../_util/hooks';
 import type { ScreenMap } from '../../_util/responsiveObserver';
 import useResponsiveObserver from '../../_util/responsiveObserver';
 
@@ -13,7 +13,7 @@ function useBreakpoint(
   defaultScreens: ScreenMap | null = {} as ScreenMap,
 ): ScreenMap | null {
   const screensRef = useRef<ScreenMap | null>(defaultScreens);
-  const forceUpdate = useForceUpdate();
+  const [, forceUpdate] = useForceUpdate();
   const responsiveObserver = useResponsiveObserver();
 
   useLayoutEffect(() => {
@@ -25,7 +25,7 @@ function useBreakpoint(
     });
 
     return () => responsiveObserver.unsubscribe(token);
-  }, []);
+  }, [refreshOnChange]);
 
   return screensRef.current;
 }

@@ -1,46 +1,35 @@
 import React, { Suspense, use } from 'react';
 import { Flex, Typography } from 'antd';
 import { createStyles } from 'antd-style';
-import classNames from 'classnames';
 import { useLocation } from 'dumi';
 
 import useLocale from '../../../../hooks/useLocale';
 import LinkButton from '../../../../theme/common/LinkButton';
 import SiteContext from '../../../../theme/slots/SiteContext';
-import type { SiteContextProps } from '../../../../theme/slots/SiteContext';
 import * as utils from '../../../../theme/utils';
+import BannerSponsors from '../BannerSponsors';
 import GroupMaskLayer from '../GroupMaskLayer';
 
 import '../SiteContext';
 
-const ComponentsBlock = React.lazy(() => import('./ComponentsBlock'));
+import LuminousBg from './LuminousBg';
 
 const locales = {
   cn: {
-    slogan: '助力设计开发者「更灵活」地搭建出「更美」的产品，让用户「快乐工作」～',
+    slogan: 'AI 友好的「设计系统」，让美与智能并进，让工作充满「灵感」与「快乐」。',
     start: '开始使用',
     designLanguage: '设计语言',
   },
   en: {
     slogan:
-      'Help designers/developers building beautiful products more flexible and working with happiness',
+      'AI friendly design system that combines beauty and intelligence, making work full of inspiration and joy.',
     start: 'Getting Started',
     designLanguage: 'Design Language',
   },
 };
 
-const useStyle = createStyles(({ token, css, cx }, siteConfig: SiteContextProps) => {
-  const textShadow = `0 0 4px ${token.colorBgContainer}`;
-  const isDark = siteConfig.theme.includes('dark');
-  const mask = cx(css`
-    position: absolute;
-    inset: 0;
-    backdrop-filter: blur(2px);
-    opacity: 1;
-    background-color: ${isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)'};
-    transition: all 1s ease;
-    pointer-events: none;
-  `);
+const useStyle = createStyles(({ cssVar, css, cx }) => {
+  const textShadow = `0 0 4px ${cssVar.colorBgContainer}`;
 
   const block = cx(css`
     position: absolute;
@@ -61,37 +50,32 @@ const useStyle = createStyles(({ token, css, cx }, siteConfig: SiteContextProps)
       perspective: 800px;
       /* fix safari bug by removing blur style */
       transform: translateZ(1000px);
-      row-gap: ${token.marginXL}px;
+      row-gap: ${cssVar.marginXL};
 
       &:hover {
-        .${mask} {
-          opacity: 0;
-        }
-
         .${block} {
           transform: scale(0.96);
         }
       }
     `,
 
-    mask,
-
     typography: css`
       text-align: center;
       position: relative;
       z-index: 1;
-      padding-inline: ${token.paddingXL}px;
+      padding-inline: ${cssVar.paddingXL};
       text-shadow: ${Array.from({ length: 5 }, () => textShadow).join(', ')};
       h1 {
         font-weight: 900 !important;
-        font-size: ${token.fontSizeHeading2 * 2}px !important;
-        line-height: ${token.lineHeightHeading2} !important;
+        font-size: calc(${cssVar.fontSizeHeading1} * 2) !important;
+        line-height: ${cssVar.lineHeightHeading1} !important;
       }
 
       p {
-        font-size: ${token.fontSizeLG}px !important;
-        font-weight: normal !important;
+        font-size: calc(${cssVar.fontSizeLG} * 1.5) !important;
+        font-weight: 400 !important;
         margin-bottom: 0;
+        color: ${cssVar.colorTextTertiary} !important;
       }
     `,
     block,
@@ -103,19 +87,7 @@ const useStyle = createStyles(({ token, css, cx }, siteConfig: SiteContextProps)
       z-index: 1;
     `,
     btnWrap: css`
-      margin-bottom: ${token.marginXL}px;
-    `,
-    bgImg: css`
-      position: absolute;
-      width: 240px;
-    `,
-    bgImgTop: css`
-      top: 0;
-      inset-inline-start: ${siteConfig.isMobile ? '-120px' : 0};
-    `,
-    bgImgBottom: css`
-      bottom: 120px;
-      inset-inline-end: ${siteConfig.isMobile ? 0 : '40%'};
+      margin-bottom: ${cssVar.marginXL};
     `,
   };
 });
@@ -130,33 +102,13 @@ const PreviewBanner: React.FC<Readonly<React.PropsWithChildren>> = (props) => {
 
   return (
     <GroupMaskLayer>
-      {/* Image Left Top */}
-      <img
-        alt="bg"
-        src="https://gw.alipayobjects.com/zos/bmw-prod/49f963db-b2a8-4f15-857a-270d771a1204.svg"
-        draggable={false}
-        className={classNames(styles.bgImg, styles.bgImgTop)}
-      />
-      {/* Image Right Top */}
-      <img
-        alt="bg"
-        src="https://gw.alipayobjects.com/zos/bmw-prod/e152223c-bcae-4913-8938-54fda9efe330.svg"
-        draggable={false}
-        className={classNames(styles.bgImg, styles.bgImgBottom)}
-      />
-
       <div className={styles.holder}>
         {/* Mobile not show the component preview */}
         <Suspense fallback={null}>
-          {siteConfig.isMobile ? null : (
-            <div className={styles.block}>
-              <ComponentsBlock />
-            </div>
-          )}
+          <LuminousBg />
         </Suspense>
-        <div className={styles.mask} />
         <Typography className={styles.typography}>
-          <h1>Ant Design 5.0</h1>
+          <h1>Ant Design</h1>
           <p>{locale.slogan}</p>
         </Typography>
         <Flex gap="middle" className={styles.btnWrap}>
@@ -175,6 +127,7 @@ const PreviewBanner: React.FC<Readonly<React.PropsWithChildren>> = (props) => {
           </LinkButton>
         </Flex>
         <div className={styles.child}>{children}</div>
+        <BannerSponsors />
       </div>
     </GroupMaskLayer>
   );

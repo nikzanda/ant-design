@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { spyElementPrototypes } from '@rc-component/util';
 import { createEvent, fireEvent, render } from '@testing-library/react';
-import { spyElementPrototypes } from 'rc-util/lib/test/domHook';
 
 import { resetWarned } from '../../_util/warning';
 import mountTest from '../../../tests/shared/mountTest';
@@ -74,7 +74,7 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker defaultValue="#000000" />);
     expect(
       container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-    ).toEqual('background: rgb(0, 0, 0);');
+    ).toBe('background: rgb(0, 0, 0);');
   });
 
   it('Should component custom trigger work', async () => {
@@ -105,7 +105,7 @@ describe('ColorPicker', () => {
     fireEvent.change(hsbInputEls[2], {
       target: { value: 39 },
     });
-    expect(container.querySelector('.custom-trigger')?.innerHTML).toEqual('hsb(0, 78%, 39%)');
+    expect(container.querySelector('.custom-trigger')?.innerHTML).toBe('hsb(0, 78%, 39%)');
   });
 
   it('Should popup open work', async () => {
@@ -141,7 +141,7 @@ describe('ColorPicker', () => {
     await waitFakeTimer();
     expect(
       container.querySelector('.ant-color-picker-alpha-input input')?.getAttribute('value'),
-    ).toEqual('0%');
+    ).toBe('0%');
     expect(
       container.querySelector('.ant-color-picker-trigger .ant-color-picker-clear'),
     ).toBeTruthy();
@@ -151,7 +151,26 @@ describe('ColorPicker', () => {
     });
     expect(
       container.querySelector('.ant-color-picker-alpha-input input')?.getAttribute('value'),
-    ).toEqual('100%');
+    ).toBe('100%');
+  });
+
+  it('Should allowClear work with keyboard', async () => {
+    const triggerClear = async (key: string) => {
+      const onClear = jest.fn();
+      const { container, unmount } = render(
+        <ColorPicker defaultValue="#1677ff" allowClear onClear={onClear} />,
+      );
+
+      fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
+      await waitFakeTimer();
+      fireEvent.keyDown(container.querySelector('.ant-color-picker-clear')!, { key });
+      expect(onClear).toHaveBeenCalledTimes(1);
+
+      unmount();
+    };
+
+    await triggerClear('Enter');
+    await triggerClear(' ');
   });
 
   it('Should render trigger work', async () => {
@@ -205,38 +224,34 @@ describe('ColorPicker', () => {
     fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
     await waitFakeTimer();
     const presetsColors = container
-      .querySelector('.ant-collapse-content')
+      .querySelector('.ant-collapse-panel')
       ?.querySelectorAll('.ant-color-picker-presets-color')!;
 
     expect(container.querySelector('.ant-color-picker-presets')).toBeTruthy();
     expect(presetsColors.length).toBe(10);
     expect(
       container
-        .querySelectorAll('.ant-collapse-content')[1]
+        .querySelectorAll('.ant-collapse-panel')[1]
         .querySelector('.ant-color-picker-presets-empty'),
     ).toBeTruthy();
 
     fireEvent.click(presetsColors[0]);
-    expect(
-      presetsColors[0].classList.contains('ant-color-picker-presets-color-bright'),
-    ).toBeFalsy();
+    expect(presetsColors[0]).not.toHaveClass('ant-color-picker-presets-color-bright');
     expect(
       container.querySelector('.ant-color-picker-hex-input input')?.getAttribute('value'),
-    ).toEqual('000000');
+    ).toBe('000000');
     expect(container.querySelectorAll('.ant-color-picker-presets-color')[0]).toHaveClass(
       'ant-color-picker-presets-color-checked',
     );
 
     fireEvent.click(presetsColors[9]);
-    expect(
-      presetsColors[9].classList.contains('ant-color-picker-presets-color-bright'),
-    ).toBeTruthy();
+    expect(presetsColors[9]).toHaveClass('ant-color-picker-presets-color-bright');
     expect(
       container.querySelector('.ant-color-picker-hex-input input')?.getAttribute('value'),
-    ).toEqual('000000');
+    ).toBe('000000');
     expect(
       container.querySelector('.ant-color-picker-alpha-input input')?.getAttribute('value'),
-    ).toEqual('2%');
+    ).toBe('2%');
     expect(container.querySelectorAll('.ant-color-picker-presets-color')[9]).toHaveClass(
       'ant-color-picker-presets-color-checked',
     );
@@ -284,17 +299,13 @@ describe('ColorPicker', () => {
     fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
     await waitFakeTimer();
     expect(container.querySelector('.ant-color-picker-hex-input')).toBeTruthy();
-    fireEvent.mouseDown(
-      container.querySelector('.ant-color-picker-format-select .ant-select-selector')!,
-    );
+    fireEvent.mouseDown(container.querySelector('.ant-color-picker-format-select')!);
     await waitFakeTimer();
     fireEvent.click(container.querySelector('.ant-select-item[title="HSB"]')!);
     await waitFakeTimer();
     expect(container.querySelector('.ant-color-picker-hsb-input')).toBeTruthy();
 
-    fireEvent.mouseDown(
-      container.querySelector('.ant-color-picker-format-select .ant-select-selector')!,
-    );
+    fireEvent.mouseDown(container.querySelector('.ant-color-picker-format-select')!);
     await waitFakeTimer();
     fireEvent.click(container.querySelector('.ant-select-item[title="RGB"]')!);
     await waitFakeTimer();
@@ -308,7 +319,7 @@ describe('ColorPicker', () => {
     });
     expect(
       container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-    ).toEqual('background: rgb(99, 21, 21);');
+    ).toBe('background: rgb(99, 21, 21);');
   });
 
   it('Should rgb input work', async () => {
@@ -325,7 +336,7 @@ describe('ColorPicker', () => {
     });
     expect(
       container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-    ).toEqual('background: rgb(99, 21, 21);');
+    ).toBe('background: rgb(99, 21, 21);');
   });
 
   it('Should hsb input work', async () => {
@@ -342,7 +353,7 @@ describe('ColorPicker', () => {
     });
     expect(
       container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-    ).toEqual('background: rgb(99, 22, 22);');
+    ).toBe('background: rgb(99, 22, 22);');
   });
 
   it('Should not trigger onChange when click clear after clearing', async () => {
@@ -417,29 +428,23 @@ describe('ColorPicker', () => {
     const targetEle = container.querySelector('.ant-color-picker-trigger-text');
     expect(targetEle).toBeTruthy();
 
-    fireEvent.mouseDown(
-      container.querySelector('.ant-color-picker-format-select .ant-select-selector')!,
-    );
+    fireEvent.mouseDown(container.querySelector('.ant-color-picker-format-select')!);
     await waitFakeTimer();
     fireEvent.click(container.querySelector('.ant-select-item[title="HSB"]')!);
     await waitFakeTimer();
-    expect(targetEle?.innerHTML).toEqual('hsb(215, 91%, 100%)');
+    expect(targetEle?.innerHTML).toBe('hsb(215, 91%, 100%)');
 
-    fireEvent.mouseDown(
-      container.querySelector('.ant-color-picker-format-select .ant-select-selector')!,
-    );
+    fireEvent.mouseDown(container.querySelector('.ant-color-picker-format-select')!);
     await waitFakeTimer();
     fireEvent.click(container.querySelector('.ant-select-item[title="RGB"]')!);
     await waitFakeTimer();
-    expect(targetEle?.innerHTML).toEqual('rgb(22,119,255)');
+    expect(targetEle?.innerHTML).toBe('rgb(22,119,255)');
 
-    fireEvent.mouseDown(
-      container.querySelector('.ant-color-picker-format-select .ant-select-selector')!,
-    );
+    fireEvent.mouseDown(container.querySelector('.ant-color-picker-format-select')!);
     await waitFakeTimer();
     fireEvent.click(container.querySelector('.ant-select-item[title="HEX"]')!);
     await waitFakeTimer();
-    expect(targetEle?.innerHTML).toEqual('#1677FF');
+    expect(targetEle?.innerHTML).toBe('#1677FF');
   });
 
   it('Should size work', async () => {
@@ -487,14 +492,14 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker defaultValue={null} open />);
     expect(
       container.querySelector('.ant-color-picker-alpha-input input')?.getAttribute('value'),
-    ).toEqual('0%');
+    ).toBe('0%');
     expect(
       container.querySelector('.ant-color-picker-hex-input input')?.getAttribute('value'),
-    ).toEqual('000000');
+    ).toBe('000000');
     doMouseMove(container, 0, 999);
     expect(
       container.querySelector('.ant-color-picker-alpha-input input')?.getAttribute('value'),
-    ).toEqual('100%');
+    ).toBe('100%');
 
     spyRect.mockRestore();
   });
@@ -525,7 +530,7 @@ describe('ColorPicker', () => {
     fireEvent.click(container.querySelector('button')!);
     await waitFakeTimer();
     expect(container.querySelector('.ant-color-picker-status-error')).toBeTruthy();
-    expect(container.querySelector('.ant-form-item-explain-error')?.innerHTML).toEqual(
+    expect(container.querySelector('.ant-form-item-explain-error')?.innerHTML).toBe(
       'color is required!',
     );
   });
@@ -603,10 +608,10 @@ describe('ColorPicker', () => {
       );
     };
     const { container } = render(<Demo />);
-    expect(container.querySelector('.color-value')?.innerHTML).toEqual('#1677ff86');
+    expect(container.querySelector('.color-value')?.innerHTML).toBe('#1677ff86');
     doMouseMove(container, 0, 999);
-    expect(container.querySelector('.color-value')?.innerHTML).toEqual('#000000');
-    expect(container.querySelector('.color-value-changed')?.innerHTML).toEqual('#000000');
+    expect(container.querySelector('.color-value')?.innerHTML).toBe('#000000');
+    expect(container.querySelector('.color-value-changed')?.innerHTML).toBe('#000000');
 
     spyRect.mockRestore();
   });
@@ -698,7 +703,7 @@ describe('ColorPicker', () => {
   });
 
   it('Controlled string value should work with allowClear correctly', async () => {
-    const Demo = (props: any) => {
+    const Demo: React.FC<Readonly<ColorPickerProps>> = (props) => {
       const [color, setColor] = useState<ColorValueType>(() => generateColor('#FF0000'));
 
       useEffect(() => {
@@ -737,7 +742,7 @@ describe('ColorPicker', () => {
   });
 
   it('Controlled value should work with allowClear correctly', async () => {
-    const Demo = (props: any) => {
+    const Demo: React.FC<Readonly<ColorPickerProps>> = (props) => {
       const [color, setColor] = useState<ColorValueType>(() => generateColor('red'));
 
       useEffect(() => {
@@ -975,7 +980,7 @@ describe('ColorPicker', () => {
       const { container } = render(<ColorPicker defaultValue="#000000" disabledFormat />);
       expect(
         container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-      ).toEqual('background: rgb(0, 0, 0);');
+      ).toBe('background: rgb(0, 0, 0);');
       fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
       expect(container.querySelector('.ant-color-picker-input-container .ant-select')).toBeFalsy();
     });
@@ -994,8 +999,39 @@ describe('ColorPicker', () => {
       });
       expect(
         container.querySelector('.ant-color-picker-color-block-inner')?.getAttribute('style'),
-      ).toEqual('background: rgb(99, 21, 21);');
+      ).toBe('background: rgb(99, 21, 21);');
       expect(container.querySelector('.ant-color-picker-input-container .ant-select')).toBeFalsy();
     });
+  });
+
+  it('default value with preset name color', () => {
+    const { container } = render(<ColorPicker defaultValue="red" />);
+    expect(container.querySelector('.ant-color-picker-color-block-inner')).toHaveStyle({
+      background: 'rgb(255, 0, 0)',
+    });
+  });
+
+  it('support classNames and styles', () => {
+    const testClassNames = {
+      root: 'test-root',
+      popup: {
+        root: 'test-popup',
+      },
+    };
+    const testStyles = {
+      root: { color: 'rgb(255, 0, 0)' },
+      popup: {
+        root: { color: 'rgb(0, 255, 0)' },
+      },
+    };
+    const { container } = render(
+      <ColorPicker defaultValue="red" open classNames={testClassNames} styles={testStyles} />,
+    );
+    const root = container.querySelector('.ant-color-picker-trigger');
+    const popup = container.querySelector('.ant-color-picker');
+    expect(root).toHaveClass(testClassNames.root);
+    expect(popup).toHaveClass(testClassNames.popup.root);
+    expect(root).toHaveStyle(testStyles.root);
+    expect(popup).toHaveStyle(testStyles.popup.root);
   });
 });

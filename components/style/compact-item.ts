@@ -3,6 +3,8 @@ import type { CSSInterpolation, CSSObject } from '@ant-design/cssinjs';
 import type { AliasToken, CSSUtil, FullToken, OverrideComponent } from '../theme/internal';
 
 interface CompactItemOptions {
+  componentCls?: string;
+
   focus?: boolean;
   /**
    * Some component borders are implemented on child elements
@@ -25,10 +27,14 @@ function compactItemBorder(
 ): CSSObject {
   const { focusElCls, focus, borderElCls } = options;
   const childCombinator = borderElCls ? '> *' : '';
-  const hoverEffects = ['hover', focus ? 'focus' : null, 'active']
-    .filter(Boolean)
-    .map((n) => `&:${n} ${childCombinator}`)
-    .join(',');
+  const suffix = childCombinator ? ` ${childCombinator}` : '';
+  const genEffects = (effects: (string | null)[]) =>
+    effects
+      .filter(Boolean)
+      .map((n) => `&:${n}${suffix}`)
+      .join(',');
+  const hoverEffects = genEffects(['hover', focusElCls ? `hover${focusElCls}` : null]);
+  const focusEffects = genEffects([focus ? 'focus' : null, 'active']);
 
   return {
     [`&-item:not(${parentCls}-last-item)`]: {
@@ -40,8 +46,12 @@ function compactItemBorder(
     },
 
     '&-item': {
-      [hoverEffects]: {
+      [focusEffects]: {
         zIndex: 3,
+      },
+
+      [hoverEffects]: {
+        zIndex: 4,
       },
 
       ...(focusElCls
@@ -96,13 +106,16 @@ export function genCompactItemStyle<T extends OverrideComponent>(
   options: CompactItemOptions = { focus: true },
 ): CSSInterpolation {
   const { componentCls } = token;
+  const { componentCls: customizePrefixCls } = options;
 
-  const compactCls = `${componentCls}-compact`;
+  const mergedComponentCls = customizePrefixCls || componentCls;
+
+  const compactCls = `${mergedComponentCls}-compact`;
 
   return {
     [compactCls]: {
-      ...compactItemBorder(token, compactCls, options, componentCls),
-      ...compactItemBorderRadius(componentCls, compactCls, options),
+      ...compactItemBorder(token, compactCls, options, mergedComponentCls),
+      ...compactItemBorderRadius(mergedComponentCls, compactCls, options),
     },
   };
 }

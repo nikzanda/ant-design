@@ -1,7 +1,8 @@
-import type { CSSInterpolation, CSSObject } from '@ant-design/cssinjs';
+import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 
 import type { AliasToken, TokenWithCommonCls } from '../theme/internal';
+import { genCssVar } from '../theme/util/genStyleUtils';
 import type { ArrowToken } from './roundedArrow';
 import { genRoundedArrow } from './roundedArrow';
 
@@ -24,39 +25,27 @@ export function getArrowOffsetToken(options: {
   return { arrowOffsetHorizontal: arrowOffset, arrowOffsetVertical };
 }
 
-function isInject(valid: boolean, code: CSSObject): CSSObject {
-  if (!valid) {
-    return {};
-  }
-  return code;
-}
-
-export default function getArrowStyle<
+const getArrowStyle = <
   Token extends TokenWithCommonCls<AliasToken> & ArrowOffsetToken & ArrowToken,
 >(
   token: Token,
   colorBg: string,
   options?: {
     arrowDistance?: number;
-    arrowPlacement?: {
-      left?: boolean;
-      right?: boolean;
-      top?: boolean;
-      bottom?: boolean;
-    };
+    arrowShadow?: boolean;
   },
-): CSSInterpolation {
-  const { componentCls, boxShadowPopoverArrow, arrowOffsetVertical, arrowOffsetHorizontal } = token;
-
+): CSSInterpolation => {
   const {
-    arrowDistance = 0,
-    arrowPlacement = {
-      left: true,
-      right: true,
-      top: true,
-      bottom: true,
-    },
-  } = options || {};
+    componentCls,
+    boxShadowPopoverArrow,
+    arrowOffsetVertical,
+    arrowOffsetHorizontal,
+    antCls,
+  } = token;
+
+  const [varName] = genCssVar(antCls, 'tooltip');
+
+  const { arrowDistance = 0, arrowShadow = true } = options || {};
 
   return {
     [componentCls]: {
@@ -67,7 +56,7 @@ export default function getArrowStyle<
           zIndex: 1, // lift it up so the menu wouldn't cask shadow on it
           display: 'block',
 
-          ...genRoundedArrow(token, colorBg, boxShadowPopoverArrow),
+          ...genRoundedArrow(token, colorBg, arrowShadow ? boxShadowPopoverArrow : false),
 
           '&:before': {
             background: colorBg,
@@ -78,150 +67,144 @@ export default function getArrowStyle<
       // ========================== Placement ==========================
       // Here handle the arrow position and rotate stuff
       // >>>>> Top
-      ...isInject(!!arrowPlacement.top, {
-        [[
-          `&-placement-top > ${componentCls}-arrow`,
-          `&-placement-topLeft > ${componentCls}-arrow`,
-          `&-placement-topRight > ${componentCls}-arrow`,
-        ].join(',')]: {
-          bottom: arrowDistance,
-          transform: 'translateY(100%) rotate(180deg)',
-        },
+      [[
+        `&-placement-top > ${componentCls}-arrow`,
+        `&-placement-topLeft > ${componentCls}-arrow`,
+        `&-placement-topRight > ${componentCls}-arrow`,
+      ].join(',')]: {
+        bottom: arrowDistance,
+        transform: 'translateY(100%) rotate(180deg)',
+      },
 
-        [`&-placement-top > ${componentCls}-arrow`]: {
+      [`&-placement-top > ${componentCls}-arrow`]: {
+        left: {
+          _skip_check_: true,
+          value: '50%',
+        },
+        transform: 'translateX(-50%) translateY(100%) rotate(180deg)',
+      },
+
+      '&-placement-topLeft': {
+        [varName('arrow-offset-x')]: arrowOffsetHorizontal,
+
+        [`> ${componentCls}-arrow`]: {
           left: {
             _skip_check_: true,
-            value: '50%',
-          },
-          transform: 'translateX(-50%) translateY(100%) rotate(180deg)',
-        },
-
-        '&-placement-topLeft': {
-          '--arrow-offset-horizontal': arrowOffsetHorizontal,
-
-          [`> ${componentCls}-arrow`]: {
-            left: {
-              _skip_check_: true,
-              value: arrowOffsetHorizontal,
-            },
+            value: arrowOffsetHorizontal,
           },
         },
+      },
 
-        '&-placement-topRight': {
-          '--arrow-offset-horizontal': `calc(100% - ${unit(arrowOffsetHorizontal)})`,
+      '&-placement-topRight': {
+        [varName('arrow-offset-x')]: `calc(100% - ${unit(arrowOffsetHorizontal)})`,
 
-          [`> ${componentCls}-arrow`]: {
-            right: {
-              _skip_check_: true,
-              value: arrowOffsetHorizontal,
-            },
-          },
-        },
-      }),
-
-      // >>>>> Bottom
-      ...isInject(!!arrowPlacement.bottom, {
-        [[
-          `&-placement-bottom > ${componentCls}-arrow`,
-          `&-placement-bottomLeft > ${componentCls}-arrow`,
-          `&-placement-bottomRight > ${componentCls}-arrow`,
-        ].join(',')]: {
-          top: arrowDistance,
-          transform: `translateY(-100%)`,
-        },
-
-        [`&-placement-bottom > ${componentCls}-arrow`]: {
-          left: {
-            _skip_check_: true,
-            value: '50%',
-          },
-          transform: `translateX(-50%) translateY(-100%)`,
-        },
-
-        '&-placement-bottomLeft': {
-          '--arrow-offset-horizontal': arrowOffsetHorizontal,
-
-          [`> ${componentCls}-arrow`]: {
-            left: {
-              _skip_check_: true,
-              value: arrowOffsetHorizontal,
-            },
-          },
-        },
-
-        '&-placement-bottomRight': {
-          '--arrow-offset-horizontal': `calc(100% - ${unit(arrowOffsetHorizontal)})`,
-
-          [`> ${componentCls}-arrow`]: {
-            right: {
-              _skip_check_: true,
-              value: arrowOffsetHorizontal,
-            },
-          },
-        },
-      }),
-
-      // >>>>> Left
-      ...isInject(!!arrowPlacement.left, {
-        [[
-          `&-placement-left > ${componentCls}-arrow`,
-          `&-placement-leftTop > ${componentCls}-arrow`,
-          `&-placement-leftBottom > ${componentCls}-arrow`,
-        ].join(',')]: {
+        [`> ${componentCls}-arrow`]: {
           right: {
             _skip_check_: true,
-            value: arrowDistance,
+            value: arrowOffsetHorizontal,
           },
-          transform: 'translateX(100%) rotate(90deg)',
         },
+      },
 
-        [`&-placement-left > ${componentCls}-arrow`]: {
-          top: {
-            _skip_check_: true,
-            value: '50%',
-          },
-          transform: 'translateY(-50%) translateX(100%) rotate(90deg)',
+      // >>>>> Bottom
+      [[
+        `&-placement-bottom > ${componentCls}-arrow`,
+        `&-placement-bottomLeft > ${componentCls}-arrow`,
+        `&-placement-bottomRight > ${componentCls}-arrow`,
+      ].join(',')]: {
+        top: arrowDistance,
+        transform: `translateY(-100%)`,
+      },
+
+      [`&-placement-bottom > ${componentCls}-arrow`]: {
+        left: {
+          _skip_check_: true,
+          value: '50%',
         },
+        transform: `translateX(-50%) translateY(-100%)`,
+      },
 
-        [`&-placement-leftTop > ${componentCls}-arrow`]: {
-          top: arrowOffsetVertical,
-        },
+      '&-placement-bottomLeft': {
+        [varName('arrow-offset-x')]: arrowOffsetHorizontal,
 
-        [`&-placement-leftBottom > ${componentCls}-arrow`]: {
-          bottom: arrowOffsetVertical,
-        },
-      }),
-
-      // >>>>> Right
-      ...isInject(!!arrowPlacement.right, {
-        [[
-          `&-placement-right > ${componentCls}-arrow`,
-          `&-placement-rightTop > ${componentCls}-arrow`,
-          `&-placement-rightBottom > ${componentCls}-arrow`,
-        ].join(',')]: {
+        [`> ${componentCls}-arrow`]: {
           left: {
             _skip_check_: true,
-            value: arrowDistance,
+            value: arrowOffsetHorizontal,
           },
-          transform: 'translateX(-100%) rotate(-90deg)',
         },
+      },
 
-        [`&-placement-right > ${componentCls}-arrow`]: {
-          top: {
+      '&-placement-bottomRight': {
+        [varName('arrow-offset-x')]: `calc(100% - ${unit(arrowOffsetHorizontal)})`,
+
+        [`> ${componentCls}-arrow`]: {
+          right: {
             _skip_check_: true,
-            value: '50%',
+            value: arrowOffsetHorizontal,
           },
-          transform: 'translateY(-50%) translateX(-100%) rotate(-90deg)',
         },
+      },
 
-        [`&-placement-rightTop > ${componentCls}-arrow`]: {
-          top: arrowOffsetVertical,
+      // >>>>> Left
+      [[
+        `&-placement-left > ${componentCls}-arrow`,
+        `&-placement-leftTop > ${componentCls}-arrow`,
+        `&-placement-leftBottom > ${componentCls}-arrow`,
+      ].join(',')]: {
+        right: {
+          _skip_check_: true,
+          value: arrowDistance,
         },
+        transform: 'translateX(100%) rotate(90deg)',
+      },
 
-        [`&-placement-rightBottom > ${componentCls}-arrow`]: {
-          bottom: arrowOffsetVertical,
+      [`&-placement-left > ${componentCls}-arrow`]: {
+        top: {
+          _skip_check_: true,
+          value: '50%',
         },
-      }),
+        transform: 'translateY(-50%) translateX(100%) rotate(90deg)',
+      },
+
+      [`&-placement-leftTop > ${componentCls}-arrow`]: {
+        top: arrowOffsetVertical,
+      },
+
+      [`&-placement-leftBottom > ${componentCls}-arrow`]: {
+        bottom: arrowOffsetVertical,
+      },
+
+      // >>>>> Right
+      [[
+        `&-placement-right > ${componentCls}-arrow`,
+        `&-placement-rightTop > ${componentCls}-arrow`,
+        `&-placement-rightBottom > ${componentCls}-arrow`,
+      ].join(',')]: {
+        left: {
+          _skip_check_: true,
+          value: arrowDistance,
+        },
+        transform: 'translateX(-100%) rotate(-90deg)',
+      },
+
+      [`&-placement-right > ${componentCls}-arrow`]: {
+        top: {
+          _skip_check_: true,
+          value: '50%',
+        },
+        transform: 'translateY(-50%) translateX(-100%) rotate(-90deg)',
+      },
+
+      [`&-placement-rightTop > ${componentCls}-arrow`]: {
+        top: arrowOffsetVertical,
+      },
+
+      [`&-placement-rightBottom > ${componentCls}-arrow`]: {
+        bottom: arrowOffsetVertical,
+      },
     },
   };
-}
+};
+
+export default getArrowStyle;

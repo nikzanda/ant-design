@@ -1,5 +1,5 @@
 // doc: https://github.com/raineorshine/npm-check-updates/tree/v16.14.6#readme
-const path = require('path');
+const path = require('node:path');
 
 const rcOrg = ['@rc-component/', 'rc-'];
 const check = ['@ant-design/', ...rcOrg];
@@ -18,5 +18,17 @@ module.exports = {
     return check.some((prefix) => name.startsWith(prefix));
   },
   // https://github.com/raineorshine/npm-check-updates#target
-  target: () => `semver`,
+  target: (name, semver) => {
+    const { operator } = semver[0] ?? {};
+
+    // rc-component
+    if (rcOrg.some((prefix) => name.startsWith(prefix))) {
+      // `^` always upgrade latest, otherwise follow semver.
+      if (operator === '^') {
+        return 'latest';
+      }
+    }
+
+    return 'semver';
+  },
 };

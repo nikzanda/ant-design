@@ -3,8 +3,8 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { Flex, Tag } from 'antd';
 
 const App: React.FC = () => (
-  <Flex gap="4px 0" wrap>
-    <Tag closable closeIcon="关 闭">
+  <Flex gap="small" align="center" wrap>
+    <Tag closable closeIcon="Close">
       Tag1
     </Tag>
     <Tag closable closeIcon={<CloseCircleOutlined />}>

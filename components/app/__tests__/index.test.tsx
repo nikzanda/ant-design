@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { SmileOutlined } from '@ant-design/icons';
-import ConfigProvider from 'antd/es/config-provider';
-import type { NotificationConfig } from 'antd/es/notification/interface';
 
 import App from '..';
 import mountTest from '../../../tests/shared/mountTest';
 import rtlTest from '../../../tests/shared/rtlTest';
 import { render, waitFakeTimer } from '../../../tests/utils';
+import ConfigProvider from '../../config-provider';
+import type { NotificationConfig } from '../../notification/interface';
 import type { AppConfig } from '../context';
 import { AppConfigContext } from '../context';
 
@@ -55,9 +55,9 @@ describe('App', () => {
       useEffect(() => {
         message.success('Message 1');
         message.success('Message 2');
-        notification.success({ message: 'Notification 1' });
-        notification.success({ message: 'Notification 2' });
-        notification.success({ message: 'Notification 3' });
+        notification.success({ title: 'Notification 1' });
+        notification.success({ title: 'Notification 2' });
+        notification.success({ title: 'Notification 3' });
       }, [message, notification]);
 
       return <div />;
@@ -135,9 +135,9 @@ describe('App', () => {
       consumedConfig = React.useContext(AppConfigContext);
 
       useEffect(() => {
-        notification.success({ message: 'Notification 1' });
-        notification.success({ message: 'Notification 2' });
-        notification.success({ message: 'Notification 3' });
+        notification.success({ title: 'Notification 1' });
+        notification.success({ title: 'Notification 2' });
+        notification.success({ title: 'Notification 3' });
       }, [notification]);
 
       return <div />;
@@ -163,7 +163,9 @@ describe('App', () => {
     expect(document.querySelector('.ant-notification-bottomLeft')).toHaveStyle({
       top: 'auto',
       left: '0px',
-      bottom: '50px',
+      bottom:
+        'calc(var(--notification-bottom, var(--notification-margin-edge, 0px)) - var(--notification-margin-edge, 0px))',
+      '--notification-bottom': '50px',
     });
   });
 
@@ -236,19 +238,9 @@ describe('App', () => {
       expect(container.querySelector('section.ant-app')).toBeTruthy();
     });
 
-    it('to false', () => {
-      const { container } = render(
-        <App component={false}>
-          <p />
-        </App>,
-      );
-      expect(errorSpy).not.toHaveBeenCalled();
-      expect(container.querySelector('.ant-app')).toBeFalsy();
-    });
-
     it('should warn if component is false and cssVarCls is not empty', () => {
       render(
-        <ConfigProvider theme={{ cssVar: true }}>
+        <ConfigProvider>
           <App component={false} />
         </ConfigProvider>,
       );
@@ -256,6 +248,21 @@ describe('App', () => {
       expect(errorSpy).toHaveBeenCalledWith(
         'Warning: [antd: App] When using cssVar, ensure `component` is assigned a valid React component string.',
       );
+    });
+
+    it('should warn if component is false and ref is not empty', () => {
+      const domRef = React.createRef<HTMLSpanElement>();
+      render(<App ref={domRef} component={false} />);
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Warning: [antd: App] `ref` is not supported when `component` is `false`. Please provide a valid `component` instead.',
+      );
+    });
+
+    it('App should support Ref', () => {
+      const domRef = React.createRef<HTMLSpanElement>();
+      const { container } = render(<App ref={domRef} className="bamboo" component="span" />);
+      expect(domRef.current).toBe(container.querySelector('.bamboo'));
     });
   });
 });

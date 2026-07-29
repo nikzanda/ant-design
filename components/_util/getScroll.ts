@@ -1,6 +1,16 @@
-export function isWindow(obj: any): obj is Window {
-  return obj !== null && obj !== undefined && obj === obj.window;
-}
+import { isNonNullable, isNumber } from './is';
+
+export const isWindow = (obj: any): obj is Window => {
+  return isNonNullable(obj) && obj === obj.window;
+};
+
+export const isDocument = (val: Document | HTMLElement): val is Document => {
+  return (
+    val instanceof Document ||
+    val.constructor.name === 'HTMLDocument' ||
+    val.nodeType === window.Node.DOCUMENT_NODE
+  );
+};
 
 const getScroll = (target: HTMLElement | Window | Document | null): number => {
   if (typeof window === 'undefined') {
@@ -24,7 +34,7 @@ const getScroll = (target: HTMLElement | Window | Document | null): number => {
     result = target['scrollTop'];
   }
 
-  if (target && !isWindow(target) && typeof result !== 'number') {
+  if (target && !isWindow(target) && !isNumber(result)) {
     result = (target.ownerDocument ?? target).documentElement?.scrollTop;
   }
   return result;

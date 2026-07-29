@@ -1,18 +1,19 @@
-import type { CSSObject } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
+import type { CSSObject } from '@ant-design/cssinjs';
 
+import type { GenerateStyle } from '../../theme/internal';
 import { mergeToken } from '../../theme/internal';
 import type { InputToken } from './token';
 
-export const genHoverStyle = (token: InputToken): CSSObject => ({
+export const genHoverStyle: GenerateStyle<InputToken, CSSObject> = (token) => ({
   borderColor: token.hoverBorderColor,
   backgroundColor: token.hoverBg,
 });
 
-export const genDisabledStyle = (token: InputToken): CSSObject => ({
+export const genDisabledStyle: GenerateStyle<InputToken, CSSObject> = (token) => ({
   color: token.colorTextDisabled,
   backgroundColor: token.colorBgContainerDisabled,
-  borderColor: token.colorBorder,
+  borderColor: token.colorBorderDisabled,
   boxShadow: 'none',
   cursor: 'not-allowed',
   opacity: 1,
@@ -24,7 +25,7 @@ export const genDisabledStyle = (token: InputToken): CSSObject => ({
   '&:hover:not([disabled])': {
     ...genHoverStyle(
       mergeToken<InputToken>(token, {
-        hoverBorderColor: token.colorBorder,
+        hoverBorderColor: token.colorBorderDisabled,
         hoverBg: token.colorBgContainerDisabled,
       }),
     ),
@@ -101,7 +102,7 @@ export const genOutlinedStyle = (token: InputToken, extraStyles?: CSSObject): CS
       hoverBorderColor: token.colorErrorBorderHover,
       activeBorderColor: token.colorError,
       activeShadow: token.errorActiveShadow,
-      affixColor: token.colorError,
+      affixColor: token.colorErrorAffix,
     }),
 
     ...genOutlinedStatusStyle(token, {
@@ -110,7 +111,7 @@ export const genOutlinedStyle = (token: InputToken, extraStyles?: CSSObject): CS
       hoverBorderColor: token.colorWarningBorderHover,
       activeBorderColor: token.colorWarning,
       activeShadow: token.warningActiveShadow,
-      affixColor: token.colorWarning,
+      affixColor: token.colorWarningAffix,
     }),
 
     ...extraStyles,
@@ -133,7 +134,7 @@ const genOutlinedGroupStatusStyle = (
   },
 });
 
-export const genOutlinedGroupStyle = (token: InputToken): CSSObject => ({
+export const genOutlinedGroupStyle: GenerateStyle<InputToken, CSSObject> = (token) => ({
   '&-outlined': {
     [`${token.componentCls}-group`]: {
       '&-addon': {
@@ -171,6 +172,31 @@ export const genOutlinedGroupStyle = (token: InputToken): CSSObject => ({
 });
 
 /* ============ Borderless ============ */
+const borderlessFocusVisibleSelector =
+  '&:focus-visible, &:has(input:focus-visible), &:has(textarea:focus-visible)';
+
+const genBorderlessFocusVisibleStyle = (token: InputToken, outlineColor: string): CSSObject => ({
+  outline: `${unit(token.lineWidth)} ${token.lineType} ${outlineColor}`,
+  outlineOffset: unit(token.calc(token.lineWidth).mul(-1).equal()),
+  transition: [`outline-offset`, `outline`].map((prop) => `${prop} 0s`).join(', '),
+});
+
+const genBorderlessStatusStyle = (
+  token: InputToken,
+  options: {
+    color: string;
+    affixColor: string;
+  },
+): CSSObject => ({
+  '&, & input, & textarea': {
+    color: options.color,
+  },
+  [borderlessFocusVisibleSelector]: genBorderlessFocusVisibleStyle(token, options.color),
+  [`${token.componentCls}-prefix, ${token.componentCls}-suffix`]: {
+    color: options.affixColor,
+  },
+});
+
 export const genBorderlessStyle = (token: InputToken, extraStyles?: CSSObject): CSSObject => {
   const { componentCls } = token;
 
@@ -178,10 +204,26 @@ export const genBorderlessStyle = (token: InputToken, extraStyles?: CSSObject): 
     '&-borderless': {
       background: 'transparent',
       border: 'none',
+      // Compensate for the removed border to maintain consistent height with other components
+      // (e.g. Select borderless) that keep a transparent border.
+      paddingBlock: token.calc(token.paddingBlock).add(token.lineWidth).equal(),
+
+      [`&${componentCls}-sm, &${componentCls}-affix-wrapper-sm`]: {
+        paddingBlock: token.calc(token.paddingBlockSM).add(token.lineWidth).equal(),
+      },
+
+      [`&${componentCls}-lg, &${componentCls}-affix-wrapper-lg`]: {
+        paddingBlock: token.calc(token.paddingBlockLG).add(token.lineWidth).equal(),
+      },
 
       '&:focus, &:focus-within': {
         outline: 'none',
       },
+
+      [borderlessFocusVisibleSelector]: genBorderlessFocusVisibleStyle(
+        token,
+        token.activeBorderColor,
+      ),
 
       // >>>>> Disabled
       [`&${componentCls}-disabled, &[disabled]`]: {
@@ -190,17 +232,15 @@ export const genBorderlessStyle = (token: InputToken, extraStyles?: CSSObject): 
       },
 
       // >>>>> Status
-      [`&${componentCls}-status-error`]: {
-        '&, & input, & textarea': {
-          color: token.colorError,
-        },
-      },
+      [`&${componentCls}-status-error`]: genBorderlessStatusStyle(token, {
+        color: token.colorError,
+        affixColor: token.colorErrorAffix,
+      }),
 
-      [`&${componentCls}-status-warning`]: {
-        '&, & input, & textarea': {
-          color: token.colorWarning,
-        },
-      },
+      [`&${componentCls}-status-warning`]: genBorderlessStatusStyle(token, {
+        color: token.colorWarning,
+        affixColor: token.colorWarningAffix,
+      }),
 
       ...extraStyles,
     },
@@ -263,6 +303,7 @@ export const genFilledStyle = (token: InputToken, extraStyles?: CSSObject): CSSO
       bg: token.colorFillTertiary,
       hoverBg: token.colorFillSecondary,
       activeBorderColor: token.activeBorderColor,
+      inputColor: token.colorText,
     }),
 
     [`&${token.componentCls}-disabled, &[disabled]`]: {
@@ -275,7 +316,7 @@ export const genFilledStyle = (token: InputToken, extraStyles?: CSSObject): CSSO
       hoverBg: token.colorErrorBgHover,
       activeBorderColor: token.colorError,
       inputColor: token.colorErrorText,
-      affixColor: token.colorError,
+      affixColor: token.colorErrorAffix,
     }),
 
     ...genFilledStatusStyle(token, {
@@ -284,7 +325,7 @@ export const genFilledStyle = (token: InputToken, extraStyles?: CSSObject): CSSO
       hoverBg: token.colorWarningBgHover,
       activeBorderColor: token.colorWarning,
       inputColor: token.colorWarningText,
-      affixColor: token.colorWarning,
+      affixColor: token.colorWarningAffix,
     }),
 
     ...extraStyles,
@@ -307,7 +348,7 @@ const genFilledGroupStatusStyle = (
   },
 });
 
-export const genFilledGroupStyle = (token: InputToken): CSSObject => ({
+export const genFilledGroupStyle: GenerateStyle<InputToken, CSSObject> = (token) => ({
   '&-filled': {
     [`${token.componentCls}-group-addon`]: {
       background: token.colorFillTertiary,
@@ -369,7 +410,7 @@ export const genBaseUnderlinedStyle = (
   borderColor: `transparent transparent ${options.borderColor} transparent`,
   borderRadius: 0,
   '&:hover': {
-    borderColor: `transparent transparent ${options.borderColor} transparent`,
+    borderColor: `transparent transparent ${options.hoverBorderColor} transparent`,
     backgroundColor: token.hoverBg,
   },
 
@@ -432,7 +473,7 @@ export const genUnderlinedStyle = (token: InputToken, extraStyles?: CSSObject): 
       hoverBorderColor: token.colorErrorBorderHover,
       activeBorderColor: token.colorError,
       activeShadow: token.errorActiveShadow,
-      affixColor: token.colorError,
+      affixColor: token.colorErrorAffix,
     }),
 
     ...genUnderlinedStatusStyle(token, {
@@ -441,7 +482,7 @@ export const genUnderlinedStyle = (token: InputToken, extraStyles?: CSSObject): 
       hoverBorderColor: token.colorWarningBorderHover,
       activeBorderColor: token.colorWarning,
       activeShadow: token.warningActiveShadow,
-      affixColor: token.colorWarning,
+      affixColor: token.colorWarningAffix,
     }),
 
     ...extraStyles,

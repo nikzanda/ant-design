@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import React from 'react';
 import {
   createCache,
@@ -53,10 +53,10 @@ function cssValidate(css: string, filename: string) {
 async function checkCSSVar() {
   await generateCssinjs({
     key: 'check',
-    render(Component: any) {
+    render(Component: React.ComponentType<any>) {
       ReactDOMServer.renderToString(
         <StyleProvider linters={[NaNLinter]}>
-          <ConfigProvider theme={{ cssVar: true, hashed: false }}>
+          <ConfigProvider theme={{ hashed: false }}>
             <Component />
           </ConfigProvider>
         </StyleProvider>,
@@ -68,7 +68,7 @@ async function checkCSSContent() {
   const errors = new Map();
   await generateCssinjs({
     key: 'css-validate',
-    render(Component: any, filePath: string) {
+    render(Component: React.ComponentType<any>, filePath: string) {
       const cache = createCache();
       ReactDOMServer.renderToString(
         <StyleProvider cache={cache}>
@@ -100,7 +100,7 @@ async function checkCSSContent() {
 (async () => {
   await generateCssinjs({
     key: 'check',
-    render(Component: any) {
+    render(Component: React.ComponentType<any>) {
       ReactDOMServer.renderToString(
         <StyleProvider
           linters={[logicalPropertiesLinter, legacyNotSelectorLinter, parentSelectorLinter]}

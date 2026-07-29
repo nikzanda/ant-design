@@ -1,18 +1,19 @@
-import path from 'path';
+import path from 'node:path';
 import React from 'react';
 // Reference: https://github.com/ant-design/ant-design/pull/24003#discussion_r427267386
 import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
+import { warning as rcWarning } from '@rc-component/util';
 import { extractStaticStyle } from 'antd-style';
 import dayjs from 'dayjs';
 import fse from 'fs-extra';
 import { globSync } from 'glob';
 import { JSDOM } from 'jsdom';
 import MockDate from 'mockdate';
-import type { HTTPRequest, Viewport } from 'puppeteer';
-import rcWarning from 'rc-util/lib/warning';
+import type { HTTPRequest, Page, Viewport } from 'puppeteer';
 import ReactDOMServer from 'react-dom/server';
 
 import { App, ConfigProvider, theme } from '../../components';
+import type { ThemeConfig } from '../../components';
 import { fillWindowEnv } from '../setup';
 import { render } from '../utils';
 import { TriggerMockContext } from './demoTestContext';
@@ -28,16 +29,31 @@ const themes = {
   compact: theme.compactAlgorithm,
 };
 
+// 修复截图快照里面的中文是乱码的问题
+const imageSnapshotFontFamily = [
+  'Arial',
+  '"PingFang SC"',
+  '"Hiragino Sans GB"',
+  '"Microsoft YaHei"',
+  '"Noto Sans CJK SC"',
+  '"Noto Sans SC"',
+  '"Source Han Sans SC"',
+  '"WenQuanYi Micro Hei"',
+  'sans-serif',
+].join(', ');
+
 interface ImageTestOptions {
+  beforeScreenshot?: (testPage: Page) => Promise<void>;
   onlyViewport?: boolean;
   ssr?: boolean | string[];
   openTriggerClassName?: string;
+  hoverSelector?: string;
   mobile?: boolean;
 }
 
 // eslint-disable-next-line jest/no-export
 export default function imageTest(
-  component: React.ReactElement,
+  component: React.ReactElement<any>,
   identifier: string,
   filename: string,
   options: ImageTestOptions,
@@ -46,9 +62,7 @@ export default function imageTest(
   let container: HTMLDivElement;
 
   beforeAll(async () => {
-    const dom = new JSDOM('<!DOCTYPE html><body></body></html>', {
-      url: 'http://localhost/',
-    });
+    const dom = new JSDOM('<!DOCTYPE html><body></body></html>', { url: 'http://localhost/' });
     const win = dom.window;
     doc = win.document;
 
@@ -107,11 +121,26 @@ export default function imageTest(
   });
 
   beforeEach(() => {
+    page.removeAllListeners('request'); // 保证没有历史残留
     doc.body.innerHTML = `<div id="root"></div>`;
     container = doc.querySelector<HTMLDivElement>('#root')!;
   });
 
-  function test(name: string, suffix: string, themedComponent: React.ReactElement, mobile = false) {
+  afterEach(() => {
+    page.removeAllListeners('request'); // 保证没有历史残留
+    MockDate.reset();
+  });
+
+  afterAll(async () => {
+    await page.setRequestInterception(false);
+  });
+
+  const test = (
+    name: string,
+    suffix: string,
+    themedComponent: React.ReactElement<any>,
+    mobile = false,
+  ) => {
     it(name, async () => {
       const sharedViewportConfig: Partial<Viewport> = {
         isMobile: mobile,
@@ -121,6 +150,9 @@ export default function imageTest(
       await page.setViewport({ width: 800, height: 600, ...sharedViewportConfig });
 
       const onRequestHandle = (request: HTTPRequest) => {
+        if (request.isInterceptResolutionHandled?.()) {
+          return;
+        }
         if (['image'].includes(request.resourceType())) {
           request.abort();
         } else {
@@ -134,9 +166,18 @@ export default function imageTest(
 
       MockDate.set(dayjs('2016-11-22').valueOf());
       page.on('request', requestListener);
-      await page.goto(`file://${process.cwd()}/tests/index.html`);
+
+      await page.goto(`file://${process.cwd()}/tests/index.html`, {
+        waitUntil: 'domcontentloaded',
+      });
       await page.addStyleTag({ path: `${process.cwd()}/components/style/reset.css` });
-      await page.addStyleTag({ content: '*{animation: none!important;}' });
+      // Disable animation & transition (including pseudo-elements like
+      // `::before`/`::after`, used by Menu/Tabs/Carousel active bars) to avoid
+      // capturing intermediate frames, which makes the rendered width/content
+      // flaky across runs.
+      await page.addStyleTag({
+        content: '*,*::before,*::after{animation: none!important; transition: none!important;}',
+      });
 
       const cache = createCache();
 
@@ -167,9 +208,7 @@ export default function imageTest(
         html = ReactDOMServer.renderToString(element);
         styleStr = extractStyle(cache) + extractStaticStyle(html).map((item) => item.tag);
       } else {
-        const { unmount } = render(element, {
-          container,
-        });
+        const { unmount } = render(element, { container });
         html = container.innerHTML;
         styleStr = extractStyle(cache) + extractStaticStyle(html).map((item) => item.tag);
         // We should extract style before unmount
@@ -215,63 +254,84 @@ export default function imageTest(
         openTriggerClassName || '',
       );
 
+      if (options.hoverSelector) {
+        await page.hover(options.hoverSelector);
+      }
+
+      // Wait for fonts to be ready and the layout to settle BEFORE measuring
+      // the page size. Otherwise the rendered width/height may shift after the
+      // screenshot is taken, making the visual diff flaky.
+      await page.evaluate(async () => {
+        // Wait fonts ready, but cap it at 1000ms as a safety net so a stuck
+        // font load can never hang the screenshot.
+        await Promise.race([
+          document.fonts?.ready ?? Promise.resolve(),
+          new Promise((resolve) => setTimeout(resolve, 1000)),
+        ]);
+        // Always settle the layout with raf * 2, regardless of which branch
+        // above resolved first.
+        await new Promise((resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              resolve(true);
+            });
+          });
+        });
+      });
+
+      await options.beforeScreenshot?.(page);
+
       if (!options.onlyViewport) {
         // Get scroll height of the rendered page and set viewport
         const bodyHeight = await page.evaluate(() => document.body.scrollHeight);
-
         // loooooong image
         rcWarning(
           bodyHeight < 4096, // Expected height
           `[IMAGE TEST] [${identifier}] may cause screenshots to be very long and unacceptable.
             Please consider using \`onlyViewport: ["filename.tsx"]\`, read more: https://github.com/ant-design/ant-design/pull/52053`,
         );
-
         await page.setViewport({ width: 800, height: bodyHeight, ...sharedViewportConfig });
       }
 
-      const image = await page.screenshot({
-        fullPage: !options.onlyViewport,
-      });
-
+      const image = await page.screenshot({ fullPage: !options.onlyViewport });
       await fse.writeFile(path.join(snapshotPath, `${identifier}${suffix}.png`), image);
-
       MockDate.reset();
       page.off('request', requestListener);
     });
-  }
+  };
 
   if (!options.mobile) {
     Object.entries(themes).forEach(([key, algorithm]) => {
-      const configTheme = {
+      const configTheme: ThemeConfig = {
         algorithm,
         token: {
-          fontFamily: 'Arial',
+          fontFamily: imageSnapshotFontFamily,
         },
       };
 
       test(
         `component image screenshot should correct ${key}`,
         `.${key}`,
-        <div style={{ background: key === 'dark' ? '#000' : '', padding: `24px 12px` }} key={key}>
+        <div
+          key={`theme-${key}`}
+          style={{
+            padding: '24px 12px',
+            backgroundColor: key === 'dark' ? '#000' : undefined,
+            fontFamily: imageSnapshotFontFamily,
+          }}
+        >
           <ConfigProvider theme={configTheme}>{component}</ConfigProvider>
         </div>,
       );
-      test(
-        `[CSS Var] component image screenshot should correct ${key}`,
-        `.${key}.css-var`,
-        <div style={{ background: key === 'dark' ? '#000' : '', padding: `24px 12px` }} key={key}>
-          <ConfigProvider theme={{ ...configTheme, cssVar: true }}>{component}</ConfigProvider>
-        </div>,
-      );
     });
-
-    // Mobile Snapshot
   } else {
-    test(identifier, `.mobile`, component, true);
+    // Mobile Snapshot
     test(
       identifier,
-      `.mobile.css-var`,
-      <ConfigProvider theme={{ cssVar: true }}>{component}</ConfigProvider>,
+      `.mobile`,
+      <div style={{ fontFamily: imageSnapshotFontFamily }} key={`mobile-${identifier}`}>
+        {component}
+      </div>,
       true,
     );
   }
@@ -279,6 +339,8 @@ export default function imageTest(
 
 type Options = {
   skip?: boolean | string[];
+  // 方便调试单个 demo 用
+  only?: string[];
   onlyViewport?: boolean | string[];
   /** Use SSR render instead. Only used when the third part deps component */
   ssr?: boolean | string[];
@@ -290,37 +352,39 @@ type Options = {
 // eslint-disable-next-line jest/no-export
 export function imageDemoTest(component: string, options: Options = {}) {
   let describeMethod = options.skip === true ? describe.skip : describe;
-  const files = globSync(`./components/${component}/demo/*.tsx`).filter(
-    (file) => !file.includes('_semantic'),
-  );
+  const files = options.only
+    ? options.only.map((file) => `./components/${component}/demo/${file}`)
+    : globSync(`./components/${component}/demo/*.tsx`).filter(
+        (file) => !file.includes('_semantic'),
+      );
 
-  const mobileDemos: [file: string, node: any][] = [];
+  const mobileDemos: [file: string, node: React.ReactElement<any>][] = [];
 
   const getTestOption = (file: string) => ({
     onlyViewport:
       options.onlyViewport === true ||
-      (Array.isArray(options.onlyViewport) && options.onlyViewport.some((c) => file.endsWith(c))),
+      (Array.isArray(options.onlyViewport) && options.onlyViewport.includes(path.basename(file))),
     ssr: options.ssr,
     openTriggerClassName: options.openTriggerClassName,
   });
 
   files.forEach((file) => {
-    if (Array.isArray(options.skip) && options.skip.some((c) => file.endsWith(c))) {
-      describeMethod = describe.skip;
-    } else {
-      describeMethod = describe;
-    }
+    const shouldSkip = Array.isArray(options.skip) && options.skip.includes(path.basename(file));
+    describeMethod = shouldSkip ? describe.skip : describe;
 
     describeMethod(`Test ${file} image`, () => {
-      let Demo = require(`../../${file}`).default;
-      if (typeof Demo === 'function') {
-        Demo = <Demo />;
-      }
-      imageTest(Demo, `${component}-${path.basename(file, '.tsx')}`, file, getTestOption(file));
+      // Only require the demo file if it's not skipped to avoid dependency issues
+      if (!shouldSkip) {
+        let Demo = jest.requireActual(`../../${file}`).default;
+        if (typeof Demo === 'function') {
+          Demo = <Demo />;
+        }
+        imageTest(Demo, `${component}-${path.basename(file, '.tsx')}`, file, getTestOption(file));
 
-      // Check if need mobile test
-      if ((options.mobile || []).some((c) => file.endsWith(c))) {
-        mobileDemos.push([file, Demo]);
+        // Check if need mobile test
+        if ((options.mobile || []).includes(path.basename(file))) {
+          mobileDemos.push([file, Demo]);
+        }
       }
     });
   });

@@ -1,24 +1,37 @@
 import React, { memo, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
-import { Affix, Card, Col, Divider, Flex, Input, Row, Tag, Typography } from 'antd';
-import { createStyles, useTheme } from 'antd-style';
+import {
+  Affix,
+  Badge,
+  BorderBeam,
+  Card,
+  Col,
+  Divider,
+  Flex,
+  Input,
+  Row,
+  Tag,
+  Typography,
+} from 'antd';
+import { createStaticStyles, useTheme } from 'antd-style';
 import { useIntl, useLocation, useSidebarData } from 'dumi';
 import debounce from 'lodash/debounce';
 import scrollIntoView from 'scroll-into-view-if-needed';
+import semver from 'semver';
 
 import Link from '../../common/Link';
 import SiteContext from '../../slots/SiteContext';
 import type { Component } from './ProComponentsList';
 import proComponentsList from './ProComponentsList';
 
-const useStyle = createStyles(({ token, css }) => ({
+const styles = createStaticStyles(({ cssVar, css }) => ({
   componentsOverviewGroupTitle: css`
-    margin-bottom: ${token.marginLG}px !important;
+    margin-bottom: ${cssVar.marginLG} !important;
   `,
   componentsOverviewTitle: css`
     overflow: hidden;
-    color: ${token.colorTextHeading};
+    color: ${cssVar.colorTextHeading};
     text-overflow: ellipsis;
   `,
   componentsOverviewImg: css`
@@ -39,23 +52,27 @@ const useStyle = createStyles(({ token, css }) => ({
   `,
   componentsOverviewAffix: css`
     display: flex;
-    transition: all ${token.motionDurationSlow};
+    transition: all ${cssVar.motionDurationSlow};
     justify-content: space-between;
   `,
   componentsOverviewSearch: css`
     padding: 0;
     box-shadow: none !important;
     .anticon-search {
-      color: ${token.colorTextDisabled};
+      color: ${cssVar.colorTextDisabled};
+    }
+    &:focus-visible,
+    &:has(input:focus-visible) {
+      outline: none !important;
     }
   `,
   componentsOverviewContent: css`
     &:empty:after {
       display: block;
-      padding: ${token.padding}px 0 ${token.paddingMD * 2}px;
-      color: ${token.colorTextDisabled};
+      padding: ${cssVar.padding} 0 calc(${cssVar.paddingMD} * 2);
+      color: ${cssVar.colorTextDisabled};
       text-align: center;
-      border-bottom: 1px solid ${token.colorSplit};
+      border-bottom: 1px solid ${cssVar.colorSplit};
       content: 'Not Found';
     }
   `,
@@ -78,8 +95,7 @@ const reportSearch = debounce<(value: string) => void>((value) => {
 const { Title } = Typography;
 
 const Overview: React.FC = () => {
-  const { styles } = useStyle();
-  const { theme } = React.use(SiteContext);
+  const { isDark } = React.use(SiteContext);
 
   const data = useSidebarData();
   const [searchBarAffixed, setSearchBarAffixed] = useState<boolean>(false);
@@ -97,6 +113,8 @@ const Overview: React.FC = () => {
 
   const { search: urlSearch } = useLocation();
   const { locale, formatMessage } = useIntl();
+
+  const deprecatedText = formatMessage({ id: 'app.components.overview.deprecated' });
 
   const [search, setSearch] = useState<string>(() => {
     const params = new URLSearchParams(urlSearch);
@@ -125,6 +143,7 @@ const Overview: React.FC = () => {
             subtitle: child.frontmatter?.subtitle,
             cover: child.frontmatter?.cover,
             coverDark: child.frontmatter?.coverDark,
+            tag: child.frontmatter?.tag,
             link: child.link,
           })),
         }))
@@ -178,12 +197,15 @@ const Overview: React.FC = () => {
         {groups
           .filter((i) => i?.title)
           .map((group) => {
-            const components = group?.children?.filter(
-              (component) =>
-                !search.trim() ||
-                component?.title?.toLowerCase()?.includes(search.trim().toLowerCase()) ||
-                (component?.subtitle || '').toLowerCase().includes(search.trim().toLowerCase()),
-            );
+            const children = group?.children ?? [];
+            const keyword = search.trim().toLowerCase();
+            const components = keyword
+              ? children.filter((component) => {
+                  const title = component?.title?.toLowerCase() ?? '';
+                  const subtitle = component?.subtitle?.toLowerCase() ?? '';
+                  return title.includes(keyword) || subtitle.includes(keyword);
+                })
+              : children;
             return components?.length ? (
               <div key={group?.title}>
                 <Title level={2} className={styles.componentsOverviewGroupTitle}>
@@ -195,11 +217,29 @@ const Overview: React.FC = () => {
                 <Row gutter={[24, 24]}>
                   {components.map((component) => {
                     let url = component.link;
+                    let src = component.cover;
+
                     /** 是否是外链 */
                     const isExternalLink = url.startsWith('http');
 
+                    /** BorderBeam 组件需要特殊处理 */
+                    const isBorderBeam = component.title === 'BorderBeam';
+
+                    /** 是否是已废弃组件 */
+                    const isDeprecated = component.tag?.toUpperCase() === 'DEPRECATED';
+
+                    /** 是否是 v6.0.0 及以上版本新增的组件 */
+                    const isNewComponent =
+                      component.tag &&
+                      semver.valid(component.tag) !== null &&
+                      semver.gte(component.tag, '6.0.0');
+
                     if (!isExternalLink) {
                       url += urlSearch;
+                    }
+
+                    if (isDark && component.coverDark) {
+                      src = component.coverDark;
                     }
 
                     const cardContent = (
@@ -210,7 +250,11 @@ const Overview: React.FC = () => {
                           body: {
                             backgroundRepeat: 'no-repeat',
                             backgroundPosition: 'bottom right',
-                            backgroundImage: `url(${component.tag || ''})`,
+                            backgroundSize: '32px 32px',
+                            backgroundColor: 'transparent',
+                            backgroundImage: component.backgroundImage
+                              ? `url(${component.backgroundImage})`
+                              : undefined,
                           },
                         }}
                         size="small"
@@ -222,28 +266,58 @@ const Overview: React.FC = () => {
                         }
                       >
                         <div className={styles.componentsOverviewImg}>
-                          <img
-                            src={
-                              theme.includes('dark') && component.coverDark
-                                ? component.coverDark
-                                : component.cover
-                            }
-                            alt={component.title}
-                          />
+                          {src && (
+                            <img
+                              src={src}
+                              alt={component.title}
+                              title={component.title}
+                              draggable={false}
+                            />
+                          )}
                         </div>
                       </Card>
                     );
 
+                    let decoratedCardContent = cardContent;
+
+                    if (isBorderBeam) {
+                      decoratedCardContent = (
+                        <BorderBeam duration={6} lineWidth={2}>
+                          {decoratedCardContent}
+                        </BorderBeam>
+                      );
+                    }
+
+                    if (isDeprecated) {
+                      decoratedCardContent = (
+                        <Badge.Ribbon color="orange" text={deprecatedText}>
+                          {decoratedCardContent}
+                        </Badge.Ribbon>
+                      );
+                    }
+
+                    if (isNewComponent) {
+                      decoratedCardContent = (
+                        <Badge.Ribbon color="green" text={component.tag}>
+                          {decoratedCardContent}
+                        </Badge.Ribbon>
+                      );
+                    }
+
                     const linkContent = isExternalLink ? (
-                      <a href={url} key={component.title}>
-                        {cardContent}
+                      <a
+                        href={url}
+                        key={`${component.title}-external-link`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {decoratedCardContent}
                       </a>
                     ) : (
-                      <Link to={url} key={component.title}>
-                        {cardContent}
+                      <Link to={url} key={`${component.title}-internal-link`}>
+                        {decoratedCardContent}
                       </Link>
                     );
-
                     return (
                       <Col xs={24} sm={12} lg={8} xl={6} key={component.title}>
                         {linkContent}

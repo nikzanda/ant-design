@@ -1,7 +1,8 @@
-import raf from 'rc-util/lib/raf';
+import { raf } from '@rc-component/util';
 
 import { easeInOutCubic } from './easings';
-import getScroll, { isWindow } from './getScroll';
+import getScroll, { isDocument, isWindow } from './getScroll';
+import { isFunction } from './is';
 
 interface ScrollToOptions {
   /** Scroll container, default as window */
@@ -18,22 +19,28 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
   const scrollTop = getScroll(container);
   const startTime = Date.now();
 
+  let rafId: number;
+
   const frameFunc = () => {
     const timestamp = Date.now();
     const time = timestamp - startTime;
     const nextScrollTop = easeInOutCubic(time > duration ? duration : time, scrollTop, y, duration);
     if (isWindow(container)) {
-      (container as Window).scrollTo(window.pageXOffset, nextScrollTop);
-    } else if (container instanceof Document || container.constructor.name === 'HTMLDocument') {
-      (container as Document).documentElement.scrollTop = nextScrollTop;
+      container.scrollTo(window.pageXOffset, nextScrollTop);
+    } else if (isDocument(container)) {
+      container.documentElement.scrollTop = nextScrollTop;
     } else {
-      (container as HTMLElement).scrollTop = nextScrollTop;
+      container.scrollTop = nextScrollTop;
     }
     if (time < duration) {
-      raf(frameFunc);
-    } else if (typeof callback === 'function') {
+      rafId = raf(frameFunc);
+    } else if (isFunction(callback)) {
       callback();
     }
   };
-  raf(frameFunc);
+  rafId = raf(frameFunc);
+
+  return () => {
+    raf.cancel(rafId);
+  };
 }

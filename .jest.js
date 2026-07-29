@@ -1,26 +1,33 @@
 const compileModules = [
   'react-sticky-box',
   'rc-tween-one',
+  'tween-one',
   '@babel',
   '@ant-design',
   'countup.js',
   '.pnpm',
-  '@asamuzakjp/css-color',
+  '@asamuzakjp',
+  '@rc-component',
+  // jsdom 27+ pulls ESM dependencies that need transform
+  'parse5',
+  'entities',
+  '@exodus',
+  'jsdom',
+  '@csstools',
 ];
 
-const ignoreList = [];
-
 // cnpm use `_` as prefix
-['', '_'].forEach((prefix) => {
-  compileModules.forEach((module) => {
-    ignoreList.push(`${prefix}${module}`);
-  });
-});
+const ignoreList = ['', '_'].reduce(
+  (acc, prefix) => [...acc, ...compileModules.map((module) => `${prefix}${module}`)],
+  [],
+);
 
 const transformIgnorePatterns = [
   // Ignore modules without es dir.
   // Update: @babel/runtime should also be transformed
   `[/\\\\]node_modules[/\\\\](?!${ignoreList.join('|')})[^/\\\\]+?[/\\\\](?!(es)[/\\\\])`,
+  // Ignore antd umd js file
+  '[/\\\\]dist[/\\\\]antd.*\\.js$',
 ];
 
 function getTestRegex(libDir) {
@@ -30,13 +37,17 @@ function getTestRegex(libDir) {
   return '.*\\.test\\.(j|t)sx?$';
 }
 
+const shouldIgnoreSemantic =
+  ['dist', 'lib', 'es', 'dist-min'].includes(process.env.LIB_DIR) ||
+  ['1', 'true'].includes(process.env.SKIP_SEMANTIC);
+
 module.exports = {
   verbose: true,
   testEnvironment: 'jsdom',
   setupFiles: ['./tests/setup.ts', 'jest-canvas-mock'],
   setupFilesAfterEnv: ['./tests/setupAfterEnv.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'md'],
-  modulePathIgnorePatterns: ['/_site/'],
+  modulePathIgnorePatterns: ['/_site/', '/__snapshots__/vitest/'],
   moduleNameMapper: {
     '/\\.(css|less)$/': 'identity-obj-proxy',
     '^antd$': '<rootDir>/components/index',
@@ -44,10 +55,17 @@ module.exports = {
     '^antd/lib/(.*)$': '<rootDir>/components/$1',
     '^antd/locale/(.*)$': '<rootDir>/components/locale/$1',
   },
-  testPathIgnorePatterns: ['/node_modules/', 'dekko', 'node', 'image.test.js', 'image.test.ts'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    'dekko',
+    'node',
+    'image.test.js',
+    'image.test.ts',
+    ...(shouldIgnoreSemantic ? ['demo-semantic.test'] : []),
+  ],
   transform: {
     '\\.tsx?$': './node_modules/@ant-design/tools/lib/jest/codePreprocessor',
-    '\\.(m?)js$': './node_modules/@ant-design/tools/lib/jest/codePreprocessor',
+    '\\.(m?)js(m)?$': './node_modules/@ant-design/tools/lib/jest/codePreprocessor',
     '\\.md$': './node_modules/@ant-design/tools/lib/jest/demoPreprocessor',
     '\\.(jpg|png|gif|svg)$': './node_modules/@ant-design/tools/lib/jest/imagePreprocessor',
   },
@@ -60,6 +78,7 @@ module.exports = {
     '!components/*/__tests__/type.test.tsx',
     '!components/**/*/interface.{ts,tsx}',
     '!components/*/__tests__/image.test.{ts,tsx}',
+    '!components/*/__tests__/demo-semantic.test.tsx',
     '!components/__tests__/node.test.tsx',
     '!components/*/demo/*.tsx',
     '!components/*/design/**',

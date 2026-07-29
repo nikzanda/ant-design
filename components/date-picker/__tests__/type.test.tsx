@@ -1,4 +1,6 @@
 import * as React from 'react';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
 
 import DatePicker from '..';
 
@@ -57,5 +59,100 @@ describe('DatePicker.typescript', () => {
     expect(datePicker).toBeTruthy();
     const rangePicker = <DatePicker.RangePicker popupClassName="popupClassName" />;
     expect(rangePicker).toBeTruthy();
+  });
+
+  it('DatePicker should accept only single value if multiple is false', () => {
+    const mockSingleValue = dayjs();
+    const mockOnChange = jest.fn<void, [Dayjs | null, string | null]>();
+    const mockOnOk = jest.fn<void, [Dayjs | null]>();
+
+    const datePicker = (
+      <DatePicker
+        defaultValue={mockSingleValue}
+        value={mockSingleValue}
+        onChange={mockOnChange}
+        onOk={mockOnOk}
+      />
+    );
+
+    expect(datePicker).toBeTruthy();
+  });
+
+  // https://github.com/ant-design/ant-design/issues/49198
+  it('DatePicker should accept only single value if multiple is explicitly false', () => {
+    const mockSingleValue = dayjs();
+    const mockOnChange = jest.fn<void, [Dayjs | null, string | null]>();
+    const mockOnOk = jest.fn<void, [Dayjs | null]>();
+
+    const datePicker = (
+      <DatePicker
+        multiple={false}
+        defaultValue={mockSingleValue}
+        value={mockSingleValue}
+        onChange={mockOnChange}
+        onOk={mockOnOk}
+      />
+    );
+
+    expect(datePicker).toBeTruthy();
+  });
+
+  it('DatePicker should accept only array value if multiple is true', () => {
+    const mockMultiValue = [dayjs()];
+    const mockOnChange = jest.fn<void, [Dayjs[] | null, string[] | null]>();
+    const mockOnOk = jest.fn<void, [Dayjs[] | null]>();
+
+    const datePicker = (
+      <DatePicker
+        multiple
+        defaultValue={mockMultiValue}
+        value={mockMultiValue}
+        onChange={mockOnChange}
+        onOk={mockOnOk}
+      />
+    );
+
+    expect(datePicker).toBeTruthy();
+  });
+
+  it('DatePicker should accept only array value if multiple is explicitly true', () => {
+    const mockMultiValue = [dayjs()];
+    const mockOnChange = jest.fn<void, [Dayjs[] | null, string[] | null]>();
+    const mockOnOk = jest.fn<void, [Dayjs[] | null]>();
+
+    const datePicker = (
+      <DatePicker
+        multiple={true}
+        defaultValue={mockMultiValue}
+        value={mockMultiValue}
+        onChange={mockOnChange}
+        onOk={mockOnOk}
+      />
+    );
+
+    expect(datePicker).toBeTruthy();
+  });
+
+  it('DatePicker should support tagRender when multiple is true', () => {
+    const datePicker = (
+      <DatePicker
+        multiple
+        tagRender={({ label, value, closable, disabled, onClose }) => {
+          value.format('YYYY-MM-DD');
+          const isClosable: boolean = closable;
+          const isDisabled: boolean = disabled;
+          void isClosable;
+          void isDisabled;
+
+          return (
+            <button type="button" onClick={onClose}>
+              {label}
+            </button>
+          );
+        }}
+      />
+    );
+
+    expect(datePicker).toBeTruthy();
   });
 });

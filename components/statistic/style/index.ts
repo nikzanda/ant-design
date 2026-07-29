@@ -14,12 +14,12 @@ export interface ComponentToken {
    * @desc 内容字体大小
    * @descEN Content font size
    */
-  contentFontSize: number;
+  contentFontSize: number | string;
 }
 
 interface StatisticToken extends FullToken<'Statistic'> {}
 
-const genStatisticStyle: GenerateStyle<StatisticToken> = (token: StatisticToken): CSSObject => {
+const genStatisticStyle: GenerateStyle<StatisticToken, CSSObject> = (token) => {
   const {
     componentCls,
     marginXXS,
@@ -34,10 +34,12 @@ const genStatisticStyle: GenerateStyle<StatisticToken> = (token: StatisticToken)
   return {
     [componentCls]: {
       ...resetComponent(token),
-      [`${componentCls}-title`]: {
-        marginBottom: marginXXS,
-        color: colorTextDescription,
-        fontSize: titleFontSize,
+      [`${componentCls}-header`]: {
+        paddingBottom: marginXXS,
+        [`${componentCls}-title`]: {
+          color: colorTextDescription,
+          fontSize: titleFontSize,
+        },
       },
 
       [`${componentCls}-skeleton`]: {

@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/uz_UZ';
+import Pagination from '@rc-component/pagination/locale/uz_UZ';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/uz_UZ';
@@ -21,6 +21,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Iltimos tanlang',
     close: 'Yopish',
+    show: "Ko'rsat",
+    hide: 'Yashir',
+    sortable: 'saralanadigan',
   },
   Table: {
     filterTitle: 'Filtr',
@@ -66,6 +69,7 @@ const localeValues: Locale = {
     selectInvert: 'Tanlovni aylantirish',
     removeAll: "Barcha ma'lumotlarni o'chirish",
     removeCurrent: "Joriy sahifani o'chirish",
+    deselectAll: "Barcha ma'lumotlarni bekor qiling",
   },
   Upload: {
     uploading: 'Yuklanmoqda...',
@@ -85,6 +89,7 @@ const localeValues: Locale = {
     copy: 'Nusxalash',
     copied: 'Nusxalandi',
     expand: 'Ochib qoyish',
+    collapse: 'Yiqilish',
   },
   Form: {
     optional: '(shart emas)',
@@ -136,12 +141,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Ko‘rib chiqish',
-  },
   QRCode: {
     expired: 'QR-kod eskirgan',
     refresh: 'Yangilash',
+    scanned: 'Skanerlangan',
+  },
+  ColorPicker: {
+    presetEmpty: "Bo'sh",
+    transparent: 'Shaffof',
+    singleColor: 'Yagona rang',
+    gradientColor: 'Gradient rangi',
   },
 };
 

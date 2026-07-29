@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import RightOutlined from '@ant-design/icons/RightOutlined';
 import UpOutlined from '@ant-design/icons/UpOutlined';
-import classNames from 'classnames';
-import useEvent from 'rc-util/lib/hooks/useEvent';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
+import { useEvent, useLayoutEffect } from '@rc-component/util';
+import { clsx } from 'clsx';
+
+import { isNumber } from '../_util/is';
+import { genCssVar } from '../theme/util/genStyleUtils';
+import type { SplitterProps, SplitterSemanticAllType } from './interface';
 
 export type ShowCollapsibleIconMode = boolean | 'auto';
 
 export interface SplitBarProps {
   index: number;
   active: boolean;
+  draggerStyle?: NonNullable<SplitterSemanticAllType['styles']>['dragger'];
+  draggerClassName?: NonNullable<SplitterSemanticAllType['classNamesNoString']>['dragger'];
   prefixCls: string;
+  rootPrefixCls: string;
   resizable: boolean;
   startCollapsible: boolean;
   endCollapsible: boolean;
+  draggerIcon?: SplitterProps['draggerIcon'];
+  collapsibleIcon?: NonNullable<SplitterProps['collapsible']>['icon'];
   showStartCollapsibleIcon: ShowCollapsibleIconMode;
   showEndCollapsibleIcon: ShowCollapsibleIconMode;
+  onDraggerDoubleClick?: (index: number) => void;
   onOffsetStart: (index: number) => void;
   onOffsetUpdate: (index: number, offsetX: number, offsetY: number, lazyEnd?: boolean) => void;
   onOffsetEnd: (lazyEnd?: boolean) => void;
@@ -30,13 +39,16 @@ export interface SplitBarProps {
   containerSize: number;
 }
 
-function getValidNumber(num: number | undefined): number {
-  return typeof num === 'number' && !Number.isNaN(num) ? Math.round(num) : 0;
-}
+const getValidNumber = (num?: number) => {
+  return isNumber(num) && Number.isFinite(num) ? Math.round(num) : 0;
+};
+
+const DOUBLE_CLICK_TIME_GAP = 300;
 
 const SplitBar: React.FC<SplitBarProps> = (props) => {
   const {
     prefixCls,
+    rootPrefixCls,
     vertical,
     index,
     active,
@@ -44,8 +56,13 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     ariaMin,
     ariaMax,
     resizable,
+    draggerIcon,
+    draggerStyle,
+    draggerClassName,
+    collapsibleIcon,
     startCollapsible,
     endCollapsible,
+    onDraggerDoubleClick,
     onOffsetStart,
     onOffsetUpdate,
     onOffsetEnd,
@@ -58,6 +75,9 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
 
   const splitBarPrefixCls = `${prefixCls}-bar`;
 
+  const lastClickTimeRef = useRef<number>(0);
+  const [varName] = genCssVar(rootPrefixCls, 'splitter');
+
   // ======================== Resize ========================
   const [startPos, setStartPos] = useState<[x: number, y: number] | null>(null);
   const [constrainedOffset, setConstrainedOffset] = useState<number>(0);
@@ -66,6 +86,18 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
   const constrainedOffsetY = vertical ? constrainedOffset : 0;
 
   const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation();
+
+    const currentTime = Date.now();
+    const timeGap = currentTime - lastClickTimeRef.current;
+
+    if (timeGap > 0 && timeGap < DOUBLE_CLICK_TIME_GAP) {
+      // Prevent drag start if it's a double-click action
+      return;
+    }
+
+    lastClickTimeRef.current = currentTime;
+
     if (resizable && e.currentTarget) {
       setStartPos([e.pageX, e.pageY]);
       onOffsetStart(index);
@@ -104,6 +136,13 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     setConstrainedOffset(0);
     onOffsetEnd(true);
   });
+
+  const onCollapseKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, type: 'start' | 'end') => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCollapse(index, type);
+    }
+  };
 
   const getVisibilityClass = (mode: ShowCollapsibleIconMode): string => {
     switch (mode) {
@@ -171,7 +210,7 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
     };
 
     for (const [event, handler] of Object.entries(eventHandlerMap)) {
-      // eslint-disable-next-line react-web-api/no-leaked-event-listener
+      // eslint-disable-next-line react/web-api-no-leaked-event-listener
       window.addEventListener(event, handler);
     }
 
@@ -183,24 +222,32 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
   }, [startPos, index, lazy]);
 
   const transformStyle: React.CSSProperties = {
-    [`--${splitBarPrefixCls}-preview-offset`]: `${constrainedOffset}px`,
+    [varName('bar-preview-offset')]: `${constrainedOffset}px`,
   };
 
   // ======================== Render ========================
-  const StartIcon = vertical ? UpOutlined : LeftOutlined;
-  const EndIcon = vertical ? DownOutlined : RightOutlined;
+  const [startIcon, endIcon, startCustomize, endCustomize] = React.useMemo(() => {
+    let startIcon = null;
+    let endIcon = null;
+    const startCustomize = collapsibleIcon?.start !== undefined;
+    const endCustomize = collapsibleIcon?.end !== undefined;
+
+    if (vertical) {
+      startIcon = startCustomize ? collapsibleIcon.start : <UpOutlined />;
+      endIcon = endCustomize ? collapsibleIcon.end : <DownOutlined />;
+    } else {
+      startIcon = startCustomize ? collapsibleIcon.start : <LeftOutlined />;
+      endIcon = endCustomize ? collapsibleIcon.end : <RightOutlined />;
+    }
+
+    return [startIcon, endIcon, startCustomize, endCustomize];
+  }, [collapsibleIcon, vertical]);
 
   return (
-    <div
-      className={splitBarPrefixCls}
-      role="separator"
-      aria-valuenow={getValidNumber(ariaNow)}
-      aria-valuemin={getValidNumber(ariaMin)}
-      aria-valuemax={getValidNumber(ariaMax)}
-    >
+    <div className={splitBarPrefixCls}>
       {lazy && (
         <div
-          className={classNames(`${splitBarPrefixCls}-preview`, {
+          className={clsx(`${splitBarPrefixCls}-preview`, {
             [`${splitBarPrefixCls}-preview-active`]: !!constrainedOffset,
           })}
           style={transformStyle}
@@ -208,49 +255,85 @@ const SplitBar: React.FC<SplitBarProps> = (props) => {
       )}
 
       <div
-        className={classNames(`${splitBarPrefixCls}-dragger`, {
-          [`${splitBarPrefixCls}-dragger-disabled`]: !resizable,
-          [`${splitBarPrefixCls}-dragger-active`]: active,
-        })}
+        style={draggerStyle?.default}
+        className={clsx(
+          `${splitBarPrefixCls}-dragger`,
+          {
+            [`${splitBarPrefixCls}-dragger-disabled`]: !resizable,
+            [`${splitBarPrefixCls}-dragger-active`]: active,
+            [`${splitBarPrefixCls}-dragger-customize`]: draggerIcon !== undefined,
+          },
+          draggerClassName?.default,
+          active && draggerClassName?.active,
+        )}
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
-      />
+        onDoubleClick={() => onDraggerDoubleClick?.(index)}
+        role="separator"
+        aria-disabled={!resizable}
+        aria-orientation={vertical ? 'horizontal' : 'vertical'}
+        aria-valuenow={getValidNumber(ariaNow)}
+        aria-valuemin={getValidNumber(ariaMin)}
+        aria-valuemax={getValidNumber(ariaMax)}
+      >
+        {draggerIcon !== undefined ? (
+          <div className={clsx(`${splitBarPrefixCls}-dragger-icon`)}>{draggerIcon}</div>
+        ) : null}
+      </div>
 
       {/* Start Collapsible */}
       {startCollapsible && (
         <div
-          className={classNames(
+          className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-start`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: startCustomize,
+            },
             getVisibilityClass(showStartCollapsibleIcon),
           )}
+          role="button"
+          tabIndex={0}
+          aria-label="Toggle start panel"
           onClick={() => onCollapse(index, 'start')}
+          onKeyDown={(e) => onCollapseKeyDown(e, 'start')}
         >
-          <StartIcon
-            className={classNames(
+          <span
+            className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-start`,
             )}
-          />
+          >
+            {startIcon}
+          </span>
         </div>
       )}
 
       {/* End Collapsible */}
       {endCollapsible && (
         <div
-          className={classNames(
+          className={clsx(
             `${splitBarPrefixCls}-collapse-bar`,
             `${splitBarPrefixCls}-collapse-bar-end`,
+            {
+              [`${splitBarPrefixCls}-collapse-bar-customize`]: endCustomize,
+            },
             getVisibilityClass(showEndCollapsibleIcon),
           )}
+          role="button"
+          tabIndex={0}
+          aria-label="Toggle end panel"
           onClick={() => onCollapse(index, 'end')}
+          onKeyDown={(e) => onCollapseKeyDown(e, 'end')}
         >
-          <EndIcon
-            className={classNames(
+          <span
+            className={clsx(
               `${splitBarPrefixCls}-collapse-icon`,
               `${splitBarPrefixCls}-collapse-end`,
             )}
-          />
+          >
+            {endIcon}
+          </span>
         </div>
       )}
     </div>

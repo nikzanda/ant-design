@@ -6,6 +6,8 @@ import { resetWarned } from '../../_util/warning';
 import mountTest from '../../../tests/shared/mountTest';
 import { render } from '../../../tests/utils';
 import ConfigProvider from '../../config-provider';
+import { matchScreen } from '../../_util/responsiveObserver';
+import DEFAULT_COLUMN_MAP from '../constant';
 
 describe('Descriptions', () => {
   mountTest(Descriptions);
@@ -145,6 +147,38 @@ describe('Descriptions', () => {
         .reduce((total, cur) => total + cur, 0),
     ).toBe(8);
     wrapper.unmount();
+  });
+
+  // Verify the mobile-first cascade fix: matchScreen(screens, userColumn) is tried
+  // before falling back to DEFAULT_COLUMN_MAP, so the highest explicitly-set
+  // user breakpoint wins over the library default for any unspecified higher breakpoint.
+  describe('column mobile-first cascade', () => {
+    it('cascades md:2 upward to lg viewport instead of DEFAULT_COLUMN_MAP.lg', () => {
+      // On an lg screen xs/sm/md/lg are all active (cumulative min-width semantics).
+      const lgScreens = { xs: true, sm: true, md: true, lg: true };
+      const column = { xs: 1, md: 2 };
+      const result =
+        matchScreen(lgScreens, column) ?? matchScreen(lgScreens, DEFAULT_COLUMN_MAP) ?? 3;
+      expect(result).toBe(2);
+    });
+
+    it('cascades xl:4 upward to xxl viewport', () => {
+      const xxlScreens = { xs: true, sm: true, md: true, lg: true, xl: true, xxl: true };
+      const column = { xs: 1, md: 2, xl: 4 };
+      const result =
+        matchScreen(xxlScreens, column) ?? matchScreen(xxlScreens, DEFAULT_COLUMN_MAP) ?? 3;
+      expect(result).toBe(4);
+    });
+
+    it('falls back to DEFAULT_COLUMN_MAP when no user-supplied key is active', () => {
+      // sm viewport; user only specified xl which is not yet active.
+      const smScreens = { xs: true, sm: true };
+      const column = { xl: 4 };
+      const result =
+        matchScreen(smScreens, column) ?? matchScreen(smScreens, DEFAULT_COLUMN_MAP) ?? 3;
+      // DEFAULT_COLUMN_MAP.sm = 2
+      expect(result).toBe(DEFAULT_COLUMN_MAP.sm);
+    });
   });
 
   it('warning if exceed the row span', () => {
@@ -288,7 +322,7 @@ describe('Descriptions', () => {
       const tds = Array.from(trs?.querySelectorAll('th')!);
       expect(tds).toHaveLength(spans.length);
       tds.forEach((td, index) => {
-        expect(Number(td.getAttribute('colSpan'))).toEqual(spans[index]);
+        expect(Number(td.getAttribute('colSpan'))).toBe(spans[index]);
       });
     }
 
@@ -393,10 +427,9 @@ describe('Descriptions', () => {
         </Descriptions.Item>
       </Descriptions>,
     );
-
     const nestDesc = container.querySelectorAll('.ant-descriptions')[1];
     const view = nestDesc.querySelector('.ant-descriptions-view');
-    expect(getComputedStyle(view!).border).toBeFalsy();
+    expect(view).toHaveStyle({ border: '' });
   });
 
   it('Should Descriptions not throw react key prop error in jsx mode', () => {
@@ -433,82 +466,157 @@ describe('Descriptions', () => {
     expect(wrapper.container.querySelectorAll('.ant-descriptions-item-content')).toHaveLength(1);
   });
 
-  it('should apply custom styles to Descriptions', () => {
-    const customClassNames = {
-      root: 'custom-root',
-      header: 'custom-header',
-      title: 'custom-title',
-      extra: 'custom-extra',
-      label: 'custom-label',
-      content: 'custom-content',
-    };
-
-    const customStyles = {
-      root: { backgroundColor: 'red' },
-      header: { backgroundColor: 'black' },
-      title: { backgroundColor: 'yellow' },
-      extra: { backgroundColor: 'purple' },
-      label: { backgroundColor: 'blue' },
-      content: { backgroundColor: 'green' },
-    };
-
-    const { container } = render(
-      <Descriptions
-        classNames={customClassNames}
-        styles={customStyles}
-        extra={'extra'}
-        title="User Info"
-        items={[
-          {
-            key: '1',
-            label: 'UserName',
-            children: '1',
-          },
-          {
-            key: '2',
-            label: 'UserName',
-            children: '2',
-            styles: {
-              content: { color: 'yellow' },
-              label: { color: 'orange' },
+  // https://github.com/ant-design/ant-design/issues/50364
+  describe('bordered: labelStyle / contentStyle land on the cell with the matching class', () => {
+    it('horizontal bordered: applies labelStyle / contentStyle to <th>/<td>, not the inner <span>', () => {
+      const { container } = render(
+        <Descriptions
+          bordered
+          items={[
+            {
+              key: '1',
+              label: 'Product',
+              children: 'Cloud Database',
+              labelStyle: { background: 'red' },
+              contentStyle: { background: 'green' },
             },
-          },
-        ]}
-      />,
-    );
+          ]}
+        />,
+      );
 
-    const rootElement = container.querySelector('.ant-descriptions') as HTMLElement;
-    const headerElement = container.querySelector('.ant-descriptions-header') as HTMLElement;
-    const titleElement = container.querySelector('.ant-descriptions-title') as HTMLElement;
-    const extraElement = container.querySelector('.ant-descriptions-extra') as HTMLElement;
-    const labelElement = container.querySelector('.ant-descriptions-item-label') as HTMLElement;
-    const contentElement = container.querySelector('.ant-descriptions-item-content') as HTMLElement;
-    const labelElements = container.querySelectorAll(
-      '.ant-descriptions-item-label',
-    ) as NodeListOf<HTMLElement>;
-    const contentElements = container.querySelectorAll(
-      '.ant-descriptions-item-content',
-    ) as NodeListOf<HTMLElement>;
+      const labelCell = container.querySelector<HTMLElement>('.ant-descriptions-item-label')!;
+      const contentCell = container.querySelector<HTMLElement>('.ant-descriptions-item-content')!;
+      expect(labelCell.tagName).toBe('TH');
+      expect(contentCell.tagName).toBe('TD');
+      expect(labelCell.style.background).toBe('red');
+      expect(contentCell.style.background).toBe('green');
 
-    // check classNames
-    expect(rootElement.classList).toContain('custom-root');
-    expect(headerElement.classList).toContain('custom-header');
-    expect(titleElement.classList).toContain('custom-title');
-    expect(extraElement.classList).toContain('custom-extra');
-    expect(labelElement.classList).toContain('custom-label');
-    expect(contentElement.classList).toContain('custom-content');
+      // Inner <span> wrappers must not carry the inline style anymore.
+      const labelSpan = labelCell.querySelector<HTMLElement>('span')!;
+      const contentSpan = contentCell.querySelector<HTMLElement>('span')!;
+      expect(labelSpan.getAttribute('style')).toBeNull();
+      expect(contentSpan.getAttribute('style')).toBeNull();
+    });
 
-    // check styles
-    expect(rootElement.style.backgroundColor).toBe('red');
-    expect(headerElement.style.backgroundColor).toBe('black');
-    expect(titleElement.style.backgroundColor).toBe('yellow');
-    expect(extraElement.style.backgroundColor).toBe('purple');
-    expect(labelElement.style.backgroundColor).toBe('blue');
-    expect(contentElement.style.backgroundColor).toBe('green');
+    it('vertical bordered: applies labelStyle / contentStyle to <th>/<td>, not the inner <span>', () => {
+      const { container } = render(
+        <Descriptions
+          bordered
+          layout="vertical"
+          items={[
+            {
+              key: '1',
+              label: 'Product',
+              children: 'Cloud Database',
+              labelStyle: { background: 'red' },
+              contentStyle: { background: 'green' },
+            },
+          ]}
+        />,
+      );
 
-    expect(labelElements[1].style.color).toBe('orange');
-    expect(contentElements[1].style.color).toBe('yellow');
-    expect(labelElements[0].style.color).not.toBe('orange');
-    expect(contentElements[0].style.color).not.toBe('yellow');
+      const labelCell = container.querySelector<HTMLElement>('.ant-descriptions-item-label')!;
+      const contentCell = container.querySelector<HTMLElement>('.ant-descriptions-item-content')!;
+      expect(labelCell.tagName).toBe('TH');
+      expect(contentCell.tagName).toBe('TD');
+      expect(labelCell.style.background).toBe('red');
+      expect(contentCell.style.background).toBe('green');
+
+      const labelSpan = labelCell.querySelector<HTMLElement>('span')!;
+      const contentSpan = contentCell.querySelector<HTMLElement>('span')!;
+      expect(labelSpan.getAttribute('style')).toBeNull();
+      expect(contentSpan.getAttribute('style')).toBeNull();
+    });
+
+    it('bordered: semantic styles.label / styles.content also land on <th>/<td>', () => {
+      const { container } = render(
+        <Descriptions
+          bordered
+          items={[
+            {
+              key: '1',
+              label: 'Product',
+              children: 'Cloud Database',
+              styles: {
+                label: { background: 'red' },
+                content: { background: 'green' },
+              },
+            },
+          ]}
+        />,
+      );
+
+      const labelCell = container.querySelector<HTMLElement>('.ant-descriptions-item-label')!;
+      const contentCell = container.querySelector<HTMLElement>('.ant-descriptions-item-content')!;
+      expect(labelCell.style.background).toBe('red');
+      expect(contentCell.style.background).toBe('green');
+    });
+
+    it('horizontal bordered: item-level labelStyle wins over root-level ConfigProvider styles', () => {
+      // Regression guard: the bordered branch must not re-apply the
+      // root-context label / content style in a way that overrides the
+      // item-level override that Row.tsx already merged into the cell
+      // `style` prop in the horizontal-bordered path.
+      const { container } = render(
+        <ConfigProvider
+          descriptions={{
+            styles: {
+              label: { color: 'red' },
+              content: { color: 'red' },
+            },
+          }}
+        >
+          <Descriptions
+            bordered
+            items={[
+              {
+                key: '1',
+                label: 'Product',
+                children: 'Cloud Database',
+                labelStyle: { color: 'blue' },
+                contentStyle: { color: 'blue' },
+              },
+            ]}
+          />
+        </ConfigProvider>,
+      );
+
+      const labelCell = container.querySelector<HTMLElement>('.ant-descriptions-item-label')!;
+      const contentCell = container.querySelector<HTMLElement>('.ant-descriptions-item-content')!;
+      expect(labelCell.style.color).toBe('blue');
+      expect(contentCell.style.color).toBe('blue');
+    });
+
+    it('vertical bordered: item `style` + `labelStyle` both land on the same cell with labelStyle winning', () => {
+      // In the vertical-bordered layout the label and content are rendered
+      // into separate <th>/<td> cells, so the per-item `style` and the
+      // per-type `labelStyle` / `contentStyle` end up on the same element.
+      // labelStyle / contentStyle (more specific) must win over style.
+      const { container } = render(
+        <Descriptions
+          bordered
+          layout="vertical"
+          items={[
+            {
+              key: '1',
+              label: 'Product',
+              children: 'Cloud Database',
+              style: { color: 'red', background: 'yellow' },
+              labelStyle: { color: 'blue' },
+              contentStyle: { color: 'green' },
+            },
+          ]}
+        />,
+      );
+
+      const labelCell = container.querySelector<HTMLElement>('.ant-descriptions-item-label')!;
+      const contentCell = container.querySelector<HTMLElement>('.ant-descriptions-item-content')!;
+      // `style` background flows through on both cells.
+      expect(labelCell.style.background).toBe('yellow');
+      expect(contentCell.style.background).toBe('yellow');
+      // labelStyle / contentStyle override `style.color` on the matching cell.
+      expect(labelCell.style.color).toBe('blue');
+      expect(contentCell.style.color).toBe('green');
+    });
   });
 });

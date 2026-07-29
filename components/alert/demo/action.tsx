@@ -1,10 +1,10 @@
 import React from 'react';
-import { Alert, Button, Space } from 'antd';
+import { Alert, Button, Flex } from 'antd';
 
 const App: React.FC = () => (
   <>
     <Alert
-      message="Success Tips"
+      title="Success Tips"
       type="success"
       showIcon
       action={
@@ -16,7 +16,7 @@ const App: React.FC = () => (
     />
     <br />
     <Alert
-      message="Error Text"
+      title="Error Text"
       showIcon
       description="Error Description Error Description Error Description Error Description"
       type="error"
@@ -28,31 +28,29 @@ const App: React.FC = () => (
     />
     <br />
     <Alert
-      message="Warning Text"
+      title="Warning Text"
       type="warning"
       action={
-        <Space>
-          <Button type="text" size="small">
-            Done
-          </Button>
-        </Space>
+        <Button type="text" size="small">
+          Done
+        </Button>
       }
       closable
     />
     <br />
     <Alert
-      message="Info Text"
+      title="Info Text"
       description="Info Description Info Description Info Description Info Description"
       type="info"
       action={
-        <Space direction="vertical">
-          <Button size="small" type="primary">
+        <Flex vertical gap="small" style={{ minWidth: 80 }}>
+          <Button size="small" type="primary" block>
             Accept
           </Button>
-          <Button size="small" danger ghost>
+          <Button size="small" danger ghost block>
             Decline
           </Button>
-        </Space>
+        </Flex>
       }
       closable
     />

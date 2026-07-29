@@ -59,11 +59,12 @@ import TreeSelect from '../../tree-select';
 import Upload from '../../upload';
 
 dayjs.extend(customParseFormat);
-jest.mock('rc-util/lib/Portal');
+
+jest.mock('@rc-component/util/lib/Portal');
 
 describe('ConfigProvider', () => {
   describe('components', () => {
-    function testPair(name: string, renderComponent: (props?: any) => React.ReactElement): void {
+    const testPair = (name: string, renderComponent: (props?: any) => React.ReactElement<any>) => {
       const isArray = ['Menu', 'TimePicker', 'Tooltip'].includes(name);
       describe(`${name}`, () => {
         // normal
@@ -95,9 +96,9 @@ describe('ConfigProvider', () => {
           expect(isArray ? container.children : container.firstChild).toMatchSnapshot();
         });
 
-        it('configProvider componentSize middle', () => {
+        it('configProvider componentSize medium', () => {
           const { container } = render(
-            <ConfigProvider componentSize="middle" prefixCls="config">
+            <ConfigProvider componentSize="medium" prefixCls="config">
               {renderComponent({})}
             </ConfigProvider>,
           );
@@ -122,7 +123,7 @@ describe('ConfigProvider', () => {
           expect(isArray ? container.children : container.firstChild).toMatchSnapshot();
         });
       });
-    }
+    };
 
     // Alert
     testPair('Alert', (props) => (
@@ -353,7 +354,7 @@ describe('ConfigProvider', () => {
           <List.Item {...props}>
             <List.Item.Meta
               {...props}
-              avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=9" />}
+              avatar={<Avatar src="https://api.dicebear.com/10.x/lorelei/svg?seed=9" />}
               title="Ant Design"
               description="Ant Design, a design language for background applications, is refined by Ant UED Team"
             />
@@ -430,11 +431,12 @@ describe('ConfigProvider', () => {
 
     // Select
     testPair('Select', (props) => (
-      <Select {...props} open>
-        <Select.OptGroup key="grp">
-          <Select.Option key="Bamboo">Light</Select.Option>
-        </Select.OptGroup>
-      </Select>
+      <Select
+        open
+        defaultValue={'light'}
+        options={[{ label: 'Light', value: 'light' }]}
+        {...props}
+      />
     ));
 
     // Skeleton

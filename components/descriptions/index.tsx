@@ -1,15 +1,20 @@
 /* eslint-disable react/no-array-index-key */
 import * as React from 'react';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
+import { isNumber } from '../_util/is';
 import type { Breakpoint } from '../_util/responsiveObserver';
 import { matchScreen } from '../_util/responsiveObserver';
 import { devUseWarning } from '../_util/warning';
 import { useComponentConfig } from '../config-provider/context';
 import useSize from '../config-provider/hooks/useSize';
+import type { SizeType } from '../config-provider/SizeContext';
 import useBreakpoint from '../grid/hooks/useBreakpoint';
 import DEFAULT_COLUMN_MAP from './constant';
 import DescriptionsContext from './DescriptionsContext';
+import type { DescriptionsContextProps } from './DescriptionsContext';
 import useItems from './hooks/useItems';
 import useRow from './hooks/useRow';
 import type { DescriptionsItemProps } from './Item';
@@ -31,15 +36,38 @@ export interface DescriptionsItemType extends Omit<DescriptionsItemProps, 'prefi
   key?: React.Key;
 }
 
-type SemanticName = 'root' | 'header' | 'title' | 'extra' | 'label' | 'content';
+export type DescriptionsSemanticType = {
+  classNames?: {
+    root?: string;
+    header?: string;
+    title?: string;
+    extra?: string;
+    label?: string;
+    content?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    header?: React.CSSProperties;
+    title?: React.CSSProperties;
+    extra?: React.CSSProperties;
+    label?: React.CSSProperties;
+    content?: React.CSSProperties;
+  };
+};
 
-export interface DescriptionsProps {
+export type DescriptionsSemanticAllType = GenerateSemantic<
+  DescriptionsSemanticType,
+  DescriptionsProps
+>;
+
+export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   prefixCls?: string;
-  className?: string;
   rootClassName?: string;
-  style?: React.CSSProperties;
   bordered?: boolean;
-  size?: 'middle' | 'small' | 'default';
+  /**
+   * Note: `default` is deprecated and will be removed in v7, please use `medium` instead.
+   */
+  size?: SizeType | 'default';
   /**
    * @deprecated use `items` instead
    */
@@ -49,12 +77,17 @@ export interface DescriptionsProps {
   column?: number | Partial<Record<Breakpoint, number>>;
   layout?: 'horizontal' | 'vertical';
   colon?: boolean;
+  /**
+   * @deprecated use `styles.label` instead
+   */
   labelStyle?: React.CSSProperties;
+  /**
+   * @deprecated use `styles.content` instead
+   */
   contentStyle?: React.CSSProperties;
-  styles?: Partial<Record<SemanticName, React.CSSProperties>>;
-  classNames?: Partial<Record<SemanticName, string>>;
+  classNames?: DescriptionsSemanticAllType['classNamesAndFn'];
+  styles?: DescriptionsSemanticAllType['stylesAndFn'];
   items?: DescriptionsItemType[];
-  id?: string;
 }
 
 const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) => {
@@ -75,7 +108,7 @@ const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) 
     contentStyle,
     styles,
     items,
-    classNames: descriptionsClassNames,
+    classNames,
     ...restProps
   } = props;
   const {
@@ -92,25 +125,27 @@ const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) 
   // ============================== Warn ==============================
   if (process.env.NODE_ENV !== 'production') {
     const warning = devUseWarning('Descriptions');
+
+    warning.deprecated(customizeSize !== 'default', 'size="default"', 'size="large"');
+
     [
-      ['labelStyle', 'styles={{ label: {} }}'],
-      ['contentStyle', 'styles={{ content: {} }}'],
+      ['labelStyle', 'styles.label'],
+      ['contentStyle', 'styles.content'],
     ].forEach(([deprecatedName, newName]) => {
       warning.deprecated(!(deprecatedName in props), deprecatedName, newName);
     });
   }
   // Column count
+  // Mobile-first cascade: try the user-supplied map first (scanning large→small
+  // over cumulative min-width screens, so a lower breakpoint like `md` is still
+  // "active" on an `lg` viewport).  Only fall back to DEFAULT_COLUMN_MAP when
+  // no user-supplied breakpoint is active at all.
   const mergedColumn = React.useMemo(() => {
-    if (typeof column === 'number') {
+    if (isNumber(column)) {
       return column;
     }
 
-    return (
-      matchScreen(screens, {
-        ...DEFAULT_COLUMN_MAP,
-        ...column,
-      }) ?? 3
-    );
+    return matchScreen(screens, column) ?? matchScreen(screens, DEFAULT_COLUMN_MAP) ?? 3;
   }, [screens, column]);
 
   // Items with responsive
@@ -119,35 +154,61 @@ const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) 
   const mergedSize = useSize(customizeSize);
   const rows = useRow(mergedColumn, mergedItems);
 
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls);
+
+  // =========== Merged Props for Semantic ==========
+  const mergedProps: DescriptionsProps = {
+    ...props,
+    column: mergedColumn,
+    items: mergedItems,
+    size: mergedSize,
+  };
+
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    DescriptionsSemanticAllType['classNames'],
+    DescriptionsSemanticAllType['styles'],
+    DescriptionsProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props: mergedProps,
+  });
 
   // ======================== Render ========================
-  const contextValue = React.useMemo(
+  const memoizedValue = React.useMemo<DescriptionsContextProps>(
     () => ({
       labelStyle,
       contentStyle,
       styles: {
-        content: { ...contextStyles.content, ...styles?.content },
-        label: { ...contextStyles.label, ...styles?.label },
+        label: mergedStyles.label,
+        content: mergedStyles.content,
       },
       classNames: {
-        label: classNames(contextClassNames.label, descriptionsClassNames?.label),
-        content: classNames(contextClassNames.content, descriptionsClassNames?.content),
+        label: mergedClassNames.label,
+        content: mergedClassNames.content,
       },
     }),
-    [labelStyle, contentStyle, styles, descriptionsClassNames, contextClassNames, contextStyles],
+    [
+      labelStyle,
+      contentStyle,
+      mergedStyles.label,
+      mergedStyles.content,
+      mergedClassNames.label,
+      mergedClassNames.content,
+    ],
   );
 
-  return wrapCSSVar(
-    <DescriptionsContext.Provider value={contextValue}>
+  return (
+    <DescriptionsContext.Provider value={memoizedValue}>
       <div
-        className={classNames(
+        className={clsx(
           prefixCls,
           contextClassName,
-          contextClassNames.root,
-          descriptionsClassNames?.root,
+          mergedClassNames.root,
           {
-            [`${prefixCls}-${mergedSize}`]: mergedSize && mergedSize !== 'default',
+            [`${prefixCls}-medium`]: mergedSize === 'medium' || mergedSize === 'middle',
+            [`${prefixCls}-small`]: mergedSize === 'small',
             [`${prefixCls}-bordered`]: !!bordered,
             [`${prefixCls}-rtl`]: direction === 'rtl',
           },
@@ -156,48 +217,32 @@ const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) 
           hashId,
           cssVarCls,
         )}
-        style={{ ...contextStyle, ...contextStyles.root, ...styles?.root, ...style }}
+        style={mergedStyles.root}
         {...restProps}
       >
         {(title || extra) && (
           <div
-            className={classNames(
-              `${prefixCls}-header`,
-              contextClassNames.header,
-              descriptionsClassNames?.header,
-            )}
-            style={{ ...contextStyles.header, ...styles?.header }}
+            className={clsx(`${prefixCls}-header`, mergedClassNames.header)}
+            style={mergedStyles.header}
           >
             {title && (
               <div
-                className={classNames(
-                  `${prefixCls}-title`,
-                  contextClassNames.title,
-                  descriptionsClassNames?.title,
-                )}
-                style={{
-                  ...contextStyles.title,
-                  ...styles?.title,
-                }}
+                className={clsx(`${prefixCls}-title`, mergedClassNames.title)}
+                style={mergedStyles.title}
               >
                 {title}
               </div>
             )}
             {extra && (
               <div
-                className={classNames(
-                  `${prefixCls}-extra`,
-                  contextClassNames.extra,
-                  descriptionsClassNames?.extra,
-                )}
-                style={{ ...contextStyles.extra, ...styles?.extra }}
+                className={clsx(`${prefixCls}-extra`, mergedClassNames.extra)}
+                style={mergedStyles.extra}
               >
                 {extra}
               </div>
             )}
           </div>
         )}
-
         <div className={`${prefixCls}-view`}>
           <table>
             <tbody>
@@ -216,7 +261,7 @@ const Descriptions: React.FC<DescriptionsProps> & CompoundedComponent = (props) 
           </table>
         </div>
       </div>
-    </DescriptionsContext.Provider>,
+    </DescriptionsContext.Provider>
   );
 };
 
@@ -224,7 +269,7 @@ if (process.env.NODE_ENV !== 'production') {
   Descriptions.displayName = 'Descriptions';
 }
 
-export type { DescriptionsContextProps } from './DescriptionsContext';
+export type { DescriptionsContextProps };
 export { DescriptionsContext };
 
 Descriptions.Item = DescriptionsItem;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button } from 'antd';
 
 const { ErrorBoundary } = Alert;
+
 const ThrowError: React.FC = () => {
   const [error, setError] = useState<Error>();
   const onClick = () => {
@@ -13,7 +14,7 @@ const ThrowError: React.FC = () => {
   }
   return (
     <Button danger onClick={onClick}>
-      Click me to throw a error
+      Click to throw an error
     </Button>
   );
 };

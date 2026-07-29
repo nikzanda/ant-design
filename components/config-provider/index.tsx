@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { createTheme, StyleContext as CssInJsStyleContext } from '@ant-design/cssinjs';
 import IconContext from '@ant-design/icons/lib/components/Context';
-import useMemo from 'rc-util/lib/hooks/useMemo';
-import { merge } from 'rc-util/lib/utils/set';
+import { merge, useMemo } from '@rc-component/util';
 
+import { isFunction, isPlainObject } from '../_util/is';
 import warning, { devUseWarning, WarningContext } from '../_util/warning';
 import type { WarningContextProps } from '../_util/warning';
 import ValidateMessagesContext from '../form/validateMessagesContext';
@@ -14,19 +14,30 @@ import LocaleContext from '../locale/context';
 import defaultLocale from '../locale/en_US';
 import { defaultTheme, DesignTokenContext } from '../theme/context';
 import defaultSeedToken from '../theme/themes/seed';
+import UniqueProvider from '../tooltip/UniqueProvider';
 import type {
   AlertConfig,
+  AnchorStyleConfig,
   BadgeConfig,
+  BorderBeamConfig,
+  BreadcrumbConfig,
   ButtonConfig,
+  CalendarConfig,
   CardConfig,
+  CardMetaConfig,
   CascaderConfig,
+  CheckboxConfig,
   CollapseConfig,
+  ColorPickerConfig,
   ComponentStyleConfig,
   ConfigConsumerProps,
   CSPConfig,
   DatePickerConfig,
+  DescriptionsConfig,
   DirectionType,
+  DividerConfig,
   DrawerConfig,
+  DropdownConfig,
   EmptyConfig,
   FlexConfig,
   FloatButtonConfig,
@@ -35,30 +46,49 @@ import type {
   ImageConfig,
   InputConfig,
   InputNumberConfig,
+  InputPasswordConfig,
+  InputSearchConfig,
   ListConfig,
+  MasonryConfig,
   MentionsConfig,
   MenuConfig,
+  MessageConfig,
   ModalConfig,
   NotificationConfig,
+  OTPConfig,
   PaginationConfig,
   PopconfirmConfig,
   PopoverConfig,
   PopupOverflow,
+  ProgressConfig,
+  QRcodeConfig,
+  RadioConfig,
   RangePickerConfig,
+  ResultConfig,
+  RibbonConfig,
+  SegmentedConfig,
   SelectConfig,
+  SkeletonConfig,
+  SliderConfig,
   SpaceConfig,
   SpinConfig,
+  SplitterConfig,
+  StatisticConfig,
+  StepsConfig,
+  SwitchStyleConfig,
   TableConfig,
   TabsConfig,
   TagConfig,
   TextAreaConfig,
-  Theme,
   ThemeConfig,
+  TimelineConfig,
   TimePickerConfig,
   TooltipConfig,
   TourConfig,
   TransferConfig,
+  TreeConfig,
   TreeSelectConfig,
+  TypographyConfig,
   UploadConfig,
   Variant,
   WaveConfig,
@@ -70,7 +100,6 @@ import {
   defaultPrefixCls,
   Variants,
 } from './context';
-import { registerTheme } from './cssVariables';
 import type { RenderEmptyHandler } from './defaultRenderEmpty';
 import { DisabledContextProvider } from './DisabledContext';
 import useConfig from './hooks/useConfig';
@@ -80,6 +109,18 @@ import PropWarning from './PropWarning';
 import type { SizeType } from './SizeContext';
 import SizeContext, { SizeContextProvider } from './SizeContext';
 import useStyle from './style';
+
+/**
+ * This component registers icon styles inside the DesignTokenContext.Provider
+ * so that CSS variables use the correct cssVar key from the theme config.
+ */
+const IconStyle: React.FC<{ iconPrefixCls: string; csp?: CSPConfig }> = ({
+  iconPrefixCls,
+  csp,
+}) => {
+  useStyle(iconPrefixCls, csp);
+  return null;
+};
 
 export type { Variant };
 
@@ -105,11 +146,11 @@ export const warnContext: (componentName: string) => void =
 
 export {
   ConfigConsumer,
-  ConfigContext,
-  defaultPrefixCls,
-  defaultIconPrefixCls,
   type ConfigConsumerProps,
+  ConfigContext,
   type CSPConfig,
+  defaultIconPrefixCls,
+  defaultPrefixCls,
   type DirectionType,
   type RenderEmptyHandler,
   type ThemeConfig,
@@ -142,8 +183,8 @@ const PASSED_PROPS: Exclude<
 ];
 
 export interface ConfigProviderProps {
-  getTargetContainer?: () => HTMLElement | Window;
-  getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;
+  getTargetContainer?: () => HTMLElement | Window | ShadowRoot;
+  getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement | ShadowRoot;
   prefixCls?: string;
   iconPrefixCls?: string;
   children?: React.ReactNode;
@@ -154,6 +195,9 @@ export interface ConfigProviderProps {
   variant?: Variant;
   form?: FormConfig;
   input?: InputConfig;
+  inputPassword?: InputPasswordConfig;
+  inputSearch?: InputSearchConfig;
+  otp?: OTPConfig;
   inputNumber?: InputNumberConfig;
   textArea?: TextAreaConfig;
   select?: SelectConfig;
@@ -172,7 +216,7 @@ export interface ConfigProviderProps {
    */
   direction?: DirectionType;
   space?: SpaceConfig;
-  splitter?: ComponentStyleConfig;
+  splitter?: SplitterConfig;
   /**
    * @descCN 设置 `false` 时关闭虚拟滚动。
    * @descEN Close the virtual scrolling when setting `false`.
@@ -186,56 +230,62 @@ export interface ConfigProviderProps {
   theme?: ThemeConfig;
   warning?: WarningContextProps;
   alert?: AlertConfig;
-  anchor?: ComponentStyleConfig;
+  affix?: ComponentStyleConfig;
+  anchor?: AnchorStyleConfig;
+  app?: ComponentStyleConfig;
   button?: ButtonConfig;
-  calendar?: ComponentStyleConfig;
+  calendar?: CalendarConfig;
   carousel?: ComponentStyleConfig;
   cascader?: CascaderConfig;
   treeSelect?: TreeSelectConfig;
   collapse?: CollapseConfig;
-  divider?: ComponentStyleConfig;
+  divider?: DividerConfig;
   drawer?: DrawerConfig;
-  typography?: ComponentStyleConfig;
-  skeleton?: ComponentStyleConfig;
+  typography?: TypographyConfig;
+  skeleton?: SkeletonConfig;
   spin?: SpinConfig;
-  segmented?: ComponentStyleConfig;
-  statistic?: ComponentStyleConfig;
-  steps?: ComponentStyleConfig;
+  segmented?: SegmentedConfig;
+  statistic?: StatisticConfig;
+  steps?: StepsConfig;
   image?: ImageConfig;
   layout?: ComponentStyleConfig;
   list?: ListConfig;
   mentions?: MentionsConfig;
   modal?: ModalConfig;
-  progress?: ComponentStyleConfig;
-  result?: ComponentStyleConfig;
-  slider?: ComponentStyleConfig;
-  breadcrumb?: ComponentStyleConfig;
+  progress?: ProgressConfig;
+  result?: ResultConfig;
+  slider?: SliderConfig;
+  masonry?: MasonryConfig;
+  breadcrumb?: BreadcrumbConfig;
   menu?: MenuConfig;
   floatButton?: FloatButtonConfig;
   floatButtonGroup?: FloatButtonGroupConfig;
-  checkbox?: ComponentStyleConfig;
-  descriptions?: ComponentStyleConfig;
+  checkbox?: CheckboxConfig;
+  descriptions?: DescriptionsConfig;
   empty?: EmptyConfig;
   badge?: BadgeConfig;
-  radio?: ComponentStyleConfig;
+  borderBeam?: BorderBeamConfig;
+  radio?: RadioConfig;
   rate?: ComponentStyleConfig;
-  switch?: ComponentStyleConfig;
+  ribbon?: RibbonConfig;
+  switch?: SwitchStyleConfig;
   transfer?: TransferConfig;
   avatar?: ComponentStyleConfig;
-  message?: ComponentStyleConfig;
+  message?: MessageConfig;
   tag?: TagConfig;
   table?: TableConfig;
   card?: CardConfig;
+  cardMeta?: CardMetaConfig;
   tabs?: TabsConfig;
-  timeline?: ComponentStyleConfig;
+  timeline?: TimelineConfig;
   timePicker?: TimePickerConfig;
   upload?: UploadConfig;
   notification?: NotificationConfig;
-  tree?: ComponentStyleConfig;
-  colorPicker?: ComponentStyleConfig;
+  tree?: TreeConfig;
+  colorPicker?: ColorPickerConfig;
   datePicker?: DatePickerConfig;
   rangePicker?: RangePickerConfig;
-  dropdown?: ComponentStyleConfig;
+  dropdown?: DropdownConfig;
   flex?: FlexConfig;
   /**
    * Wave is special component which only patch on the effect of component interaction.
@@ -245,6 +295,8 @@ export interface ConfigProviderProps {
   tooltip?: TooltipConfig;
   popover?: PopoverConfig;
   popconfirm?: PopconfirmConfig;
+  watermark?: ComponentStyleConfig;
+  qrcode?: QRcodeConfig;
 }
 
 interface ProviderChildrenProps extends ConfigProviderProps {
@@ -267,14 +319,10 @@ function getGlobalIconPrefixCls() {
   return globalIconPrefixCls || defaultIconPrefixCls;
 }
 
-function isLegacyTheme(theme: Theme | ThemeConfig): theme is Theme {
-  return Object.keys(theme).some((key) => key.endsWith('Color'));
-}
-
 export interface GlobalConfigProps {
   prefixCls?: string;
   iconPrefixCls?: string;
-  theme?: Theme | ThemeConfig;
+  theme?: ThemeConfig;
   holderRender?: holderRenderType;
 }
 
@@ -291,16 +339,7 @@ const setGlobalConfig = (props: GlobalConfigProps) => {
   }
 
   if (theme) {
-    if (isLegacyTheme(theme)) {
-      warning(
-        false,
-        'ConfigProvider',
-        '`config` of css variable theme is not work in v5. Please use new `theme` config instead.',
-      );
-      registerTheme(getGlobalPrefixCls(), theme);
-    } else {
-      globalTheme = theme;
-    }
+    globalTheme = theme;
   }
 };
 
@@ -331,9 +370,11 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     csp: customCsp,
     autoInsertSpaceInButton,
     alert,
+    affix,
     anchor,
+    app,
     form,
-    locale,
+    locale: rawLocale,
     componentSize,
     direction,
     space,
@@ -370,14 +411,20 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     result,
     slider,
     breadcrumb,
+    masonry,
     menu,
     pagination,
     input,
+    inputPassword,
+    inputSearch,
     textArea,
+    otp,
     empty,
     badge,
+    borderBeam,
     radio,
     rate,
+    ribbon,
     switch: SWITCH,
     transfer,
     avatar,
@@ -385,6 +432,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tag,
     table,
     card,
+    cardMeta,
     tabs,
     timeline,
     timePicker,
@@ -402,12 +450,26 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tooltip,
     popover,
     popconfirm,
+    qrcode,
     floatButton,
     floatButtonGroup,
     variant,
     inputNumber,
     treeSelect,
+    watermark,
   } = props;
+
+  // https://github.com/ant-design/ant-design/issues/57295
+  const locale = React.useMemo(() => {
+    if (
+      isPlainObject(rawLocale) &&
+      Object.prototype.hasOwnProperty.call(rawLocale, 'default') &&
+      (rawLocale as any).default?.locale
+    ) {
+      return (rawLocale as any).default as Locale;
+    }
+    return rawLocale as Locale;
+  }, [rawLocale]);
 
   // =================================== Context ===================================
   const getPrefixCls = React.useCallback(
@@ -428,8 +490,6 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
   const iconPrefixCls = customIconPrefixCls || parentContext.iconPrefixCls || defaultIconPrefixCls;
   const csp = customCsp || parentContext.csp;
 
-  useStyle(iconPrefixCls, csp);
-
   const mergedTheme = useTheme(theme, parentContext.theme, { prefixCls: getPrefixCls('') });
 
   if (process.env.NODE_ENV !== 'production') {
@@ -440,7 +500,9 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     csp,
     autoInsertSpaceInButton,
     alert,
+    affix,
     anchor,
+    app,
     locale: locale || legacyLocale,
     direction,
     space,
@@ -467,7 +529,10 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     steps,
     image,
     input,
+    inputPassword,
+    inputSearch,
     textArea,
+    otp,
     layout,
     list,
     mentions,
@@ -476,12 +541,15 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     result,
     slider,
     breadcrumb,
+    masonry,
     menu,
     pagination,
     empty,
     badge,
+    borderBeam,
     radio,
     rate,
+    ribbon,
     switch: SWITCH,
     transfer,
     avatar,
@@ -489,6 +557,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tag,
     table,
     card,
+    cardMeta,
     tabs,
     timeline,
     timePicker,
@@ -506,11 +575,13 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
     tooltip,
     popover,
     popconfirm,
+    qrcode,
     floatButton,
     floatButtonGroup,
     variant,
     inputNumber,
     treeSelect,
+    watermark,
   };
 
   if (process.env.NODE_ENV !== 'production') {
@@ -566,12 +637,18 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
   const { layer } = React.useContext(CssInJsStyleContext);
 
   const memoIconContextValue = React.useMemo(
-    () => ({ prefixCls: iconPrefixCls, csp, layer: layer ? 'antd' : undefined }),
-    [iconPrefixCls, csp, layer],
+    () => ({
+      prefixCls: iconPrefixCls,
+      csp,
+      layer: layer ? 'antd' : undefined,
+      zeroRuntime: !!layer || mergedTheme?.zeroRuntime,
+    }),
+    [iconPrefixCls, csp, layer, mergedTheme?.zeroRuntime],
   );
 
   let childNode = (
     <>
+      <IconStyle iconPrefixCls={iconPrefixCls} csp={csp} />
       <PropWarning dropdownMatchSelectWidth={dropdownMatchSelectWidth} />
       {children}
     </>
@@ -617,6 +694,11 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
   // =================================== Motion ===================================
   childNode = <MotionWrapper>{childNode}</MotionWrapper>;
 
+  // ================================ Tooltip Unique ===============================
+  if (tooltip?.unique) {
+    childNode = <UniqueProvider>{childNode}</UniqueProvider>;
+  }
+
   // ================================ Dynamic theme ================================
   const memoTheme = React.useMemo(() => {
     const { algorithm, token, components, cssVar, ...rest } = mergedTheme || {};
@@ -633,10 +715,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
       if ('algorithm' in parsedToken) {
         if (parsedToken.algorithm === true) {
           parsedToken.theme = themeObj;
-        } else if (
-          Array.isArray(parsedToken.algorithm) ||
-          typeof parsedToken.algorithm === 'function'
-        ) {
+        } else if (Array.isArray(parsedToken.algorithm) || isFunction(parsedToken.algorithm)) {
           parsedToken.theme = createTheme(parsedToken.algorithm);
         }
         delete parsedToken.algorithm;
@@ -659,7 +738,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = (props) => {
         override: mergedToken,
         ...parsedComponents,
       },
-      cssVar: cssVar as Exclude<ThemeConfig['cssVar'], boolean>,
+      cssVar,
     };
   }, [mergedTheme]);
 

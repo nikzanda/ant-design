@@ -3,7 +3,7 @@
 exports[`DatePicker prop locale should works 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-root ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -19,6 +19,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="calendar"
           class="anticon anticon-calendar"
           role="img"
@@ -38,9 +39,10 @@ Array [
           </svg>
         </span>
       </span>
-      <span
+      <button
+        aria-label="Изчистване"
         class="ant-picker-clear"
-        role="button"
+        type="button"
       >
         <span
           aria-label="close-circle"
@@ -62,11 +64,11 @@ Array [
             />
           </svg>
         </span>
-      </span>
+      </button>
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-root ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -643,9 +645,34 @@ Array [
 ]
 `;
 
+exports[`DatePicker suffixIcon 1`] = `
+Array [
+  <div
+    class="ant-picker ant-picker-outlined css-var-root ant-picker-css-var"
+  >
+    <div
+      class="ant-picker-input"
+    >
+      <input
+        aria-invalid="false"
+        autocomplete="off"
+        placeholder="Select date"
+        size="12"
+        value=""
+      />
+      <span
+        class="ant-picker-suffix"
+      >
+        123
+      </span>
+    </div>
+  </div>,
+]
+`;
+
 exports[`DatePicker support DatePicker.generatePicker 1`] = `
 <div
-  class="ant-picker ant-picker-outlined"
+  class="ant-picker ant-picker-outlined css-var-root ant-picker-css-var"
 >
   <div
     class="ant-picker-input"
@@ -661,6 +688,7 @@ exports[`DatePicker support DatePicker.generatePicker 1`] = `
       class="ant-picker-suffix"
     >
       <span
+        aria-hidden="true"
         aria-label="calendar"
         class="anticon anticon-calendar"
         role="img"

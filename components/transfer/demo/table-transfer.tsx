@@ -3,6 +3,7 @@ import { Flex, Switch, Table, Tag, Transfer } from 'antd';
 import type { GetProp, TableColumnsType, TableProps, TransferProps } from 'antd';
 
 type TransferItem = GetProp<TransferProps, 'dataSource'>[number];
+
 type TableRowSelection<T extends object> = TableProps<T>['rowSelection'];
 
 interface DataType {
@@ -10,6 +11,7 @@ interface DataType {
   title: string;
   description: string;
   tag: string;
+  disabled?: boolean;
 }
 
 interface TableTransferProps extends TransferProps<TransferItem> {
@@ -42,7 +44,7 @@ const TableTransfer: React.FC<TableTransferProps> = (props) => {
         };
 
         return (
-          <Table
+          <Table<DataType>
             rowSelection={rowSelection}
             columns={columns}
             dataSource={filteredItems}
@@ -108,7 +110,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <Flex align="start" gap="middle" vertical>
+    <Flex align="start" gap="medium" vertical>
       <TableTransfer
         dataSource={mockData}
         targetKeys={targetKeys}

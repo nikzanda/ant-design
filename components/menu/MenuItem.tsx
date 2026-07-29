@@ -1,14 +1,14 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import type { MenuItemProps as RcMenuItemProps } from 'rc-menu';
-import { Item } from 'rc-menu';
-import toArray from 'rc-util/lib/Children/toArray';
-import omit from 'rc-util/lib/omit';
+import type { MenuItemProps as RcMenuItemProps } from '@rc-component/menu';
+import { Item } from '@rc-component/menu';
+import { omit, toArray } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { isFunction } from '../_util/is';
 import { cloneElement } from '../_util/reactNode';
 import type { SiderContextProps } from '../layout/Sider';
 import { SiderContext } from '../layout/Sider';
-import type { TooltipProps } from '../tooltip';
+import type { TooltipProps, TooltipSemanticType } from '../tooltip';
 import Tooltip from '../tooltip';
 import type { MenuContextProps } from './MenuContext';
 import MenuContext from './MenuContext';
@@ -42,16 +42,23 @@ const MenuItem: GenericComponent = (props) => {
     firstLevel,
     direction,
     disableMenuItemTitleTooltip,
+    tooltip,
     inlineCollapsed: isInlineCollapsed,
+    styles,
+    classNames,
   } = React.useContext<MenuContextProps>(MenuContext);
   const renderItemChildren = (inlineCollapsed: boolean) => {
     const label = (children as React.ReactNode[])?.[0];
-
     const wrapNode = (
       <span
-        className={classNames(`${prefixCls}-title-content`, {
-          [`${prefixCls}-title-content-with-extra`]: !!extra || extra === 0,
-        })}
+        className={clsx(
+          `${prefixCls}-title-content`,
+          firstLevel ? classNames?.itemContent : classNames?.subMenu?.itemContent,
+          {
+            [`${prefixCls}-title-content-with-extra`]: !!extra || extra === 0,
+          },
+        )}
+        style={firstLevel ? styles?.itemContent : styles?.subMenu?.itemContent}
       >
         {children}
       </span>
@@ -76,7 +83,14 @@ const MenuItem: GenericComponent = (props) => {
     tooltipTitle = '';
   }
 
-  const tooltipProps: TooltipProps = { title: tooltipTitle };
+  const tooltipConfig = tooltip === false ? undefined : tooltip;
+  const mergedTooltipTitle =
+    tooltipConfig && tooltipConfig.title !== undefined ? tooltipConfig.title : tooltipTitle;
+
+  const tooltipProps: TooltipProps = {
+    ...(tooltipConfig ?? null),
+    title: mergedTooltipTitle,
+  };
 
   if (!siderCollapsed && !isInlineCollapsed) {
     tooltipProps.title = null;
@@ -90,31 +104,67 @@ const MenuItem: GenericComponent = (props) => {
   let returnNode = (
     <Item
       {...omit(props, ['title', 'icon', 'danger'])}
-      className={classNames(
+      className={clsx(
+        firstLevel ? classNames?.item : classNames?.subMenu?.item,
         {
           [`${prefixCls}-item-danger`]: danger,
           [`${prefixCls}-item-only-child`]: (icon ? childrenLength + 1 : childrenLength) === 1,
         },
         className,
       )}
+      style={{
+        ...(firstLevel ? styles?.item : styles?.subMenu?.item),
+        ...props.style,
+      }}
       title={typeof title === 'string' ? title : undefined}
+      itemData={props?.itemData ?? { ...props, key: props.eventKey }}
     >
-      {cloneElement(icon, {
-        className: classNames(
-          React.isValidElement<{ className?: string }>(icon) ? icon.props?.className : undefined,
+      {cloneElement(icon, (oriProps) => ({
+        className: clsx(
           `${prefixCls}-item-icon`,
+          firstLevel ? classNames?.itemIcon : classNames?.subMenu?.itemIcon,
+          oriProps.className,
         ),
-      })}
+        style: {
+          ...(firstLevel ? styles?.itemIcon : styles?.subMenu?.itemIcon),
+          ...oriProps.style,
+        },
+      }))}
       {renderItemChildren(isInlineCollapsed)}
     </Item>
   );
 
-  if (!disableMenuItemTitleTooltip) {
+  if (!disableMenuItemTitleTooltip && tooltip !== false) {
+    const mergedTooltipPlacement =
+      tooltipConfig && tooltipConfig.placement
+        ? tooltipConfig.placement
+        : direction === 'rtl'
+          ? 'left'
+          : 'right';
+
+    const baseTooltipClassName = `${prefixCls}-inline-collapsed-tooltip`;
+
+    const mergeTooltipRootClassName = (classNames?: TooltipSemanticType['classNames']) => ({
+      ...classNames,
+      root: clsx(baseTooltipClassName, classNames?.root),
+    });
+
+    const mergedTooltipClassNames = isFunction(tooltipConfig?.classNames)
+      ? (info: { props: TooltipProps }) => {
+          const resolvedClassNames = (
+            tooltipConfig.classNames as (info: {
+              props: TooltipProps;
+            }) => TooltipSemanticType['classNames']
+          )(info);
+          return mergeTooltipRootClassName(resolvedClassNames);
+        }
+      : mergeTooltipRootClassName(tooltipConfig?.classNames as TooltipSemanticType['classNames']);
+
     returnNode = (
       <Tooltip
         {...tooltipProps}
-        placement={direction === 'rtl' ? 'left' : 'right'}
-        classNames={{ root: `${prefixCls}-inline-collapsed-tooltip` }}
+        placement={mergedTooltipPlacement}
+        classNames={mergedTooltipClassNames}
       >
         {returnNode}
       </Tooltip>

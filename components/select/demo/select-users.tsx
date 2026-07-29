@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Select, Spin, Avatar } from 'antd';
+import { Avatar, Select, Spin } from 'antd';
 import type { SelectProps } from 'antd';
 import debounce from 'lodash/debounce';
 
@@ -45,14 +45,17 @@ function DebounceSelect<
   return (
     <Select
       labelInValue
-      filterOption={false}
-      onSearch={debounceFetcher}
+      showSearch={{
+        autoClearSearchValue: false,
+        filterOption: false,
+        onSearch: debounceFetcher,
+      }}
       notFoundContent={fetching ? <Spin size="small" /> : 'No results found'}
       {...props}
       options={options}
       optionRender={(option) => (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {option.data.avatar && <Avatar src={option.data.avatar} style={{ marginRight: 8 }} />}
+          {option.data.avatar && <Avatar src={option.data.avatar} style={{ marginInlineEnd: 8 }} />}
           {option.label}
         </div>
       )}
@@ -73,11 +76,15 @@ async function fetchUserList(username: string): Promise<UserValue[]> {
     .then((res) => res.json())
     .then((res) => {
       const results = Array.isArray(res) ? res : [];
-      return results.map((user) => ({
+      return results.map<UserValue>((user) => ({
         label: user.name,
         value: user.id,
         avatar: user.avatar,
       }));
+    })
+    .catch(() => {
+      console.log('fetch mock data failed');
+      return [];
     });
 }
 

@@ -1,9 +1,14 @@
 import React from 'react';
-import type { GetProps, SplitterProps } from 'antd';
-import { ConfigProvider, Splitter } from 'antd';
-import { spyElementPrototypes } from 'rc-util/lib/test/domHook';
+import { CaretLeftOutlined, CaretRightOutlined, ColumnWidthOutlined } from '@ant-design/icons';
+import { spyElementPrototypes } from '@rc-component/util';
 
+import Splitter from '..';
+import type { SplitterProps } from '..';
+import type { Orientation } from '../../_util/hooks';
+import type { GetProps } from '../../_util/type';
 import { resetWarned } from '../../_util/warning';
+import mountTest from '../../../tests/shared/mountTest';
+import rtlTest from '../../../tests/shared/rtlTest';
 import {
   act,
   createEvent,
@@ -12,24 +17,37 @@ import {
   triggerResize,
   waitFakeTimer,
 } from '../../../tests/utils';
+import ConfigProvider from '../../config-provider';
+import type { SplitterSemanticAllType } from '../interface';
+import SplitBar from '../SplitBar';
 
 type PanelProps = GetProps<typeof Splitter.Panel>;
 
 const resizeSplitter = async () => {
-  triggerResize(document.body.querySelector('.ant-splitter')!);
+  triggerResize(document.body.querySelector<HTMLElement>('.ant-splitter')!);
   await waitFakeTimer();
 };
 
-const SplitterDemo = ({ items = [{}, {}], ...props }: { items?: PanelProps[] } & SplitterProps) => (
-  <Splitter {...props}>
-    {items?.map((item, idx) => {
+const SplitterDemo: React.FC<Readonly<{ items?: PanelProps[] } & SplitterProps>> = ({
+  items = [{}, {}],
+  ...rest
+}) => (
+  <Splitter {...rest}>
+    {items?.map(({ children, ...item }, idx) => {
       const key = `panel-${idx}`;
-      return <Splitter.Panel key={key} {...item} />;
+      return (
+        <Splitter.Panel key={key} {...item}>
+          {children}
+        </Splitter.Panel>
+      );
     })}
   </Splitter>
 );
 
 describe('Splitter', () => {
+  mountTest(Splitter);
+  rtlTest(Splitter);
+
   const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
   let containerSize = 100;
@@ -76,11 +94,148 @@ describe('Splitter', () => {
     expect(panels?.[2]).toHaveStyle('flex-basis: 35px');
   });
 
+  describe('onDraggerDoubleClick', () => {
+    it('should trigger onDraggerDoubleClick when clicking within 300ms', () => {
+      const onDraggerDoubleClick = jest.fn();
+      const { container } = render(
+        <SplitterDemo items={[{}, {}]} onDraggerDoubleClick={onDraggerDoubleClick} />,
+      );
+      const dragger = container.querySelector('.ant-splitter-bar-dragger')!;
+
+      fireEvent.doubleClick(dragger);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      fireEvent.mouseDown(dragger);
+
+      expect(onDraggerDoubleClick).toHaveBeenCalledTimes(1);
+      expect(onDraggerDoubleClick).toHaveBeenCalledWith(0);
+    });
+
+    it('should NOT trigger onDraggerDoubleClick when time gap > 300ms', () => {
+      const onDraggerDoubleClick = jest.fn();
+      const { container } = render(
+        <SplitterDemo items={[{}, {}]} onDraggerDoubleClick={onDraggerDoubleClick} />,
+      );
+      const dragger = container.querySelector('.ant-splitter-bar-dragger')!;
+
+      fireEvent.mouseDown(dragger);
+      fireEvent.mouseUp(dragger);
+      fireEvent.click(dragger);
+
+      act(() => {
+        jest.advanceTimersByTime(400);
+      });
+
+      fireEvent.mouseDown(dragger);
+      fireEvent.mouseUp(dragger);
+      fireEvent.click(dragger);
+
+      expect(onDraggerDoubleClick).not.toHaveBeenCalled();
+    });
+
+    it('should trigger with correct index for multiple splitters', () => {
+      const onDraggerDoubleClick = jest.fn();
+      const { container } = render(
+        <SplitterDemo items={[{}, {}, {}]} onDraggerDoubleClick={onDraggerDoubleClick} />,
+      );
+
+      const draggers = container.querySelectorAll('.ant-splitter-bar-dragger');
+      const secondDragger = draggers[1];
+
+      fireEvent.doubleClick(secondDragger);
+
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+
+      fireEvent.doubleClick(secondDragger);
+
+      expect(onDraggerDoubleClick).toHaveBeenCalledWith(1);
+    });
+
+    it('should stop propagation to allow nested splitter usage', () => {
+      const onOuterDoubleClick = jest.fn();
+      const onInnerDoubleClick = jest.fn();
+
+      const { getByTestId } = render(
+        <Splitter onDraggerDoubleClick={onOuterDoubleClick}>
+          <Splitter.Panel>Outer Left</Splitter.Panel>
+          <Splitter.Panel>
+            <div data-testid="inner-wrapper">
+              <Splitter onDraggerDoubleClick={onInnerDoubleClick}>
+                <Splitter.Panel>Inner Top</Splitter.Panel>
+                <Splitter.Panel>Inner Bottom</Splitter.Panel>
+              </Splitter>
+            </div>
+          </Splitter.Panel>
+        </Splitter>,
+      );
+
+      const innerWrapper = getByTestId('inner-wrapper');
+      const innerDragger = innerWrapper.querySelector('.ant-splitter-bar-dragger')!;
+
+      fireEvent.doubleClick(innerDragger);
+      act(() => {
+        jest.advanceTimersByTime(100);
+      });
+      fireEvent.doubleClick(innerDragger);
+
+      expect(onInnerDoubleClick).toHaveBeenCalled();
+      expect(onOuterDoubleClick).not.toHaveBeenCalled();
+    });
+
+    it('should prevent drag start (return early) when mouse down happens within 300ms', () => {
+      const onOffsetStart = jest.fn();
+
+      const { container } = render(
+        <SplitBar
+          index={0}
+          active={false}
+          prefixCls="ant-splitter"
+          rootPrefixCls="ant"
+          resizable
+          vertical={false}
+          startCollapsible
+          endCollapsible
+          showStartCollapsibleIcon
+          showEndCollapsibleIcon
+          containerSize={500}
+          ariaNow={50}
+          ariaMin={0}
+          ariaMax={100}
+          onOffsetStart={onOffsetStart}
+          onOffsetUpdate={jest.fn()}
+          onOffsetEnd={jest.fn()}
+          onCollapse={jest.fn()}
+        />,
+      );
+
+      const dragger = container.querySelector('.ant-splitter-bar-dragger')!;
+
+      fireEvent.mouseDown(dragger);
+
+      expect(onOffsetStart).toHaveBeenCalledTimes(1);
+
+      fireEvent.mouseUp(dragger);
+
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
+
+      fireEvent.mouseDown(dragger);
+
+      expect(onOffsetStart).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it('The layout should work fine', () => {
     const { container, rerender } = render(<SplitterDemo />);
     expect(container.querySelector('.ant-splitter-horizontal')).toBeTruthy();
 
-    rerender(<SplitterDemo items={[{}, {}, {}]} layout="vertical" />);
+    rerender(<SplitterDemo items={[{}, {}, {}]} orientation="vertical" />);
     expect(container.querySelector('.ant-splitter-vertical')).toBeTruthy();
   });
 
@@ -98,7 +253,7 @@ describe('Splitter', () => {
 
   it('Splitter.Panel is syntactic sugar', () => {
     const { container } = render(<Splitter.Panel />);
-    expect(container.innerHTML).toEqual('');
+    expect(container.innerHTML).toBe('');
   });
 
   // ============================== Resizable ==============================
@@ -326,6 +481,19 @@ describe('Splitter', () => {
       );
       expect(container.querySelector('[aria-valuemax]')?.getAttribute('aria-valuemax')).not.toBe(
         'NaN',
+      );
+    });
+
+    it('should render percentage-based aria value range before resize', () => {
+      const { container } = render(
+        <SplitterDemo
+          items={[{ defaultSize: 100, min: 100, max: 200 }, { min: 100, max: 200 }, { min: '20%' }]}
+        />,
+      );
+
+      expect(container.querySelectorAll('.ant-splitter-bar-dragger')[1]).toHaveAttribute(
+        'aria-valuemax',
+        '80',
       );
     });
   });
@@ -834,6 +1002,65 @@ describe('Splitter', () => {
       expect(onResize).toHaveBeenCalledWith([440, 0]);
       expect(onResizeEnd).toHaveBeenCalledWith([440, 0]);
     });
+
+    it('should trigger onCollapse when collapse button clicked', async () => {
+      const onCollapse = jest.fn();
+      const { container } = render(
+        <SplitterDemo
+          items={[{ collapsible: true }, { collapsible: true }]}
+          onCollapse={onCollapse}
+        />,
+      );
+
+      await resizeSplitter();
+
+      fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-start')!);
+      expect(onCollapse).toHaveBeenCalledTimes(1);
+      expect(onCollapse).toHaveBeenCalledWith([true, false], [0, 100]);
+
+      fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-end')!);
+      expect(onCollapse).toHaveBeenCalledTimes(2);
+      expect(onCollapse).toHaveBeenCalledWith([false, false], [50, 50]);
+    });
+
+    it('should trigger onCollapse when collapse button keydown', async () => {
+      const onCollapse = jest.fn();
+      const { container } = render(
+        <SplitterDemo
+          items={[{ collapsible: true }, { collapsible: true }]}
+          onCollapse={onCollapse}
+        />,
+      );
+
+      await resizeSplitter();
+
+      fireEvent.keyDown(container.querySelector('.ant-splitter-bar-collapse-start')!, {
+        key: 'Enter',
+      });
+      expect(onCollapse).toHaveBeenCalledTimes(1);
+      expect(onCollapse).toHaveBeenCalledWith([true, false], [0, 100]);
+
+      fireEvent.keyDown(container.querySelector('.ant-splitter-bar-collapse-end')!, {
+        key: ' ',
+      });
+      expect(onCollapse).toHaveBeenCalledTimes(2);
+      expect(onCollapse).toHaveBeenCalledWith([false, false], [50, 50]);
+    });
+
+    it('should apply transition when motion is true', async () => {
+      const { container } = render(
+        <SplitterDemo
+          items={[{ collapsible: true }, { collapsible: true }]}
+          collapsible={{
+            motion: true,
+          }}
+        />,
+      );
+
+      expect(container.querySelector('.ant-splitter-panel')).toHaveClass(
+        'ant-splitter-panel-transition',
+      );
+    });
   });
 
   it('auto resize', async () => {
@@ -860,5 +1087,183 @@ describe('Splitter', () => {
 
     fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-start')!);
     expect(onResize).toHaveBeenCalledWith([0, 200]);
+  });
+
+  // ============================= customize =============================
+  describe('customize', () => {
+    it('customize draggerIcon', () => {
+      const { container } = render(
+        <SplitterDemo draggerIcon={<ColumnWidthOutlined className="customize-dragger-icon" />} />,
+      );
+      const draggerEle = container.querySelector('.ant-splitter-bar-dragger')!;
+
+      expect(draggerEle).toHaveClass('ant-splitter-bar-dragger-customize');
+      expect(draggerEle.querySelector('.ant-splitter-bar-dragger-icon')).toBeTruthy();
+      expect(draggerEle.querySelector('.customize-dragger-icon')).toBeTruthy();
+    });
+
+    it('customize collapsibleIcon (deprecated)', async () => {
+      render(
+        <SplitterDemo
+          items={[{ size: 20, collapsible: true }, { collapsible: true }]}
+          collapsibleIcon={{
+            start: <CaretLeftOutlined className="customize-icon-start" />,
+            end: <CaretRightOutlined className="customize-icon-end" />,
+          }}
+        />,
+      );
+
+      expect(errSpy).toHaveBeenCalledWith(
+        'Warning: [antd: Splitter] `collapsibleIcon` is deprecated. Please use `collapsible.icon` instead.',
+      );
+    });
+
+    it('customize collapsible.icon', async () => {
+      const { container } = render(
+        <SplitterDemo
+          items={[{ size: 20, collapsible: true }, { collapsible: true }]}
+          collapsible={{
+            icon: {
+              start: <CaretLeftOutlined className="customize-icon-start" />,
+              end: <CaretRightOutlined className="customize-icon-end" />,
+            },
+          }}
+        />,
+      );
+
+      await resizeSplitter();
+      const startEle = container.querySelector('.ant-splitter-bar-collapse-bar-start')!;
+      const endEle = container.querySelector('.ant-splitter-bar-collapse-bar-end')!;
+
+      expect(startEle).toHaveClass('ant-splitter-bar-collapse-bar-customize');
+      expect(endEle).toHaveClass('ant-splitter-bar-collapse-bar-customize');
+
+      expect(startEle.querySelector('.customize-icon-start')).toBeTruthy();
+      expect(endEle.querySelector('.customize-icon-end')).toBeTruthy();
+
+      expect(startEle).toHaveStyle({ background: 'transparent' });
+      expect(endEle).toHaveStyle({ background: 'transparent' });
+    });
+
+    it('styles', () => {
+      const customStyles: SplitterProps['styles'] = {
+        root: { background: 'red' },
+        panel: { background: 'blue' },
+        // dragger: { background: 'green' },
+        dragger: { default: { background: 'green' } },
+      };
+      const customClassNames: SplitterSemanticAllType['classNamesNoString'] = {
+        root: 'custom-root',
+        panel: 'custom-panel',
+        dragger: { default: 'custom-dragger', active: 'custom-dragger-active' },
+      };
+
+      const { container } = render(
+        <SplitterDemo styles={customStyles} classNames={customClassNames} />,
+      );
+
+      const root = container.querySelector('.ant-splitter');
+      expect(root).toHaveStyle(customStyles.root as Record<string, string>);
+      expect(root).toHaveClass(customClassNames.root as string);
+
+      const panel = container.querySelector('.ant-splitter-panel');
+      expect(panel).toHaveStyle(customStyles.panel as Record<string, string>);
+      expect(panel).toHaveClass(customClassNames.panel as string);
+      const dragger = container.querySelector('.ant-splitter-bar-dragger');
+      expect(dragger).toHaveStyle(customStyles.dragger?.default as Record<string, string>);
+
+      expect(dragger).toHaveClass(customClassNames.dragger?.default as string);
+      expect(dragger).not.toHaveClass(customClassNames.dragger?.active as string);
+
+      // Dragging
+      fireEvent.mouseDown(dragger!);
+      expect(dragger).toHaveClass(customClassNames.dragger?.default as string);
+      expect(dragger).toHaveClass(customClassNames.dragger?.active as string);
+    });
+  });
+
+  // ============================= orientation =============================
+  describe('orientation attribute', () => {
+    const testCases: Array<
+      [
+        params: [orientation?: Orientation, defaultVertical?: boolean, layout?: Orientation],
+        expected: string,
+      ]
+    > = [
+      [[undefined, undefined, 'vertical'], 'vertical'],
+      [['vertical', undefined, 'horizontal'], 'vertical'],
+      [['vertical', undefined, undefined], 'vertical'],
+      [['horizontal', true, undefined], 'horizontal'],
+      [[undefined, true, undefined], 'vertical'],
+    ];
+
+    it.each(testCases)('with args %j should have %s node', (params, expected) => {
+      const { container } = render(
+        <SplitterDemo
+          items={[{}, {}, {}]}
+          orientation={params[0]}
+          vertical={params[1]}
+          {...(params[2] && { layout: params[2] })}
+        />,
+      );
+      expect(container.querySelector<HTMLSpanElement>(`.ant-splitter-${expected}`)).toBeTruthy();
+      if (params[2]) {
+        expect(errSpy).toHaveBeenCalledWith(
+          'Warning: [antd: Splitter] `layout` is deprecated. Please use `orientation` instead.',
+        );
+      }
+    });
+  });
+
+  it('destroyOnHidden', async () => {
+    const onResize = jest.fn();
+
+    const { container } = render(
+      <SplitterDemo
+        destroyOnHidden
+        onResize={onResize}
+        items={[
+          {
+            collapsible: true,
+            children: <div data-testid="panel-1">Panel 1</div>,
+          },
+          {
+            collapsible: true,
+            destroyOnHidden: false,
+            children: <div data-testid="panel-2">Panel 2</div>,
+          },
+        ]}
+      />,
+    );
+
+    await resizeSplitter();
+
+    // Both panels should exist initially
+    expect(container.querySelector('[data-testid="panel-1"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="panel-2"]')).toBeTruthy();
+
+    // Collapse the first panel (inherits destroyOnHidden from Splitter)
+    fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-start')!);
+    expect(onResize).toHaveBeenCalledWith([0, 100]);
+
+    // Panel 1 should be destroyed, panel 2 should remain
+    expect(container.querySelector('[data-testid="panel-1"]')).toBeFalsy();
+    expect(container.querySelector('[data-testid="panel-2"]')).toBeTruthy();
+
+    // Collapse the second panel (has destroyOnHidden=false override)
+    onResize.mockReset();
+    fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-end')!);
+
+    // Panel 1 should restore (expanded back), panel 2 should remain (override)
+    expect(container.querySelector('[data-testid="panel-1"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="panel-2"]')).toBeTruthy();
+
+    // Collapse panel 2 fully
+    onResize.mockReset();
+    fireEvent.click(container.querySelector('.ant-splitter-bar-collapse-end')!);
+
+    // Panel 1 should exist, panel 2 should still exist (destroyOnHidden=false)
+    expect(container.querySelector('[data-testid="panel-1"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="panel-2"]')).toBeTruthy();
   });
 });

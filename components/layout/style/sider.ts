@@ -88,7 +88,7 @@ const genSiderStyle: GenerateStyle<LayoutToken, CSSObject> = (token) => {
         background: siderBg,
         borderRadius: `0 ${unit(borderRadiusLG)} ${unit(borderRadiusLG)} 0`,
         cursor: 'pointer',
-        transition: `background ${motionDurationSlow} ease`,
+        transition: `background-color ${motionDurationSlow} ease`,
 
         '&::after': {
           position: 'absolute',
@@ -120,7 +120,7 @@ const genSiderStyle: GenerateStyle<LayoutToken, CSSObject> = (token) => {
         [`${componentCls}-zero-width-trigger`]: {
           color: lightTriggerColor,
           background: lightTriggerBg,
-          border: `1px solid ${bodyBg}`, // Safe to modify to any other color
+          border: `${unit(token.lineWidth)} ${token.lineType} ${bodyBg}`, // Safe to modify to any other color
           borderInlineStart: 0,
         },
       },

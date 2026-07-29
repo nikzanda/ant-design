@@ -1,9 +1,10 @@
 import * as React from 'react';
 import type { JSX } from 'react';
-import classNames from 'classnames';
-import { get, set } from 'rc-util';
-import useLayoutEffect from 'rc-util/lib/hooks/useLayoutEffect';
+import { get, set, useLayoutEffect } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { isPlainObject } from '../_util/is';
+import { responsiveArrayReversed } from '../_util/responsiveObserver';
 import type { ColProps } from '../grid/col';
 import Col from '../grid/col';
 import { FormContext, FormItemPrefixContext } from './context';
@@ -63,34 +64,39 @@ const FormItemInput: React.FC<FormItemInputProps & FormItemInputMiscProps> = (pr
   const baseClassName = `${prefixCls}-item`;
 
   const formContext = React.useContext(FormContext);
+  const { classNames: contextClassNames, styles: contextStyles } = formContext;
 
   const mergedWrapperCol = React.useMemo(() => {
     let mergedWrapper: ColProps = { ...(wrapperCol || formContext.wrapperCol || {}) };
     if (label === null && !labelCol && !wrapperCol && formContext.labelCol) {
-      const list = [undefined, 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
+      const list = [undefined, ...responsiveArrayReversed] as const;
 
       list.forEach((size) => {
         const _size = size ? [size] : [];
 
         const formLabel = get(formContext.labelCol, _size);
-        const formLabelObj = typeof formLabel === 'object' ? formLabel : {};
+        const formLabelObj = isPlainObject(formLabel) ? formLabel : {};
 
         const wrapper = get(mergedWrapper, _size);
-        const wrapperObj = typeof wrapper === 'object' ? wrapper : {};
+        const wrapperObj = isPlainObject(wrapper) ? wrapper : {};
 
-        if ('span' in formLabelObj && !('offset' in wrapperObj) && formLabelObj.span < GRID_MAX) {
+        if (
+          'span' in formLabelObj &&
+          !('offset' in wrapperObj) &&
+          (formLabelObj as any).span < GRID_MAX
+        ) {
           mergedWrapper = set(mergedWrapper, [..._size, 'offset'], formLabelObj.span);
         }
       });
     }
     return mergedWrapper;
-  }, [wrapperCol, formContext]);
+  }, [wrapperCol, formContext.wrapperCol, formContext.labelCol, label, labelCol]);
 
-  const className = classNames(`${baseClassName}-control`, mergedWrapperCol.className);
+  const className = clsx(`${baseClassName}-control`, mergedWrapperCol.className);
 
   // Pass to sub FormItem should not with col info
   const subFormContext = React.useMemo(() => {
-    const { labelCol, wrapperCol, ...rest } = formContext;
+    const { labelCol: _labelCol, wrapperCol: _wrapperCol, ...rest } = formContext;
     return rest;
   }, [formContext]);
 
@@ -106,7 +112,12 @@ const FormItemInput: React.FC<FormItemInputProps & FormItemInputMiscProps> = (pr
 
   const inputDom: React.ReactNode = (
     <div className={`${baseClassName}-control-input`}>
-      <div className={`${baseClassName}-control-input-content`}>{children}</div>
+      <div
+        className={clsx(`${baseClassName}-control-input-content`, contextClassNames?.content)}
+        style={contextStyles?.content}
+      >
+        {children}
+      </div>
     </div>
   );
   const formItemContext = React.useMemo(() => ({ prefixCls, status }), [prefixCls, status]);
@@ -134,7 +145,12 @@ const FormItemInput: React.FC<FormItemInputProps & FormItemInputMiscProps> = (pr
   // If extra = 0, && will goes wrong
   // 0&&error -> 0
   const extraDom: React.ReactNode = extra ? (
-    <div {...extraProps} className={`${baseClassName}-extra`} ref={extraRef}>
+    <div
+      {...extraProps}
+      className={clsx(`${baseClassName}-extra`, contextClassNames?.extra)}
+      style={contextStyles?.extra}
+      ref={extraRef}
+    >
       {extra}
     </div>
   ) : null;

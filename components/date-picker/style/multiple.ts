@@ -1,10 +1,11 @@
 import type { CSSInterpolation } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 
-import { genOverflowStyle, getMultipleSelectorUnit } from '../../select/style/multiple';
+import { textEllipsis } from '../../style';
 import { mergeToken } from '../../theme/internal';
 import type { GenerateStyle } from '../../theme/internal';
 import type { PickerToken } from './token';
+import { genOverflowStyle, getMultipleSelectorUnit } from './util';
 
 const genSize = (token: PickerToken, suffix?: string): CSSInterpolation => {
   const { componentCls, controlHeight } = token;
@@ -85,12 +86,10 @@ const genPickerMultipleStyle: GenerateStyle<PickerToken> = (token) => {
             insetInlineEnd: 0,
             transform: 'translateY(-50%)',
             transition: `all ${token.motionDurationSlow}`,
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
             flex: 1,
             color: token.colorTextPlaceholder,
             pointerEvents: 'none',
+            ...textEllipsis,
           },
         },
 

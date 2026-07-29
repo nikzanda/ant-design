@@ -1,14 +1,12 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import RcMentions from 'rc-mentions';
-import type {
-  DataDrivenOptionProps as MentionsOptionProps,
-  MentionsProps as RcMentionsProps,
-  MentionsRef as RcMentionsRef,
-} from 'rc-mentions/lib/Mentions';
-import { composeRef } from 'rc-util/lib/ref';
+import RcMentions from '@rc-component/mentions';
+import type { MentionsProps as RcMentionsProps } from '@rc-component/mentions';
+import { composeRef } from '@rc-component/util';
+import { clsx } from 'clsx';
 
-import getAllowClear from '../_util/getAllowClear';
+import { useAllowClear, useZIndex } from '../_util/hooks';
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
 import genPurePanel from '../_util/PurePanel';
 import type { InputStatus } from '../_util/statusUtils';
 import { getMergedStatus, getStatusClassNames } from '../_util/statusUtils';
@@ -16,8 +14,12 @@ import toList from '../_util/toList';
 import { devUseWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
 import type { Variant } from '../config-provider';
+import { useComponentConfig } from '../config-provider/context';
 import DefaultRenderEmpty from '../config-provider/defaultRenderEmpty';
+import DisabledContext from '../config-provider/DisabledContext';
 import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
+import useSize from '../config-provider/hooks/useSize';
+import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext } from '../form/context';
 import useVariant from '../form/hooks/useVariants';
 import Spin from '../spin';
@@ -31,7 +33,8 @@ function loadingFilterOption() {
 
 export type MentionPlacement = 'top' | 'bottom';
 
-export type { DataDrivenOptionProps as MentionsOptionProps } from 'rc-mentions/lib/Mentions';
+export type MentionsOptionProps = NonNullable<RcMentionsProps['options']>[number];
+type RcMentionsRef = React.ComponentRef<typeof RcMentions>;
 
 export interface OptionProps {
   value: string;
@@ -39,7 +42,24 @@ export interface OptionProps {
   [key: string]: any;
 }
 
-export interface MentionProps extends Omit<RcMentionsProps, 'suffix'> {
+export type MentionSemanticType = {
+  classNames?: {
+    root?: string;
+    textarea?: string;
+    popup?: string;
+    suffix?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    textarea?: React.CSSProperties;
+    popup?: React.CSSProperties;
+    suffix?: React.CSSProperties;
+  };
+};
+
+export type MentionSemanticAllType = GenerateSemantic<MentionSemanticType, MentionProps>;
+
+export interface MentionProps extends Omit<RcMentionsProps, 'suffix' | 'classNames' | 'styles'> {
   rootClassName?: string;
   loading?: boolean;
   status?: InputStatus;
@@ -50,6 +70,9 @@ export interface MentionProps extends Omit<RcMentionsProps, 'suffix'> {
    * @default "outlined"
    */
   variant?: Variant;
+  classNames?: MentionSemanticAllType['classNamesAndFn'];
+  styles?: MentionSemanticAllType['stylesAndFn'];
+  size?: SizeType;
 }
 
 export interface MentionsProps extends MentionProps {}
@@ -71,42 +94,75 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
     prefixCls: customizePrefixCls,
     className,
     rootClassName,
-    disabled,
+    disabled: customDisabled,
     loading,
     filterOption,
     children,
     notFoundContent,
     options,
     status: customStatus,
-    allowClear = false,
+    allowClear,
     popupClassName,
     style,
     variant: customVariant,
+    classNames,
+    styles,
+    size: customSize,
     ...restProps
   } = props;
   const [focused, setFocused] = React.useState(false);
   const innerRef = React.useRef<MentionsRef>(null);
   const mergedRef = composeRef(ref, innerRef);
 
+  // ===================== Size =====================
+  const mergedSize = useSize((ctx) => customSize ?? ctx);
+
   // =================== Warning =====================
   if (process.env.NODE_ENV !== 'production') {
     const warning = devUseWarning('Mentions');
-
     warning.deprecated(!children, 'Mentions.Option', 'options');
   }
 
   const {
     getPrefixCls,
-    renderEmpty,
     direction,
-    mentions: contextMentions,
-  } = React.useContext(ConfigContext);
+    allowClear: contextAllowClear,
+    className: contextClassName,
+    style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
+  } = useComponentConfig('mentions');
+  const { renderEmpty } = React.useContext(ConfigContext);
   const {
     status: contextStatus,
     hasFeedback,
     feedbackIcon,
   } = React.useContext(FormItemInputContext);
   const mergedStatus = getMergedStatus(contextStatus, customStatus);
+  // ===================== Disabled =====================
+  const contextDisabled = React.useContext(DisabledContext);
+  const mergedDisabled = customDisabled ?? contextDisabled;
+
+  const prefixCls = getPrefixCls('mentions', customizePrefixCls);
+
+  // =========== Merged Props for Semantic ===========
+  const mergedProps: MentionProps = {
+    ...props,
+    disabled: mergedDisabled,
+    status: mergedStatus,
+    variant: customVariant,
+  };
+
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const styleRoot = useSemanticRootStyle(style);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    MentionSemanticAllType['classNames'],
+    MentionSemanticAllType['styles'],
+    MentionProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, styleRoot], {
+    props: mergedProps,
+  });
 
   const onFocus: React.FocusEventHandler<HTMLTextAreaElement> = (...args) => {
     if (restProps.onFocus) {
@@ -153,54 +209,79 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
 
   const mentionsfilterOption = loading ? loadingFilterOption : filterOption;
 
-  const prefixCls = getPrefixCls('mentions', customizePrefixCls);
-
-  const mergedAllowClear = getAllowClear(allowClear);
+  const mergedAllowClear = useAllowClear({
+    allowClear,
+    contextAllowClear,
+    defaultAllowClear: false,
+    componentName: 'Mentions',
+  });
 
   // Style
   const rootCls = useCSSVarCls(prefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
+  const [hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
   const [variant, enableVariantCls] = useVariant('mentions', customVariant);
 
+  // ====================== zIndex =========================
+  const [zIndex] = useZIndex('SelectLike', mergedStyles.popup?.zIndex as number);
+
   const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
-  const mergedClassName = classNames(
-    contextMentions?.className,
+  const mergedClassName = clsx(
+    contextClassName,
     className,
     rootClassName,
     cssVarCls,
     rootCls,
+    mergedClassNames.root,
+    {
+      [`${prefixCls}-sm`]: mergedSize === 'small',
+      [`${prefixCls}-lg`]: mergedSize === 'large',
+    },
   );
 
-  const mentions = (
+  return (
     <RcMentions
       silent={loading}
       prefixCls={prefixCls}
       notFoundContent={notFoundContentEle}
       className={mergedClassName}
-      disabled={disabled}
+      disabled={mergedDisabled}
       allowClear={mergedAllowClear}
       direction={direction}
-      style={{ ...contextMentions?.style, ...style }}
+      style={mergedStyles.root}
       {...restProps}
       filterOption={mentionsfilterOption}
       onFocus={onFocus}
       onBlur={onBlur}
-      dropdownClassName={classNames(popupClassName, rootClassName, hashId, cssVarCls, rootCls)}
       ref={mergedRef}
       options={mergedOptions}
       suffix={suffixNode}
+      styles={{
+        textarea: mergedStyles.textarea,
+        popup: { ...mergedStyles.popup, zIndex },
+        suffix: mergedStyles.suffix,
+      }}
       classNames={{
-        mentions: classNames(
+        textarea: clsx(mergedClassNames.textarea),
+        popup: clsx(
+          mergedClassNames.popup,
+          popupClassName,
+          rootClassName,
+          hashId,
+          cssVarCls,
+          rootCls,
+        ),
+        suffix: mergedClassNames.suffix,
+        mentions: clsx(
           {
-            [`${prefixCls}-disabled`]: disabled,
+            [`${prefixCls}-disabled`]: mergedDisabled,
             [`${prefixCls}-focused`]: focused,
             [`${prefixCls}-rtl`]: direction === 'rtl',
           },
           hashId,
         ),
-        variant: classNames(
+        variant: clsx(
           {
             [`${prefixCls}-${variant}`]: enableVariantCls,
           },
@@ -212,8 +293,6 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
       {mentionOptions}
     </RcMentions>
   );
-
-  return wrapCSSVar(mentions);
 });
 
 type CompoundedComponent = typeof InternalMentions & {
@@ -239,29 +318,29 @@ Mentions.getMentions = (value = '', config: MentionsConfig = {}): MentionsEntity
   const { prefix = '@', split = ' ' } = config;
   const prefixList: string[] = toList(prefix);
 
-  return value
-    .split(split)
-    .map((str = ''): MentionsEntity | null => {
-      let hitPrefix: string | null = null;
+  return value.split(split).reduce<MentionsEntity[]>((list, str = '') => {
+    let hitPrefix: string | null = null;
 
-      prefixList.some((prefixStr) => {
-        const startStr = str.slice(0, prefixStr.length);
-        if (startStr === prefixStr) {
-          hitPrefix = prefixStr;
-          return true;
-        }
-        return false;
-      });
-
-      if (hitPrefix !== null) {
-        return {
-          prefix: hitPrefix,
-          value: str.slice((hitPrefix as string).length),
-        };
+    prefixList.some((prefixStr) => {
+      const startStr = str.slice(0, prefixStr.length);
+      if (startStr === prefixStr) {
+        hitPrefix = prefixStr;
+        return true;
       }
-      return null;
-    })
-    .filter((entity): entity is MentionsEntity => !!entity && !!entity.value);
+      return false;
+    });
+
+    if (hitPrefix !== null) {
+      const entity = {
+        prefix: hitPrefix,
+        value: str.slice((hitPrefix as string).length),
+      };
+      if (entity.value) {
+        list.push(entity);
+      }
+    }
+    return list;
+  }, []);
 };
 
 export default Mentions;

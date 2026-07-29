@@ -2,14 +2,14 @@
 
 exports[`renders components/time-picker/demo/12hours.tsx extend context correctly 1`] = `
 <div
-  class="ant-space ant-space-horizontal ant-space-align-center ant-space-gap-row-small ant-space-gap-col-small"
+  class="ant-space ant-space-horizontal ant-space-align-center ant-space-gap-row-small ant-space-gap-col-small css-var-test-id"
   style="flex-wrap: wrap;"
 >
   <div
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -25,6 +25,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -50,7 +51,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -1455,7 +1456,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -1475,7 +1476,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -1491,6 +1492,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -1516,7 +1518,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -2921,7 +2923,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -2941,7 +2943,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -2957,6 +2959,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -2982,7 +2985,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -3782,7 +3785,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -3806,7 +3809,7 @@ exports[`renders components/time-picker/demo/12hours.tsx extend context correctl
 exports[`renders components/time-picker/demo/addon.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -3822,6 +3825,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -3847,7 +3851,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -5334,7 +5338,7 @@ Array [
               class="ant-picker-footer-extra"
             >
               <button
-                class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                 type="button"
               >
                 <span>
@@ -5359,7 +5363,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   disabled=""
                   type="button"
                 >
@@ -5382,7 +5386,7 @@ exports[`renders components/time-picker/demo/addon.tsx extend context correctly 
 exports[`renders components/time-picker/demo/basic.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -5398,6 +5402,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -5423,7 +5428,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -6923,7 +6928,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   type="button"
                 >
                   <span>
@@ -6945,7 +6950,7 @@ exports[`renders components/time-picker/demo/basic.tsx extend context correctly 
 exports[`renders components/time-picker/demo/change-on-scroll.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -6961,6 +6966,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -6986,7 +6992,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -8496,7 +8502,7 @@ exports[`renders components/time-picker/demo/change-on-scroll.tsx extend context
 exports[`renders components/time-picker/demo/colored-popup.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -8512,6 +8518,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -8537,7 +8544,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up myCustomClassName ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var myCustomClassName ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -10037,7 +10044,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   type="button"
                 >
                   <span>
@@ -10059,7 +10066,7 @@ exports[`renders components/time-picker/demo/colored-popup.tsx extend context co
 exports[`renders components/time-picker/demo/disabled.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-disabled ant-picker-outlined"
+    class="ant-picker ant-picker-disabled ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -10076,6 +10083,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -10101,7 +10109,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -11601,7 +11609,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   type="button"
                 >
                   <span>
@@ -11623,7 +11631,7 @@ exports[`renders components/time-picker/demo/disabled.tsx extend context correct
 exports[`renders components/time-picker/demo/hide-column.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -11639,6 +11647,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -11661,9 +11670,10 @@ Array [
           </svg>
         </span>
       </span>
-      <span
+      <button
+        aria-label="Clear"
         class="ant-picker-clear"
-        role="button"
+        type="button"
       >
         <span
           aria-label="close-circle"
@@ -11685,11 +11695,11 @@ Array [
             />
           </svg>
         </span>
-      </span>
+      </button>
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -12584,7 +12594,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   type="button"
                 >
                   <span>
@@ -12606,7 +12616,7 @@ exports[`renders components/time-picker/demo/hide-column.tsx extend context corr
 exports[`renders components/time-picker/demo/interval-options.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -12622,6 +12632,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -12647,7 +12658,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -13047,7 +13058,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   disabled=""
                   type="button"
                 >
@@ -13070,7 +13081,7 @@ exports[`renders components/time-picker/demo/interval-options.tsx extend context
 exports[`renders components/time-picker/demo/need-confirm.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -13086,6 +13097,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -13111,7 +13123,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -14611,7 +14623,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   disabled=""
                   type="button"
                 >
@@ -14634,10 +14646,10 @@ exports[`renders components/time-picker/demo/need-confirm.tsx extend context cor
 exports[`renders components/time-picker/demo/range-picker.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-range ant-picker-outlined"
+    class="ant-picker ant-picker-range ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
-      class="ant-picker-input"
+      class="ant-picker-input ant-picker-input-start"
     >
       <input
         aria-invalid="false"
@@ -14677,7 +14689,7 @@ Array [
       </span>
     </div>
     <div
-      class="ant-picker-input"
+      class="ant-picker-input ant-picker-input-end"
     >
       <input
         aria-invalid="false"
@@ -14696,6 +14708,7 @@ Array [
       class="ant-picker-suffix"
     >
       <span
+        aria-hidden="true"
         aria-label="clock-circle"
         class="anticon anticon-clock-circle"
         role="img"
@@ -14718,9 +14731,10 @@ Array [
         </svg>
       </span>
     </span>
-    <span
+    <button
+      aria-label="Clear"
       class="ant-picker-clear"
-      role="button"
+      type="button"
     >
       <span
         aria-label="close-circle"
@@ -14742,10 +14756,10 @@ Array [
           />
         </svg>
       </span>
-    </span>
+    </button>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -16242,7 +16256,7 @@ Array [
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     type="button"
                   >
                     <span>
@@ -16267,7 +16281,7 @@ exports[`renders components/time-picker/demo/render-panel.tsx extend context cor
   style="padding-bottom: 0px; position: relative; min-width: 0;"
 >
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     style="margin: 0px;"
   >
     <div
@@ -16284,6 +16298,7 @@ exports[`renders components/time-picker/demo/render-panel.tsx extend context cor
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -16309,7 +16324,7 @@ exports[`renders components/time-picker/demo/render-panel.tsx extend context cor
     </div>
   </div>
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -17809,7 +17824,7 @@ exports[`renders components/time-picker/demo/render-panel.tsx extend context cor
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   disabled=""
                   type="button"
                 >
@@ -17831,14 +17846,14 @@ exports[`renders components/time-picker/demo/render-panel.tsx extend context cor
 
 exports[`renders components/time-picker/demo/size.tsx extend context correctly 1`] = `
 <div
-  class="ant-space ant-space-horizontal ant-space-align-center ant-space-gap-row-small ant-space-gap-col-small"
+  class="ant-space ant-space-horizontal ant-space-align-center ant-space-gap-row-small ant-space-gap-col-small css-var-test-id"
   style="flex-wrap: wrap;"
 >
   <div
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-large ant-picker-outlined"
+      class="ant-picker ant-picker-large ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -17854,6 +17869,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -17876,9 +17892,10 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
             </svg>
           </span>
         </span>
-        <span
+        <button
+          aria-label="Clear"
           class="ant-picker-clear"
-          role="button"
+          type="button"
         >
           <span
             aria-label="close-circle"
@@ -17900,11 +17917,11 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
               />
             </svg>
           </span>
-        </span>
+        </button>
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -19404,7 +19421,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     type="button"
                   >
                     <span>
@@ -19423,7 +19440,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -19439,6 +19456,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -19461,9 +19479,10 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
             </svg>
           </span>
         </span>
-        <span
+        <button
+          aria-label="Clear"
           class="ant-picker-clear"
-          role="button"
+          type="button"
         >
           <span
             aria-label="close-circle"
@@ -19485,11 +19504,11 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
               />
             </svg>
           </span>
-        </span>
+        </button>
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -20989,7 +21008,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     type="button"
                   >
                     <span>
@@ -21008,7 +21027,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-small ant-picker-outlined"
+      class="ant-picker ant-picker-small ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -21024,6 +21043,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -21046,9 +21066,10 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
             </svg>
           </span>
         </span>
-        <span
+        <button
+          aria-label="Clear"
           class="ant-picker-clear"
-          role="button"
+          type="button"
         >
           <span
             aria-label="close-circle"
@@ -21070,11 +21091,11 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
               />
             </svg>
           </span>
-        </span>
+        </button>
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -22574,7 +22595,7 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 1
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     type="button"
                   >
                     <span>
@@ -22596,13 +22617,13 @@ exports[`renders components/time-picker/demo/size.tsx extend context correctly 2
 
 exports[`renders components/time-picker/demo/status.tsx extend context correctly 1`] = `
 <div
-  class="ant-space ant-space-vertical ant-space-gap-row-small ant-space-gap-col-small"
+  class="ant-space ant-space-vertical ant-space-gap-row-small ant-space-gap-col-small css-var-test-id"
 >
   <div
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined ant-picker-status-error"
+      class="ant-picker ant-picker-outlined ant-picker-status-error css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -22618,6 +22639,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -22643,7 +22665,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -24143,7 +24165,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -24163,7 +24185,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined ant-picker-status-warning"
+      class="ant-picker ant-picker-outlined ant-picker-status-warning css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -24179,6 +24201,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -24204,7 +24227,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -25704,7 +25727,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -25724,10 +25747,10 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-range ant-picker-outlined ant-picker-status-error"
+      class="ant-picker ant-picker-range ant-picker-outlined ant-picker-status-error css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -25767,7 +25790,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -25786,6 +25809,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -25810,7 +25834,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -27307,7 +27331,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -27328,10 +27352,10 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-range ant-picker-outlined ant-picker-status-warning"
+      class="ant-picker ant-picker-range ant-picker-outlined ant-picker-status-warning css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -27371,7 +27395,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -27390,6 +27414,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -27414,7 +27439,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -28911,7 +28936,7 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -28933,16 +28958,3144 @@ exports[`renders components/time-picker/demo/status.tsx extend context correctly
 
 exports[`renders components/time-picker/demo/status.tsx extend context correctly 2`] = `[]`;
 
+exports[`renders components/time-picker/demo/style-class.tsx extend context correctly 1`] = `
+<div
+  class="ant-flex css-var-test-id ant-flex-align-stretch ant-flex-gap-medium ant-flex-vertical"
+>
+  <div
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var acss-syjkhv"
+    style="border-color: rgb(217, 217, 217);"
+  >
+    <div
+      class="ant-picker-input"
+    >
+      <input
+        aria-invalid="false"
+        autocomplete="off"
+        placeholder="Object"
+        size="10"
+        value=""
+      />
+      <span
+        class="ant-picker-suffix"
+      >
+        <span
+          aria-hidden="true"
+          aria-label="clock-circle"
+          class="anticon anticon-clock-circle"
+          role="img"
+        >
+          <svg
+            aria-hidden="true"
+            data-icon="clock-circle"
+            fill="currentColor"
+            focusable="false"
+            height="1em"
+            viewBox="64 64 896 896"
+            width="1em"
+          >
+            <path
+              d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
+            />
+            <path
+              d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"
+            />
+          </svg>
+        </span>
+      </span>
+    </div>
+  </div>
+  <div
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
+    style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
+  >
+    <div
+      class="ant-picker-panel-container ant-picker-time-panel-container"
+      style="margin-left: 0px; margin-right: auto;"
+      tabindex="-1"
+    >
+      <div
+        class="ant-picker-panel-layout"
+      >
+        <div>
+          <div
+            class="ant-picker-panel"
+            tabindex="0"
+          >
+            <div
+              class="ant-picker-time-panel"
+            >
+              <div
+                class="ant-picker-content"
+              >
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="hour"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                </ul>
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="minute"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="24"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      24
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="25"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      25
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="26"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      26
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="27"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      27
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="28"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      28
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="29"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      29
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="30"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      30
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="31"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      31
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="32"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      32
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="33"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      33
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="34"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      34
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="35"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      35
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="36"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      36
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="37"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      37
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="38"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      38
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="39"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      39
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="40"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      40
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="41"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      41
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="42"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      42
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="43"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      43
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="44"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      44
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="45"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      45
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="46"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      46
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="47"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      47
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="48"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      48
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="49"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      49
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="50"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      50
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="51"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      51
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="52"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      52
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="53"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      53
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="54"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      54
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="55"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      55
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="56"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      56
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="57"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      57
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="58"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      58
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="59"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      59
+                    </div>
+                  </li>
+                </ul>
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="second"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="24"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      24
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="25"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      25
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="26"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      26
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="27"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      27
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="28"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      28
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="29"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      29
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="30"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      30
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="31"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      31
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="32"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      32
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="33"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      33
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="34"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      34
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="35"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      35
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="36"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      36
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="37"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      37
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="38"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      38
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="39"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      39
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="40"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      40
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="41"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      41
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="42"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      42
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="43"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      43
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="44"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      44
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="45"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      45
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="46"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      46
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="47"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      47
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="48"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      48
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="49"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      49
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="50"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      50
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="51"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      51
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="52"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      52
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="53"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      53
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="54"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      54
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="55"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      55
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="56"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      56
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="57"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      57
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="58"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      58
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="59"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      59
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-picker-footer"
+          >
+            <ul
+              class="ant-picker-ranges"
+            >
+              <li
+                class="ant-picker-now"
+              >
+                <a
+                  aria-disabled="false"
+                  class="ant-picker-now-btn"
+                >
+                  Now
+                </a>
+              </li>
+              <li
+                class="ant-picker-ok"
+              >
+                <button
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  disabled=""
+                  type="button"
+                >
+                  <span>
+                    OK
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="ant-picker ant-picker-large ant-picker-outlined css-var-test-id ant-picker-css-var acss-syjkhv"
+    style="border-color: rgb(114, 46, 209);"
+  >
+    <div
+      class="ant-picker-input"
+    >
+      <input
+        aria-invalid="false"
+        autocomplete="off"
+        placeholder="Function"
+        size="10"
+        value=""
+      />
+      <span
+        class="ant-picker-suffix"
+        style="color: rgb(114, 46, 209);"
+      >
+        <span
+          aria-hidden="true"
+          aria-label="clock-circle"
+          class="anticon anticon-clock-circle"
+          role="img"
+        >
+          <svg
+            aria-hidden="true"
+            data-icon="clock-circle"
+            fill="currentColor"
+            focusable="false"
+            height="1em"
+            viewBox="64 64 896 896"
+            width="1em"
+          >
+            <path
+              d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
+            />
+            <path
+              d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"
+            />
+          </svg>
+        </span>
+      </span>
+    </div>
+  </div>
+  <div
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
+    style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
+  >
+    <div
+      class="ant-picker-panel-container ant-picker-time-panel-container"
+      style="margin-left: 0px; margin-right: auto; border: 1px solid rgb(114, 46, 209); border-radius: 8px;"
+      tabindex="-1"
+    >
+      <div
+        class="ant-picker-panel-layout"
+      >
+        <div>
+          <div
+            class="ant-picker-panel"
+            tabindex="0"
+          >
+            <div
+              class="ant-picker-time-panel"
+            >
+              <div
+                class="ant-picker-content"
+              >
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="hour"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                </ul>
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="minute"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="24"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      24
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="25"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      25
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="26"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      26
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="27"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      27
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="28"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      28
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="29"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      29
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="30"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      30
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="31"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      31
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="32"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      32
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="33"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      33
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="34"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      34
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="35"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      35
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="36"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      36
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="37"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      37
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="38"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      38
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="39"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      39
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="40"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      40
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="41"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      41
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="42"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      42
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="43"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      43
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="44"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      44
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="45"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      45
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="46"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      46
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="47"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      47
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="48"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      48
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="49"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      49
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="50"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      50
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="51"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      51
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="52"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      52
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="53"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      53
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="54"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      54
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="55"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      55
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="56"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      56
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="57"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      57
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="58"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      58
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="59"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      59
+                    </div>
+                  </li>
+                </ul>
+                <ul
+                  class="ant-picker-time-panel-column"
+                  data-type="second"
+                >
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="0"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      00
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="1"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      01
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="2"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      02
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="3"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      03
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="4"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      04
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="5"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      05
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="6"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      06
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="7"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      07
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="8"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      08
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="9"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      09
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="10"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      10
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="11"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      11
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="12"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      12
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="13"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      13
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="14"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      14
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="15"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      15
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="16"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      16
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="17"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      17
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="18"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      18
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="19"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      19
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="20"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      20
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="21"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      21
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="22"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      22
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="23"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      23
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="24"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      24
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="25"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      25
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="26"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      26
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="27"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      27
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="28"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      28
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="29"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      29
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="30"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      30
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="31"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      31
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="32"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      32
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="33"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      33
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="34"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      34
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="35"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      35
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="36"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      36
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="37"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      37
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="38"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      38
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="39"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      39
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="40"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      40
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="41"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      41
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="42"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      42
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="43"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      43
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="44"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      44
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="45"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      45
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="46"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      46
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="47"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      47
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="48"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      48
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="49"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      49
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="50"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      50
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="51"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      51
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="52"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      52
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="53"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      53
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="54"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      54
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="55"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      55
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="56"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      56
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="57"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      57
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="58"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      58
+                    </div>
+                  </li>
+                  <li
+                    class="ant-picker-time-panel-cell"
+                    data-value="59"
+                  >
+                    <div
+                      class="ant-picker-time-panel-cell-inner"
+                    >
+                      59
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div
+            class="ant-picker-footer"
+          >
+            <ul
+              class="ant-picker-ranges"
+            >
+              <li
+                class="ant-picker-now"
+              >
+                <a
+                  aria-disabled="false"
+                  class="ant-picker-now-btn"
+                >
+                  Now
+                </a>
+              </li>
+              <li
+                class="ant-picker-ok"
+              >
+                <button
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  disabled=""
+                  type="button"
+                >
+                  <span>
+                    OK
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`renders components/time-picker/demo/style-class.tsx extend context correctly 2`] = `[]`;
+
 exports[`renders components/time-picker/demo/suffix.tsx extend context correctly 1`] = `
 <div
-  class="ant-space ant-space-vertical"
+  class="ant-space ant-space-vertical css-var-test-id"
   style="column-gap: 12px; row-gap: 12px;"
 >
   <div
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -28980,7 +32133,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -30480,7 +33633,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     type="button"
                   >
                     <span>
@@ -30499,7 +33652,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-prefix"
@@ -30538,6 +33691,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -30563,7 +33717,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -32063,7 +35217,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -32083,7 +35237,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
     class="ant-space-item"
   >
     <div
-      class="ant-picker ant-picker-range ant-picker-outlined"
+      class="ant-picker ant-picker-range ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-prefix"
@@ -32109,7 +35263,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -32149,7 +35303,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -32168,6 +35322,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -32192,7 +35347,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -33689,7 +36844,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -33714,7 +36869,7 @@ exports[`renders components/time-picker/demo/suffix.tsx extend context correctly
 exports[`renders components/time-picker/demo/value.tsx extend context correctly 1`] = `
 Array [
   <div
-    class="ant-picker ant-picker-outlined"
+    class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
   >
     <div
       class="ant-picker-input"
@@ -33730,6 +36885,7 @@ Array [
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -33755,7 +36911,7 @@ Array [
     </div>
   </div>,
   <div
-    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+    class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
     style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
   >
     <div
@@ -35255,7 +38411,7 @@ Array [
                 class="ant-picker-ok"
               >
                 <button
-                  class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                  class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                   disabled=""
                   type="button"
                 >
@@ -35277,15 +38433,15 @@ exports[`renders components/time-picker/demo/value.tsx extend context correctly 
 
 exports[`renders components/time-picker/demo/variant.tsx extend context correctly 1`] = `
 <div
-  class="ant-flex ant-flex-align-stretch ant-flex-vertical"
+  class="ant-flex css-var-test-id ant-flex-align-stretch ant-flex-vertical"
   style="gap: 12px;"
 >
   <div
-    class="ant-flex"
+    class="ant-flex css-var-test-id"
     style="gap: 8px;"
   >
     <div
-      class="ant-picker ant-picker-outlined"
+      class="ant-picker ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -35301,6 +38457,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -35326,7 +38483,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -36826,7 +39983,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -36842,10 +39999,10 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker ant-picker-range ant-picker-outlined"
+      class="ant-picker ant-picker-range ant-picker-outlined css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -36885,7 +40042,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -36904,6 +40061,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -36928,7 +40086,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -38425,7 +41583,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -38443,11 +41601,11 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
     </div>
   </div>
   <div
-    class="ant-flex"
+    class="ant-flex css-var-test-id"
     style="gap: 8px;"
   >
     <div
-      class="ant-picker ant-picker-filled"
+      class="ant-picker ant-picker-filled css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -38463,6 +41621,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -38488,7 +41647,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -39988,7 +43147,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -40004,10 +43163,10 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker ant-picker-range ant-picker-filled"
+      class="ant-picker ant-picker-range ant-picker-filled css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -40047,7 +43206,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -40066,6 +43225,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -40090,7 +43250,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -41587,7 +44747,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -41605,11 +44765,11 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
     </div>
   </div>
   <div
-    class="ant-flex"
+    class="ant-flex css-var-test-id"
     style="gap: 8px;"
   >
     <div
-      class="ant-picker ant-picker-borderless"
+      class="ant-picker ant-picker-borderless css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -41625,6 +44785,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -41650,7 +44811,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -43150,7 +46311,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -43166,10 +46327,10 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker ant-picker-range ant-picker-borderless"
+      class="ant-picker ant-picker-range ant-picker-borderless css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -43209,7 +46370,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -43228,6 +46389,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -43252,7 +46414,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -44749,7 +47911,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >
@@ -44767,11 +47929,11 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
     </div>
   </div>
   <div
-    class="ant-flex"
+    class="ant-flex css-var-test-id"
     style="gap: 8px;"
   >
     <div
-      class="ant-picker ant-picker-underlined"
+      class="ant-picker ant-picker-underlined css-var-test-id ant-picker-css-var"
     >
       <div
         class="ant-picker-input"
@@ -44787,6 +47949,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
           class="ant-picker-suffix"
         >
           <span
+            aria-hidden="true"
             aria-label="clock-circle"
             class="anticon anticon-clock-circle"
             role="img"
@@ -44812,7 +47975,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -46312,7 +49475,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                   class="ant-picker-ok"
                 >
                   <button
-                    class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                    class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                     disabled=""
                     type="button"
                   >
@@ -46328,10 +49491,10 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </div>
     </div>
     <div
-      class="ant-picker ant-picker-range ant-picker-underlined"
+      class="ant-picker ant-picker-range ant-picker-underlined css-var-test-id ant-picker-css-var"
     >
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-start"
       >
         <input
           aria-invalid="false"
@@ -46371,7 +49534,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         </span>
       </div>
       <div
-        class="ant-picker-input"
+        class="ant-picker-input ant-picker-input-end"
       >
         <input
           aria-invalid="false"
@@ -46390,6 +49553,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
         class="ant-picker-suffix"
       >
         <span
+          aria-hidden="true"
           aria-label="clock-circle"
           class="anticon anticon-clock-circle"
           role="img"
@@ -46414,7 +49578,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
       </span>
     </div>
     <div
-      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
+      class="ant-picker-dropdown ant-slide-up-appear ant-slide-up-appear-prepare ant-slide-up css-var-test-id ant-picker-css-var ant-picker-dropdown-range ant-picker-dropdown-placement-bottomLeft"
       style="--arrow-x: 0px; --arrow-y: 0px; left: -1000vw; top: -1000vh; right: auto; bottom: auto; box-sizing: border-box;"
     >
       <div
@@ -47911,7 +51075,7 @@ exports[`renders components/time-picker/demo/variant.tsx extend context correctl
                     class="ant-picker-ok"
                   >
                     <button
-                      class="ant-btn ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
+                      class="ant-btn css-var-test-id ant-btn-primary ant-btn-color-primary ant-btn-variant-solid ant-btn-sm"
                       disabled=""
                       type="button"
                     >

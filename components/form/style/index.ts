@@ -12,6 +12,7 @@ import type {
   GetDefaultToken,
 } from '../../theme/internal';
 import { genStyleHooks, mergeToken } from '../../theme/internal';
+import { genCssVar } from '../../theme/util/genStyleUtils';
 import genFormValidateMotionStyle from './explain';
 
 export interface ComponentToken {
@@ -35,6 +36,8 @@ export interface ComponentToken {
    * @descEN Label height
    */
   labelHeight: number | string;
+  /** @internal */
+  verticalLabelHeight: number | string;
   /**
    * @desc 标签冒号前间距
    * @descEN Label colon margin-inline-start
@@ -84,7 +87,7 @@ export interface FormToken extends FullToken<'Form'> {
   rootPrefixCls: string;
 }
 
-const resetForm = (token: AliasToken): CSSObject => ({
+const resetForm: GenerateStyle<AliasToken, CSSObject> = (token) => ({
   legend: {
     display: 'block',
     width: '100%',
@@ -122,9 +125,7 @@ const resetForm = (token: AliasToken): CSSObject => ({
   },
 
   // Focus for file, radio, and checkbox
-  [`input[type='file']:focus,
-  input[type='radio']:focus,
-  input[type='checkbox']:focus`]: {
+  "input[type='file']:focus, input[type='radio']:focus, input[type='checkbox']:focus": {
     outline: 0,
     boxShadow: `0 0 0 ${unit(token.controlOutlineWidth)} ${token.controlOutline}`,
   },
@@ -155,11 +156,10 @@ const genFormSize = (token: FormToken, height: number): CSSObject => {
   };
 };
 
-const genFormStyle: GenerateStyle<FormToken> = (token) => {
+const genFormStyle: GenerateStyle<FormToken, CSSObject> = (token) => {
   const { componentCls } = token;
-
   return {
-    [token.componentCls]: {
+    [componentCls]: {
       ...resetComponent(token),
       ...resetForm(token),
 
@@ -182,7 +182,7 @@ const genFormStyle: GenerateStyle<FormToken> = (token) => {
   };
 };
 
-const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
+const genFormItemStyle: GenerateStyle<FormToken, CSSObject> = (token) => {
   const {
     formItemCls,
     iconCls,
@@ -196,6 +196,8 @@ const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
     labelColonMarginInlineEnd,
     itemMarginBottom,
   } = token;
+
+  const [varName] = genCssVar(antCls, 'grid');
 
   return {
     [formItemCls]: {
@@ -212,18 +214,6 @@ const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
         &-hidden${antCls}-row`]: {
         // https://github.com/ant-design/ant-design/issues/26141
         display: 'none',
-      },
-
-      '&-has-warning': {
-        [`${formItemCls}-split`]: {
-          color: token.colorError,
-        },
-      },
-
-      '&-has-error': {
-        [`${formItemCls}-split`]: {
-          color: token.colorWarning,
-        },
       },
 
       // ==============================================================
@@ -271,7 +261,7 @@ const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
               marginInlineEnd: token.marginXXS,
               color: labelRequiredMarkColor,
               fontSize: token.fontSize,
-              fontFamily: 'SimSun, sans-serif',
+              fontFamily: 'sans-serif',
               lineHeight: 1,
               content: '"*"',
             },
@@ -319,7 +309,7 @@ const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
       // =                            Input                           =
       // ==============================================================
       [`${formItemCls}-control`]: {
-        ['--ant-display' as any]: 'flex',
+        [varName('display')]: 'flex',
         flexDirection: 'column',
         flexGrow: 1,
 
@@ -421,7 +411,7 @@ const genFormItemStyle: GenerateStyle<FormToken> = (token) => {
   };
 };
 
-const makeVerticalLayoutLabel = (token: FormToken): CSSObject => ({
+const makeVerticalLayoutLabel: GenerateStyle<FormToken, CSSObject> = (token) => ({
   padding: token.verticalLabelPadding,
   margin: token.verticalLabelMargin,
   whiteSpace: 'initial',
@@ -437,7 +427,7 @@ const makeVerticalLayoutLabel = (token: FormToken): CSSObject => ({
   },
 });
 
-const genHorizontalStyle = (token: FormToken): CSSObject => {
+const genHorizontalStyle: GenerateStyle<FormToken, CSSObject> = (token) => {
   const { antCls, formItemCls } = token;
 
   return {
@@ -468,7 +458,7 @@ const genHorizontalStyle = (token: FormToken): CSSObject => {
   };
 };
 
-const genInlineStyle: GenerateStyle<FormToken> = (token) => {
+const genInlineStyle: GenerateStyle<FormToken, CSSObject> = (token) => {
   const { componentCls, formItemCls, inlineItemMarginBottom } = token;
 
   return {
@@ -507,7 +497,7 @@ const genInlineStyle: GenerateStyle<FormToken> = (token) => {
   };
 };
 
-const makeVerticalLayout = (token: FormToken): CSSObject => {
+const makeVerticalLayout: GenerateStyle<FormToken, CSSObject> = (token) => {
   const { componentCls, formItemCls, rootPrefixCls } = token;
 
   return {
@@ -531,8 +521,8 @@ const makeVerticalLayout = (token: FormToken): CSSObject => {
   };
 };
 
-const genVerticalStyle: GenerateStyle<FormToken> = (token) => {
-  const { componentCls, formItemCls, antCls } = token;
+const genVerticalStyle: GenerateStyle<FormToken, CSSObject> = (token) => {
+  const { componentCls, formItemCls, antCls, verticalLabelHeight } = token;
 
   return {
     [`${formItemCls}-vertical`]: {
@@ -541,7 +531,7 @@ const genVerticalStyle: GenerateStyle<FormToken> = (token) => {
       },
 
       [`${formItemCls}-label > label`]: {
-        height: 'auto',
+        height: verticalLabelHeight,
       },
 
       [`${formItemCls}-control`]: {
@@ -595,6 +585,7 @@ export const prepareComponentToken: GetDefaultToken<'Form'> = (token) => ({
   labelColor: token.colorTextHeading,
   labelFontSize: token.fontSize,
   labelHeight: token.controlHeight,
+  verticalLabelHeight: token.labelHeight ?? 'auto',
   labelColonMarginInlineStart: token.marginXXS / 2,
   labelColonMarginInlineEnd: token.marginXS,
   itemMarginBottom: token.marginLG,
@@ -603,10 +594,7 @@ export const prepareComponentToken: GetDefaultToken<'Form'> = (token) => ({
   inlineItemMarginBottom: 0,
 });
 
-export const prepareToken: (
-  token: Parameters<GenStyleFn<'Form'>>[0],
-  rootPrefixCls: string,
-) => FormToken = (token, rootPrefixCls) => {
+export const prepareToken = (token: Parameters<GenStyleFn<'Form'>>[0], rootPrefixCls: string) => {
   const formToken = mergeToken<FormToken>(token, {
     formItemCls: `${token.componentCls}-item`,
     rootPrefixCls,

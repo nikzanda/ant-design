@@ -1,7 +1,9 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import omit from 'rc-util/lib/omit';
+import { omit } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import type { HTMLAriaDataAttributes } from '../_util/aria-data-attrs';
+import { isNumber } from '../_util/is';
 import { ConfigContext } from '../config-provider';
 import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import type { CheckboxChangeEvent } from './Checkbox';
@@ -22,7 +24,7 @@ export interface CheckboxOptionType<T = any> {
   required?: boolean;
 }
 
-export interface AbstractCheckboxGroupProps<T = any> {
+export interface AbstractCheckboxGroupProps<T = any> extends HTMLAriaDataAttributes {
   prefixCls?: string;
   className?: string;
   rootClassName?: string;
@@ -55,6 +57,7 @@ const CheckboxGroup = React.forwardRef(
       rootClassName,
       style,
       onChange,
+      role = 'group',
       ...restProps
     } = props;
     const { getPrefixCls, direction } = React.useContext(ConfigContext);
@@ -71,7 +74,7 @@ const CheckboxGroup = React.forwardRef(
     const memoizedOptions = React.useMemo<CheckboxOptionType<T>[]>(
       () =>
         options.map<CheckboxOptionType<T>>((option: any) => {
-          if (typeof option === 'string' || typeof option === 'number') {
+          if (typeof option === 'string' || isNumber(option)) {
             return { label: option, value: option };
           }
           return option;
@@ -113,7 +116,7 @@ const CheckboxGroup = React.forwardRef(
     const groupPrefixCls = `${prefixCls}-group`;
 
     const rootCls = useCSSVarCls(prefixCls);
-    const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls, rootCls);
+    const [hashId, cssVarCls] = useStyle(prefixCls, rootCls);
 
     const domProps = omit(restProps, ['value', 'disabled']);
 
@@ -126,7 +129,7 @@ const CheckboxGroup = React.forwardRef(
             value={option.value}
             checked={value.includes(option.value)}
             onChange={option.onChange}
-            className={classNames(`${groupPrefixCls}-item`, option.className)}
+            className={clsx(`${groupPrefixCls}-item`, option.className)}
             style={option.style}
             title={option.title}
             id={option.id}
@@ -150,7 +153,7 @@ const CheckboxGroup = React.forwardRef(
       [toggleOption, value, restProps.disabled, restProps.name, registerValue, cancelValue],
     );
 
-    const classString = classNames(
+    const classString = clsx(
       groupPrefixCls,
       {
         [`${groupPrefixCls}-rtl`]: direction === 'rtl',
@@ -162,10 +165,10 @@ const CheckboxGroup = React.forwardRef(
       hashId,
     );
 
-    return wrapCSSVar(
-      <div className={classString} style={style} {...domProps} ref={ref}>
+    return (
+      <div className={classString} style={style} role={role} {...domProps} ref={ref}>
         <GroupContext.Provider value={memoizedContext}>{childrenNode}</GroupContext.Provider>
-      </div>,
+      </div>
     );
   },
 );

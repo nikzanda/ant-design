@@ -1,14 +1,18 @@
 import type { Component } from 'react';
 import React from 'react';
 import HolderOutlined from '@ant-design/icons/HolderOutlined';
-import classNames from 'classnames';
-import type { CSSMotionProps } from 'rc-motion';
-import type { BasicDataNode, TreeProps as RcTreeProps } from 'rc-tree';
-import RcTree from 'rc-tree';
-import type { DataNode, Key } from 'rc-tree/lib/interface';
+import type { CSSMotionProps } from '@rc-component/motion';
+import type { BasicDataNode, DataNode, TreeProps as RcTreeProps } from '@rc-component/tree';
+import RcTree from '@rc-component/tree';
+import { clsx } from 'clsx';
 
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
 import initCollapseMotion from '../_util/motion';
+import { devUseWarning } from '../_util/warning';
 import { ConfigContext } from '../config-provider';
+import { useComponentConfig } from '../config-provider/context';
+import DisabledContext from '../config-provider/DisabledContext';
 import { useToken } from '../theme/internal';
 import useStyle from './style';
 import dropIndicatorRender from './utils/dropIndicator';
@@ -44,8 +48,8 @@ export interface AntTreeNodeProps {
   disabled?: boolean;
   disableCheckbox?: boolean;
   title?: React.ReactNode | ((data: DataNode) => React.ReactNode);
-  key?: Key;
-  eventKey?: Key;
+  key?: React.Key;
+  eventKey?: React.Key;
   isLeaf?: boolean;
   checked?: boolean;
   expanded?: boolean;
@@ -86,13 +90,13 @@ export interface AntTreeNodeMouseEvent {
 }
 
 export interface AntTreeNodeDragEnterEvent extends AntTreeNodeMouseEvent {
-  expandedKeys: Key[];
+  expandedKeys: React.Key[];
 }
 
 export interface AntTreeNodeDropEvent {
   node: AntTreeNode;
   dragNode: AntTreeNode;
-  dragNodesKeys: Key[];
+  dragNodesKeys: React.Key[];
   dropPosition: number;
   dropToGap?: boolean;
   event: React.MouseEvent<HTMLElement>;
@@ -108,13 +112,44 @@ interface DraggableConfig {
   nodeDraggable?: DraggableFn;
 }
 
+export type TreeSemanticType = {
+  classNames?: {
+    root?: string;
+    item?: string;
+    itemIcon?: string;
+    itemTitle?: string;
+    itemSwitcher?: string;
+  };
+  styles?: {
+    root?: React.CSSProperties;
+    item?: React.CSSProperties;
+    itemIcon?: React.CSSProperties;
+    itemTitle?: React.CSSProperties;
+    itemSwitcher?: React.CSSProperties;
+  };
+};
+
+export type TreeSemanticAllType = GenerateSemantic<TreeSemanticType, TreeProps>;
+
 export interface TreeProps<T extends BasicDataNode = DataNode>
   extends Omit<
     RcTreeProps<T>,
-    'prefixCls' | 'showLine' | 'direction' | 'draggable' | 'icon' | 'switcherIcon'
+    | 'prefixCls'
+    | 'showLine'
+    | 'direction'
+    | 'draggable'
+    | 'icon'
+    | 'switcherIcon'
+    | 'classNames'
+    | 'styles'
+    | 'rootStyle'
   > {
   showLine?: boolean | { showLeafIcon: boolean | TreeLeafIcon };
   className?: string;
+  classNames?: TreeSemanticAllType['classNamesAndFn'];
+  styles?: TreeSemanticAllType['stylesAndFn'];
+  /** @deprecated Please use `styles.root` instead */
+  rootStyle?: React.CSSProperties;
   /** Whether to support multiple selection */
   multiple?: boolean;
   /** Whether to automatically expand the parent node */
@@ -130,21 +165,21 @@ export interface TreeProps<T extends BasicDataNode = DataNode>
   /** Expand the corresponding tree node by default */
   defaultExpandParent?: boolean;
   /** Expand the specified tree node by default */
-  defaultExpandedKeys?: Key[];
+  defaultExpandedKeys?: React.Key[];
   /** (Controlled) Expand the specified tree node */
-  expandedKeys?: Key[];
+  expandedKeys?: React.Key[];
   /** (Controlled) Tree node with checked checkbox */
-  checkedKeys?: Key[] | { checked: Key[]; halfChecked: Key[] };
+  checkedKeys?: React.Key[] | { checked: React.Key[]; halfChecked: React.Key[] };
   /** Tree node with checkbox checked by default */
-  defaultCheckedKeys?: Key[];
+  defaultCheckedKeys?: React.Key[];
   /** (Controlled) Set the selected tree node */
-  selectedKeys?: Key[];
+  selectedKeys?: React.Key[];
   /** Tree node selected by default */
-  defaultSelectedKeys?: Key[];
+  defaultSelectedKeys?: React.Key[];
   selectable?: boolean;
   /** Click on the tree node to trigger */
   filterAntTreeNode?: (node: AntTreeNode) => boolean;
-  loadedKeys?: Key[];
+  loadedKeys?: React.Key[];
   /** Set the node to be draggable (IE>8) */
   draggable?: DraggableFn | boolean | DraggableConfig;
   style?: React.CSSProperties;
@@ -158,7 +193,15 @@ export interface TreeProps<T extends BasicDataNode = DataNode>
 }
 
 const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
-  const { getPrefixCls, direction, virtual, tree } = React.useContext(ConfigContext);
+  const {
+    getPrefixCls,
+    direction,
+    className: contextClassName,
+    style: contextStyle,
+    classNames: contextClassNames,
+    styles: contextStyles,
+  } = useComponentConfig('tree');
+  const { virtual } = React.useContext(ConfigContext);
   const {
     prefixCls: customizePrefixCls,
     className,
@@ -171,9 +214,23 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
     checkable = false,
     selectable = true,
     draggable,
+    disabled,
     motion: customMotion,
     style,
+    rootClassName,
+    rootStyle,
+    classNames,
+    styles,
+    icon,
   } = props;
+
+  if (process.env.NODE_ENV !== 'production') {
+    const warning = devUseWarning('Tree');
+    warning.deprecated(!rootStyle, 'rootStyle', 'styles.root');
+  }
+
+  const contextDisabled = React.useContext(DisabledContext);
+  const mergedDisabled = disabled ?? contextDisabled;
 
   const prefixCls = getPrefixCls('tree', customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
@@ -183,18 +240,35 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
     motionAppear: false,
   };
 
-  const newProps = {
+  // =========== Merged Props for Semantic ==========
+  const mergedProps: TreeProps = {
     ...props,
+    showIcon,
+    blockNode,
     checkable,
     selectable,
-    showIcon,
+    disabled: mergedDisabled,
     motion,
-    blockNode,
-    showLine: Boolean(showLine),
-    dropIndicatorRender,
   };
 
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(prefixCls);
+  const rootStyleRoot = useSemanticRootStyle(rootStyle);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    TreeSemanticAllType['classNames'],
+    TreeSemanticAllType['styles'],
+    TreeProps
+  >([contextClassNames, classNames], [contextStyles, rootStyleRoot, styles], {
+    props: mergedProps,
+  });
+
+  const newProps = {
+    ...mergedProps,
+    showLine: Boolean(showLine),
+    icon: icon as RcTreeProps<DataNode>['icon'],
+    dropIndicatorRender: dropIndicatorRender as RcTreeProps<DataNode>['dropIndicatorRender'],
+  };
+
+  const [hashId, cssVarCls] = useStyle(prefixCls);
   const [, token] = useToken();
 
   const itemHeight = token.paddingXS / 2 + (token.Tree?.titleHeight || token.controlHeightSM);
@@ -233,29 +307,32 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
       showLine={showLine}
     />
   );
-
-  return wrapCSSVar(
-    // @ts-ignore
+  return (
     <RcTree
       itemHeight={itemHeight}
       ref={ref}
       virtual={virtual}
       {...newProps}
       // newProps may contain style so declare style below it
-      style={{ ...tree?.style, ...style }}
       prefixCls={prefixCls}
-      className={classNames(
+      className={clsx(
         {
           [`${prefixCls}-icon-hide`]: !showIcon,
           [`${prefixCls}-block-node`]: blockNode,
           [`${prefixCls}-unselectable`]: !selectable,
           [`${prefixCls}-rtl`]: direction === 'rtl',
+          [`${prefixCls}-disabled`]: mergedDisabled,
         },
-        tree?.className,
+        contextClassName,
         className,
         hashId,
         cssVarCls,
       )}
+      style={{ ...contextStyle, ...style }}
+      rootClassName={clsx(mergedClassNames.root, rootClassName)}
+      rootStyle={mergedStyles.root}
+      classNames={mergedClassNames}
+      styles={mergedStyles}
       direction={direction}
       checkable={checkable ? <span className={`${prefixCls}-checkbox-inner`} /> : checkable}
       selectable={selectable}
@@ -263,7 +340,7 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
       draggable={draggableConfig}
     >
       {children}
-    </RcTree>,
+    </RcTree>
   );
 });
 

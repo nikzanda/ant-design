@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useMutateObserver } from '@rc-component/mutate-observer';
-import classNames from 'classnames';
-import useEvent from 'rc-util/lib/hooks/useEvent';
+import { useEvent } from '@rc-component/util';
+import { clsx } from 'clsx';
 
-import toList from '../_util/toList';
+import { useComponentConfig } from '../config-provider/context';
 import { useToken } from '../theme/internal';
 import WatermarkContext from './context';
 import type { WatermarkContextProps } from './context';
@@ -11,7 +11,23 @@ import useClips, { FontGap } from './useClips';
 import useRafDebounce from './useRafDebounce';
 import useSingletonCache from './useSingletonCache';
 import useWatermark from './useWatermark';
-import { getPixelRatio, reRendering } from './utils';
+import { getCanvasFont, getContentLines, getPixelRatio, reRendering } from './utils';
+
+export interface WatermarkFont {
+  color?: CanvasFillStrokeStyles['fillStyle'];
+  fontSize?: number | string;
+  fontWeight?: 'normal' | 'lighter' | 'bold' | 'bolder' | number;
+  fontStyle?: 'none' | 'normal' | 'italic' | 'oblique';
+  fontFamily?: string;
+  textAlign?: CanvasTextAlign;
+}
+
+export interface WatermarkText {
+  text: string;
+  font?: WatermarkFont;
+}
+
+export type WatermarkContent = string | WatermarkText;
 
 export interface WatermarkProps {
   zIndex?: number;
@@ -19,15 +35,8 @@ export interface WatermarkProps {
   width?: number;
   height?: number;
   image?: string;
-  content?: string | string[];
-  font?: {
-    color?: CanvasFillStrokeStyles['fillStyle'];
-    fontSize?: number | string;
-    fontWeight?: 'normal' | 'light' | 'weight' | number;
-    fontStyle?: 'none' | 'normal' | 'italic' | 'oblique';
-    fontFamily?: string;
-    textAlign?: CanvasTextAlign;
-  };
+  content?: WatermarkContent | WatermarkContent[];
+  font?: WatermarkFont;
   style?: React.CSSProperties;
   className?: string;
   rootClassName?: string;
@@ -35,6 +44,10 @@ export interface WatermarkProps {
   offset?: [number, number];
   children?: React.ReactNode;
   inherit?: boolean;
+  /**
+   * @since 6.0.0
+   */
+  onRemove?: () => void;
 }
 
 /**
@@ -47,6 +60,7 @@ function getSizeDiff<T>(prev: Set<T>, next: Set<T>) {
 
 const DEFAULT_GAP_X = 100;
 const DEFAULT_GAP_Y = 100;
+const WATERMARK_Z_INDEX_OFFSET = 1;
 
 const fixedStyle: React.CSSProperties = {
   position: 'relative',
@@ -55,11 +69,7 @@ const fixedStyle: React.CSSProperties = {
 
 const Watermark: React.FC<WatermarkProps> = (props) => {
   const {
-    /**
-     * The antd content layer zIndex is basically below 10
-     * https://github.com/ant-design/ant-design/blob/6192403b2ce517c017f9e58a32d58774921c10cd/components/style/themes/default.less#L335
-     */
-    zIndex = 9,
+    zIndex,
     rotate = -22,
     width,
     height,
@@ -73,14 +83,20 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
     offset,
     children,
     inherit = true,
+    onRemove,
   } = props;
 
-  const mergedStyle = {
+  const { className: contextClassName, style: contextStyle } = useComponentConfig('watermark');
+
+  const mergedStyle: React.CSSProperties = {
     ...fixedStyle,
+    ...contextStyle,
     ...style,
   };
 
   const [, token] = useToken();
+  // Keep Watermark above content layers while staying below popup base.
+  const mergedZIndex = zIndex ?? token.zIndexPopupBase - WATERMARK_Z_INDEX_OFFSET;
   const {
     color = token.colorFill,
     fontSize = token.fontSizeLG,
@@ -90,6 +106,23 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
     textAlign = 'center',
   } = font;
 
+  const mergedFont = React.useMemo<Required<WatermarkFont>>(
+    () => ({
+      color,
+      fontSize,
+      fontWeight,
+      fontStyle,
+      fontFamily,
+      textAlign,
+    }),
+    [color, fontSize, fontWeight, fontStyle, fontFamily, textAlign],
+  );
+
+  const contentLines = React.useMemo(
+    () => getContentLines(content, mergedFont),
+    [content, mergedFont],
+  );
+
   const [gapX = DEFAULT_GAP_X, gapY = DEFAULT_GAP_Y] = gap;
   const gapXCenter = gapX / 2;
   const gapYCenter = gapY / 2;
@@ -98,7 +131,7 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
 
   const markStyle = React.useMemo(() => {
     const mergedMarkStyle: React.CSSProperties = {
-      zIndex,
+      zIndex: mergedZIndex,
       position: 'absolute',
       left: 0,
       top: 0,
@@ -124,7 +157,7 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
     mergedMarkStyle.backgroundPosition = `${positionLeft}px ${positionTop}px`;
 
     return mergedMarkStyle;
-  }, [zIndex, offsetLeft, gapXCenter, offsetTop, gapYCenter]);
+  }, [mergedZIndex, offsetLeft, gapXCenter, offsetTop, gapYCenter]);
 
   const [container, setContainer] = React.useState<HTMLDivElement | null>();
 
@@ -146,17 +179,21 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
     let defaultWidth = 120;
     let defaultHeight = 64;
     if (!image && ctx.measureText) {
-      ctx.font = `${Number(fontSize)}px ${fontFamily}`;
-      const contents = toList(content);
-      const sizes = contents.map((item) => {
-        const metrics = ctx.measureText(item!);
+      if (contentLines.length) {
+        const sizes = contentLines.map(({ text, font: lineFont }) => {
+          ctx.font = getCanvasFont(lineFont);
+          const metrics = ctx.measureText(text);
 
-        return [metrics.width, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent];
-      });
-      defaultWidth = Math.ceil(Math.max(...sizes.map((size) => size[0])));
-      defaultHeight =
-        Math.ceil(Math.max(...sizes.map((size) => size[1]))) * contents.length +
-        (contents.length - 1) * FontGap;
+          return [metrics.width, metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent];
+        });
+        defaultWidth = Math.ceil(Math.max(...sizes.map((size) => size[0])));
+        defaultHeight =
+          Math.ceil(sizes.reduce((total, size) => total + size[1], 0)) +
+          (contentLines.length - 1) * FontGap;
+      } else {
+        defaultWidth = 0;
+        defaultHeight = 0;
+      }
     }
     return [width ?? defaultWidth, height ?? defaultHeight] as const;
   };
@@ -179,16 +216,13 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
       const ratio = getPixelRatio();
       const [markWidth, markHeight] = getMarkSize(ctx);
 
-      const drawCanvas = (
-        drawContent?: NonNullable<WatermarkProps['content']> | HTMLImageElement,
-      ) => {
+      const drawCanvas = (drawContent?: typeof contentLines | HTMLImageElement) => {
         const params: ClipParams = [
-          drawContent || '',
+          drawContent || [],
           rotate,
           ratio,
           markWidth,
           markHeight,
-          { color, fontSize, fontStyle, fontWeight, fontFamily, textAlign },
           gapX,
           gapY,
         ] as const;
@@ -204,13 +238,13 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
           drawCanvas(img);
         };
         img.onerror = () => {
-          drawCanvas(content);
+          drawCanvas(contentLines);
         };
         img.crossOrigin = 'anonymous';
         img.referrerPolicy = 'no-referrer';
         img.src = image;
       } else {
-        drawCanvas(content);
+        drawCanvas(contentLines);
       }
     }
   };
@@ -219,7 +253,7 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
 
   // ============================= Effect =============================
   // Append watermark to the container
-  const [appendWatermark, removeWatermark, isWatermarkEle] = useWatermark(markStyle);
+  const [appendWatermark, removeWatermark, isWatermarkEle] = useWatermark(markStyle, onRemove);
 
   useEffect(() => {
     if (watermarkInfo) {
@@ -256,17 +290,11 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
 
   useEffect(syncWatermark, [
     rotate,
-    zIndex,
+    mergedZIndex,
     width,
     height,
     image,
-    content,
-    color,
-    fontSize,
-    fontWeight,
-    fontStyle,
-    fontFamily,
-    textAlign,
+    contentLines,
     gapX,
     gapY,
     offsetLeft,
@@ -305,7 +333,11 @@ const Watermark: React.FC<WatermarkProps> = (props) => {
   );
 
   return (
-    <div ref={setContainer} className={classNames(className, rootClassName)} style={mergedStyle}>
+    <div
+      ref={setContainer}
+      className={clsx(className, contextClassName, rootClassName)}
+      style={mergedStyle}
+    >
       {childNode}
     </div>
   );

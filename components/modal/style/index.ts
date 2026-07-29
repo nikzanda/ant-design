@@ -1,8 +1,9 @@
 import type React from 'react';
+import type { CSSObject } from '@ant-design/cssinjs';
 import { unit } from '@ant-design/cssinjs';
 
 import { getMediaSize } from '../../grid/style';
-import { genFocusStyle, resetComponent } from '../../style';
+import { genFocusOutline, genFocusStyle, resetComponent } from '../../style';
 import { initFadeMotion, initZoomMotion } from '../../style/motion';
 import type {
   AliasToken,
@@ -31,7 +32,7 @@ export interface ComponentToken {
    * @desc 标题字体大小
    * @descEN Font size of title
    */
-  titleFontSize: number;
+  titleFontSize: number | string;
   /**
    * @desc 标题字体颜色
    * @descEN Font color of title
@@ -150,7 +151,7 @@ export const genModalMaskStyle: GenerateStyle<TokenWithCommonCls<AliasToken>> = 
 
         // https://github.com/ant-design/ant-design/issues/37329
         // https://github.com/ant-design/ant-design/issues/40272
-        [`${componentCls}${antCls}-zoom-leave ${componentCls}-content`]: {
+        [`${componentCls}${antCls}-zoom-leave ${componentCls}-container`]: {
           pointerEvents: 'none',
         },
 
@@ -160,6 +161,10 @@ export const genModalMaskStyle: GenerateStyle<TokenWithCommonCls<AliasToken>> = 
           height: '100%',
           backgroundColor: token.colorBgMask,
           pointerEvents: 'none',
+
+          [`&${componentCls}-mask-blur`]: {
+            backdropFilter: 'blur(4px)',
+          },
 
           [`${componentCls}-hidden`]: {
             display: 'none',
@@ -180,7 +185,7 @@ export const genModalMaskStyle: GenerateStyle<TokenWithCommonCls<AliasToken>> = 
 };
 
 const genModalStyle: GenerateStyle<ModalToken> = (token) => {
-  const { componentCls } = token;
+  const { componentCls, motionDurationMid } = token;
 
   return [
     // ======================== Root =========================
@@ -233,7 +238,11 @@ const genModalStyle: GenerateStyle<ModalToken> = (token) => {
         width: 'auto',
         maxWidth: `calc(100vw - ${unit(token.calc(token.margin).mul(2).equal())})`,
         margin: '0 auto',
-        paddingBottom: token.paddingLG,
+
+        '&:focus-visible': {
+          borderRadius: token.borderRadiusLG,
+          ...genFocusOutline(token),
+        },
 
         [`${componentCls}-title`]: {
           margin: 0,
@@ -244,7 +253,7 @@ const genModalStyle: GenerateStyle<ModalToken> = (token) => {
           wordWrap: 'break-word',
         },
 
-        [`${componentCls}-content`]: {
+        [`${componentCls}-container`]: {
           position: 'relative',
           backgroundColor: token.contentBg,
           backgroundClip: 'padding-box',
@@ -276,8 +285,9 @@ const genModalStyle: GenerateStyle<ModalToken> = (token) => {
           border: 0,
           outline: 0,
           cursor: 'pointer',
-          transition: `color ${token.motionDurationMid}, background-color ${token.motionDurationMid}`,
-
+          transition: ['color', 'background-color']
+            .map((prop) => `${prop} ${motionDurationMid}`)
+            .join(', '),
           '&-x': {
             display: 'flex',
             fontSize: token.fontSizeLG,
@@ -356,7 +366,7 @@ const genModalStyle: GenerateStyle<ModalToken> = (token) => {
         display: 'flex',
         flexDirection: 'column',
 
-        [`${componentCls}-content,
+        [`${componentCls}-container,
           ${componentCls}-body,
           ${componentCls}-confirm-body-wrapper`]: {
           display: 'flex',
@@ -372,13 +382,12 @@ const genModalStyle: GenerateStyle<ModalToken> = (token) => {
   ];
 };
 
-const genRTLStyle: GenerateStyle<ModalToken> = (token) => {
+const genRTLStyle: GenerateStyle<ModalToken, CSSObject> = (token) => {
   const { componentCls } = token;
   return {
     [`${componentCls}-root`]: {
       [`${componentCls}-wrap-rtl`]: {
         direction: 'rtl',
-
         [`${componentCls}-confirm-body`]: {
           direction: 'rtl',
         },
@@ -387,7 +396,7 @@ const genRTLStyle: GenerateStyle<ModalToken> = (token) => {
   };
 };
 
-const genResponsiveWidthStyle: GenerateStyle<ModalToken> = (token) => {
+const genResponsiveWidthStyle: GenerateStyle<ModalToken, CSSObject> = (token) => {
   const { componentCls } = token;
 
   const oriGridMediaSizesMap: Record<string, number> = getMediaSize(token);
@@ -425,7 +434,7 @@ const genResponsiveWidthStyle: GenerateStyle<ModalToken> = (token) => {
 };
 
 // ============================== Export ==============================
-export const prepareToken: (token: Parameters<GenStyleFn<'Modal'>>[0]) => ModalToken = (token) => {
+export const prepareToken = (token: Parameters<GenStyleFn<'Modal'>>[0]) => {
   const headerPaddingVertical = token.padding;
   const headerFontSize = token.fontSizeHeading5;
   const headerLineHeight = token.lineHeightHeading5;
@@ -450,7 +459,7 @@ export const prepareToken: (token: Parameters<GenStyleFn<'Modal'>>[0]) => ModalT
 
 export const prepareComponentToken = (token: GlobalToken) => ({
   footerBg: 'transparent',
-  headerBg: token.colorBgElevated,
+  headerBg: 'transparent',
   titleLineHeight: token.lineHeightHeading5,
   titleFontSize: token.fontSizeHeading5,
   contentBg: token.colorBgElevated,
@@ -479,6 +488,7 @@ export const prepareComponentToken = (token: GlobalToken) => ({
     : 0,
   confirmIconMarginInlineEnd: token.wireframe ? token.margin : token.marginSM,
   confirmBtnsMarginTop: token.wireframe ? token.marginLG : token.marginSM,
+  mask: true,
 });
 
 export default genStyleHooks(

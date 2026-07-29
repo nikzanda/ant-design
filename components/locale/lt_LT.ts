@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/lt_LT';
+import Pagination from '@rc-component/pagination/locale/lt_LT';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/lt_LT';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Pasirinkite',
     close: 'Uždaryti',
+    show: 'Rodyti',
+    hide: 'Slėpti',
+    sortable: 'rūšiuojami',
   },
   Table: {
     filterTitle: 'Filtras',
@@ -61,6 +64,7 @@ const localeValues: Locale = {
     selectAll: 'Pasirinkti viską',
     removeAll: 'Ištrinti viską',
     selectInvert: 'Apversti pasirinkimą',
+    deselectAll: 'Panaikinkite visų duomenų pasirinkimą',
   },
   Upload: {
     uploading: 'Įkeliami duomenys...',
@@ -80,6 +84,7 @@ const localeValues: Locale = {
     copy: 'Kopijuoti',
     copied: 'Nukopijuota',
     expand: 'Plačiau',
+    collapse: 'Sutraukti',
   },
   Form: {
     optional: '(neprivaloma)',
@@ -131,12 +136,10 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Peržiūrėti',
-  },
   QRCode: {
     expired: 'QR kodo galiojimas baigėsi',
     refresh: 'Atnaujinti',
+    scanned: 'Nuskaityta',
   },
   ColorPicker: {
     presetEmpty: 'Tuščia',

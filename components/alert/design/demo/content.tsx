@@ -22,9 +22,9 @@ const locales = {
 const Demo: React.FC = () => {
   const [locale] = useLocale(locales);
   return (
-    <Flex gap="middle" vertical style={{ maxWidth: 600 }}>
-      <Alert message={locale.welcomeMessage} />
-      <Alert message={locale.helpTitle} description={locale.helpDescription} />
+    <Flex gap="medium" vertical style={{ maxWidth: 600 }}>
+      <Alert title={locale.welcomeMessage} />
+      <Alert title={locale.helpTitle} description={locale.helpDescription} />
     </Flex>
   );
 };

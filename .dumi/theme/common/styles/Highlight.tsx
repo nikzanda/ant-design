@@ -2,7 +2,7 @@ import React from 'react';
 import { css, Global } from '@emotion/react';
 import { useTheme } from 'antd-style';
 
-export default () => {
+const Highlight: React.FC = () => {
   const token = useTheme();
 
   return (
@@ -22,8 +22,8 @@ export default () => {
           font-family: 'Lucida Console', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
           line-height: 2;
           white-space: pre;
-          background: white;
-          border: 1px solid #e9e9e9;
+          background: ${token.colorBgContainer};
+          border: 1px solid ${token.colorBorderSecondary};
           border-radius: ${token.borderRadius}px;
         }
 
@@ -34,7 +34,7 @@ export default () => {
           line-height: ${token.lineHeightLG};
           direction: ltr;
           white-space: pre;
-          text-align: left;
+          text-align: start;
           word-wrap: normal;
           word-break: normal;
           word-spacing: normal;
@@ -155,3 +155,5 @@ export default () => {
     />
   );
 };
+
+export default Highlight;

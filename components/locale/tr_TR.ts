@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/tr_TR';
+import Pagination from '@rc-component/pagination/locale/tr_TR';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/tr_TR';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Lütfen seçiniz',
     close: 'Kapat',
+    show: 'Göster',
+    hide: 'Gizle',
+    sortable: 'sıralanabilir',
   },
   Table: {
     filterTitle: 'Filtre menüsü',
@@ -32,6 +35,9 @@ const localeValues: Locale = {
     triggerDesc: 'Azalan düzende sırala',
     triggerAsc: 'Artan düzende sırala',
     cancelSort: 'Sıralamayı kaldır',
+    filterSearchPlaceholder: 'Filtrelerde ara',
+    emptyText: 'Veri yok',
+    selectNone: 'Tüm verileri temizle',
   },
   Tour: {
     Next: 'Sonraki',
@@ -130,8 +136,16 @@ const localeValues: Locale = {
       },
     },
   },
-  Image: {
-    preview: 'Önizleme',
+  QRCode: {
+    expired: 'QR kodunun süresi doldu',
+    refresh: 'Yenile',
+    scanned: 'Tarandı',
+  },
+  ColorPicker: {
+    presetEmpty: 'Boş',
+    transparent: 'Şeffaf',
+    singleColor: 'Tek renk',
+    gradientColor: 'Gradyan rengi',
   },
 };
 

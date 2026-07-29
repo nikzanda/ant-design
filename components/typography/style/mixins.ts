@@ -12,11 +12,11 @@ import { unit } from '@ant-design/cssinjs';
 import type { CSSObject } from '@ant-design/cssinjs';
 
 import type { TypographyToken } from '.';
-import { operationUnit } from '../../style';
+import { operationUnit, textEllipsis } from '../../style';
 import type { GenerateStyle } from '../../theme/internal';
 
 const getTitleStyle = (
-  fontSize: number,
+  fontSize: number | string,
   lineHeight: number,
   color: string,
   token: TypographyToken,
@@ -35,7 +35,7 @@ const getTitleStyle = (
 export const getTitleStyles: GenerateStyle<TypographyToken, CSSObject> = (token) => {
   const headings = [1, 2, 3, 4, 5] as const;
 
-  const styles = {} as CSSObject;
+  const styles: CSSObject = {};
   headings.forEach((headingLevel) => {
     styles[
       `
@@ -56,9 +56,10 @@ export const getTitleStyles: GenerateStyle<TypographyToken, CSSObject> = (token)
 
 export const getLinkStyles: GenerateStyle<TypographyToken, CSSObject> = (token) => {
   const { componentCls } = token;
+  const linkCls = `${componentCls}-link`;
 
   return {
-    'a&, a': {
+    [`&${linkCls}`]: {
       ...operationUnit(token),
       userSelect: 'text',
 
@@ -72,13 +73,20 @@ export const getLinkStyles: GenerateStyle<TypographyToken, CSSObject> = (token) 
 
         '&:active': {
           pointerEvents: 'none',
+
+          // Action buttons (copy, edit, expand) must remain interactive even when
+          // the disabled link is being clicked, otherwise their click events get
+          // swallowed by the parent's pointer-events: none during :active.
+          [`${componentCls}-actions`]: {
+            pointerEvents: 'auto',
+          },
         },
       },
     },
   };
 };
 
-export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token): CSSObject => ({
+export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token) => ({
   code: {
     margin: '0 0.2em',
     paddingInline: '0.4em',
@@ -86,7 +94,7 @@ export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token)
     fontSize: '85%',
     fontFamily: token.fontFamilyCode,
     background: 'rgba(150, 150, 150, 0.1)',
-    border: '1px solid rgba(100, 100, 100, 0.2)',
+    border: `${unit(token.lineWidth)} ${token.lineType} rgba(100, 100, 100, 0.2)`,
     borderRadius: 3,
   },
 
@@ -97,7 +105,7 @@ export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token)
     fontSize: '90%',
     fontFamily: token.fontFamilyCode,
     background: 'rgba(150, 150, 150, 0.06)',
-    border: '1px solid rgba(100, 100, 100, 0.2)',
+    border: `${unit(token.lineWidth)} ${token.lineType} rgba(100, 100, 100, 0.2)`,
     borderBottomWidth: 2,
     borderRadius: 3,
   },
@@ -157,7 +165,7 @@ export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token)
     whiteSpace: 'pre-wrap',
     wordWrap: 'break-word',
     background: 'rgba(150, 150, 150, 0.1)',
-    border: '1px solid rgba(100, 100, 100, 0.2)',
+    border: `${unit(token.lineWidth)} ${token.lineType} rgba(100, 100, 100, 0.2)`,
     borderRadius: 3,
     fontFamily: token.fontFamilyCode,
 
@@ -179,6 +187,58 @@ export const getResetStyles: GenerateStyle<TypographyToken, CSSObject> = (token)
     borderInlineStart: '4px solid rgba(100, 100, 100, 0.2)',
     opacity: 0.85,
   },
+
+  // table - Follow Table component default style
+  table: {
+    width: '100%',
+    textAlign: 'start',
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+    marginBlock: '1em',
+
+    'th, td': {
+      padding: unit(token.padding),
+      overflowWrap: 'break-word',
+      borderBottom: `${unit(token.lineWidth)} ${token.lineType} ${token.colorSplit}`,
+    },
+
+    'thead > tr:first-child > th:first-child': {
+      borderStartStartRadius: token.borderRadiusLG,
+    },
+
+    'thead > tr:first-child > th:last-child': {
+      borderStartEndRadius: token.borderRadiusLG,
+    },
+
+    'thead > tr > th': {
+      textAlign: 'start',
+      position: 'relative',
+      color: token.colorTextHeading,
+      fontWeight: token.fontWeightStrong,
+      backgroundColor: token.colorFillAlter,
+      transition: `background-color ${token.motionDurationMid} ease`,
+
+      '&:not(:last-child)::before': {
+        position: 'absolute',
+        top: '50%',
+        insetInlineEnd: 0,
+        width: 1,
+        height: '1.6em',
+        backgroundColor: token.colorSplit,
+        transform: 'translateY(-50%)',
+        content: '""',
+      },
+    },
+
+    'tbody > tr': {
+      '> th, > td': {
+        transition: `background-color ${token.motionDurationMid} ease`,
+      },
+      '&:hover > th, &:hover > td': {
+        backgroundColor: token.colorFillAlter,
+      },
+    },
+  },
 });
 
 export const getEditableStyles: GenerateStyle<TypographyToken, CSSObject> = (token) => {
@@ -191,8 +251,8 @@ export const getEditableStyles: GenerateStyle<TypographyToken, CSSObject> = (tok
 
       'div&': {
         insetInlineStart: token.calc(token.paddingSM).mul(-1).equal(),
-        marginTop: token.calc(inputShift).mul(-1).equal(),
-        marginBottom: `calc(1em - ${unit(inputShift)})`,
+        insetBlockStart: token.calc(inputShift).div(-2).add(1).equal(),
+        marginBottom: token.calc(inputShift).div(2).sub(2).equal(),
       },
 
       [`${componentCls}-edit-content-confirm`]: {
@@ -207,8 +267,23 @@ export const getEditableStyles: GenerateStyle<TypographyToken, CSSObject> = (tok
         pointerEvents: 'none',
       },
 
-      textarea: {
+      // Double the `-edit-content` class to raise this selector's specificity
+      // above Input's own `textarea.ant-input { line-height: token.lineHeight }`
+      // rule. Both otherwise share the same (0,1,1) specificity and Input is
+      // injected after Typography, so on the raw TextArea path the Input rule
+      // would win the cascade and the inherited font props below (notably
+      // `line-height`) would not apply.
+      [`&${componentCls}-edit-content textarea`]: {
         margin: '0!important',
+        // Inherit the edited element's typography so the editing textarea
+        // matches the rendered text (including customized heading tokens such
+        // as `fontSizeHeading1` and the strong heading weight), keeping editing
+        // WYSIWYG. Browsers do not inherit font properties for form controls by
+        // default, so they are set explicitly here.
+        fontSize: 'inherit',
+        lineHeight: 'inherit',
+        fontFamily: 'inherit',
+        fontWeight: 'inherit',
         // Fix Editable Textarea flash in Firefox
         MozTransition: 'none',
         height: '1em',
@@ -219,10 +294,7 @@ export const getEditableStyles: GenerateStyle<TypographyToken, CSSObject> = (tok
 
 export const getCopyableStyles: GenerateStyle<TypographyToken, CSSObject> = (token) => ({
   [`${token.componentCls}-copy-success`]: {
-    [`
-    &,
-    &:hover,
-    &:focus`]: {
+    '&, &:hover, &:focus': {
       color: token.colorSuccess,
     },
   },
@@ -232,18 +304,13 @@ export const getCopyableStyles: GenerateStyle<TypographyToken, CSSObject> = (tok
 });
 
 export const getEllipsisStyles = (): CSSObject => ({
-  [`
-  a&-ellipsis,
-  span&-ellipsis
-  `]: {
+  'a&-ellipsis, span&-ellipsis': {
     display: 'inline-block',
     maxWidth: '100%',
   },
 
   '&-ellipsis-single-line': {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    ...textEllipsis,
 
     // https://blog.csdn.net/iefreer/article/details/50421025
     'a&, span&': {

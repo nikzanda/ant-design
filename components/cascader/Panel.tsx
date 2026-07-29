@@ -1,20 +1,23 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import type { CascaderProps as RcCascaderProps } from 'rc-cascader';
-import { Panel } from 'rc-cascader';
-import type { PickType } from 'rc-cascader/lib/Panel';
+import type { CascaderProps as RcCascaderProps } from '@rc-component/cascader';
+import { Panel } from '@rc-component/cascader';
+import { clsx } from 'clsx';
 
 import type { CascaderProps, DefaultOptionType } from '.';
+import { useComponentConfig } from '../config-provider/context';
 import DefaultRenderEmpty from '../config-provider/defaultRenderEmpty';
 import DisabledContext from '../config-provider/DisabledContext';
 import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import useBase from './hooks/useBase';
 import useCheckable from './hooks/useCheckable';
-import useColumnIcons from './hooks/useColumnIcons';
 import useStyle from './style';
 import usePanelStyle from './style/panel';
+import useIcons from './hooks/useIcons';
 
-export type PanelPickType = Exclude<PickType, 'checkable'> | 'multiple' | 'rootClassName';
+type RcPanelProps = React.ComponentProps<typeof Panel>;
+type RcPanelPickType = Extract<keyof RcPanelProps, keyof RcCascaderProps>;
+
+export type PanelPickType = Exclude<RcPanelPickType, 'checkable'> | 'multiple' | 'rootClassName';
 
 export type CascaderPanelProps<
   OptionType extends DefaultOptionType = DefaultOptionType,
@@ -41,25 +44,35 @@ function CascaderPanel<
     notFoundContent,
     direction,
     expandIcon,
+    loadingIcon,
     disabled: customDisabled,
   } = props;
+
+  const { expandIcon: contextExpandIcon, loadingIcon: contextLoadingIcon } =
+    useComponentConfig('cascader');
 
   const disabled = React.useContext(DisabledContext);
   const mergedDisabled = customDisabled ?? disabled;
 
-  const [prefixCls, cascaderPrefixCls, mergedDirection, renderEmpty] = useBase(
+  const [_, cascaderPrefixCls, mergedDirection, renderEmpty] = useBase(
     customizePrefixCls,
     direction,
   );
 
   const rootCls = useCSSVarCls(cascaderPrefixCls);
-  const [wrapCSSVar, hashId, cssVarCls] = useStyle(cascaderPrefixCls, rootCls);
+  const [hashId, cssVarCls] = useStyle(cascaderPrefixCls, rootCls);
   usePanelStyle(cascaderPrefixCls);
 
   const isRtl = mergedDirection === 'rtl';
 
   // ===================== Icon ======================
-  const [mergedExpandIcon, loadingIcon] = useColumnIcons(prefixCls, isRtl, expandIcon);
+  const { expandIcon: mergedExpandIcon, loadingIcon: mergedLoadingIcon } = useIcons({
+    contextExpandIcon,
+    contextLoadingIcon,
+    expandIcon,
+    loadingIcon,
+    isRtl,
+  });
 
   // ===================== Empty =====================
   const mergedNotFoundContent = notFoundContent || renderEmpty?.('Cascader') || (
@@ -71,18 +84,18 @@ function CascaderPanel<
 
   // ==================== Render =====================
 
-  return wrapCSSVar(
+  return (
     <Panel
-      {...(props as Pick<RcCascaderProps, PickType>)}
+      {...(props as Pick<RcCascaderProps, RcPanelPickType>)}
       checkable={checkable}
       prefixCls={cascaderPrefixCls}
-      className={classNames(className, hashId, rootClassName, cssVarCls, rootCls)}
+      className={clsx(className, hashId, rootClassName, cssVarCls, rootCls)}
       notFoundContent={mergedNotFoundContent}
       direction={mergedDirection}
       expandIcon={mergedExpandIcon}
-      loadingIcon={loadingIcon}
+      loadingIcon={mergedLoadingIcon}
       disabled={mergedDisabled}
-    />,
+    />
   );
 }
 

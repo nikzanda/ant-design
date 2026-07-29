@@ -1,6 +1,6 @@
 import React from 'react';
 import { CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Tag } from 'antd';
+import { Flex, Tag } from 'antd';
 
 const preventDefault = (e: React.MouseEvent<HTMLElement>) => {
   e.preventDefault();
@@ -8,13 +8,14 @@ const preventDefault = (e: React.MouseEvent<HTMLElement>) => {
 };
 
 const App: React.FC = () => (
-  <>
+  <Flex gap="small" align="center" wrap>
     <Tag>Tag 1</Tag>
     <Tag>
       <a
         href="https://github.com/ant-design/ant-design/issues/1862"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="Ant Design issue"
       >
         Link
       </a>
@@ -34,7 +35,7 @@ const App: React.FC = () => (
     >
       Tag 3
     </Tag>
-  </>
+  </Flex>
 );
 
 export default App;

@@ -2,6 +2,7 @@ import React from 'react';
 import type { Theme } from '@ant-design/cssinjs';
 import { useCacheToken } from '@ant-design/cssinjs';
 
+import { ConfigContext } from '../config-provider/context';
 import version from '../version';
 import type { DesignTokenProviderProps } from './context';
 import { defaultTheme, DesignTokenContext } from './context';
@@ -54,6 +55,9 @@ const preserve: {
   screenXLMax: true,
   screenXXL: true,
   screenXXLMin: true,
+  screenXXLMax: true,
+  screenXXXL: true,
+  screenXXXLMin: true,
 };
 
 export const getComputedToken = (
@@ -105,15 +109,24 @@ export default function useToken(): [
   token: GlobalToken,
   hashId: string,
   realToken: GlobalToken,
-  cssVar?: DesignTokenProviderProps['cssVar'],
+  cssVar: DesignTokenProviderProps['cssVar'],
+  zeroRuntime: boolean,
 ] {
   const {
     token: rootDesignToken,
     hashed,
     theme,
     override,
-    cssVar,
+    cssVar: ctxCssVar,
+    zeroRuntime,
   } = React.useContext(DesignTokenContext);
+
+  const { csp, getPrefixCls } = React.useContext(ConfigContext);
+
+  const cssVar = {
+    prefix: ctxCssVar?.prefix ?? getPrefixCls(),
+    key: ctxCssVar?.key ?? 'css-var-root',
+  };
 
   const salt = `${version}-${hashed || ''}`;
 
@@ -126,18 +139,15 @@ export default function useToken(): [
       salt,
       override,
       getComputedToken,
-      // formatToken will not be consumed after 1.15.0 with getComputedToken.
-      // But token will break if @ant-design/cssinjs is under 1.15.0 without it
-      formatToken,
-      cssVar: cssVar && {
-        prefix: cssVar.prefix,
-        key: cssVar.key,
+      cssVar: {
+        ...cssVar,
         unitless,
         ignore,
         preserve,
       },
+      nonce: csp?.nonce,
     },
   );
 
-  return [mergedTheme, realToken, hashed ? hashId : '', token, cssVar];
+  return [mergedTheme, realToken, hashed ? hashId : '', token, cssVar, !!zeroRuntime];
 }

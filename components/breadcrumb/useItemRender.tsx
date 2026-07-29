@@ -1,7 +1,8 @@
 import * as React from 'react';
-import classNames from 'classnames';
-import pickAttrs from 'rc-util/lib/pickAttrs';
+import { pickAttrs } from '@rc-component/util';
+import { clsx } from 'clsx';
 
+import { isPlainObject, isReactRenderable } from '../_util/is';
 import type { BreadcrumbProps, InternalRouteType, ItemType } from './Breadcrumb';
 
 type AddParameters<TFunction extends (...args: any) => any, TParameters extends [...args: any]> = (
@@ -12,11 +13,11 @@ type ItemRender = NonNullable<BreadcrumbProps['itemRender']>;
 type InternalItemRenderParams = AddParameters<ItemRender, [href?: string]>;
 
 function getBreadcrumbName(route: InternalRouteType, params: any) {
-  if (route.title === undefined || route.title === null) {
+  if (!isReactRenderable(route.title)) {
     return null;
   }
   const paramsKeys = Object.keys(params).join('|');
-  return typeof route.title === 'object'
+  return isPlainObject(route.title)
     ? route.title
     : String(route.title).replace(
         new RegExp(`:(${paramsKeys})`, 'g'),
@@ -30,30 +31,27 @@ export function renderItem(
   children: React.ReactNode,
   href?: string,
 ) {
-  if (children === null || children === undefined) {
+  if (!isReactRenderable(children)) {
     return null;
   }
 
   const { className, onClick, ...restItem } = item;
 
   const passedProps = {
-    ...pickAttrs(restItem, {
-      data: true,
-      aria: true,
-    }),
+    ...pickAttrs(restItem, { data: true, aria: true }),
     onClick,
   };
 
   if (href !== undefined) {
     return (
-      <a {...passedProps} className={classNames(`${prefixCls}-link`, className)} href={href}>
+      <a {...passedProps} className={clsx(`${prefixCls}-link`, className)} href={href}>
         {children}
       </a>
     );
   }
 
   return (
-    <span {...passedProps} className={classNames(`${prefixCls}-link`, className)}>
+    <span {...passedProps} className={clsx(`${prefixCls}-link`, className)}>
       {children}
     </span>
   );

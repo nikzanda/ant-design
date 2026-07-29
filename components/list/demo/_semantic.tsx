@@ -1,10 +1,9 @@
 import React from 'react';
-
-import SemanticPreview from '../../../.dumi/theme/common/SemanticPreview';
-import useLocale from '../../../.dumi/hooks/useLocale';
-
-import { Avatar, List, Space } from 'antd';
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import { Avatar, List, Space } from 'antd';
+
+import useLocale from '../../../.dumi/hooks/useLocale';
+import SemanticPreview from '../../../.dumi/theme/common/SemanticPreview';
 
 const locales = {
   cn: {
@@ -27,7 +26,7 @@ const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
 const data = Array.from({ length: 1 }).map((_, i) => ({
   href: 'https://ant.design',
   title: `ant design part ${i}`,
-  avatar: `https://api.dicebear.com/7.x/miniavs/svg?seed=${i}`,
+  avatar: `https://api.dicebear.com/10.x/lorelei/svg?seed=${i}`,
   description:
     'Ant Design, a design language for background applications, is refined by Ant UED Team.',
   content:
@@ -54,6 +53,7 @@ const BlockList: React.FC<React.PropsWithChildren> = (props) => {
             ]}
             extra={
               <img
+                draggable={false}
                 width={272}
                 alt="logo"
                 src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"

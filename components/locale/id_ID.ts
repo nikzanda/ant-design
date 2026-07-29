@@ -1,4 +1,4 @@
-import Pagination from 'rc-pagination/lib/locale/id_ID';
+import Pagination from '@rc-component/pagination/locale/id_ID';
 
 import type { Locale } from '.';
 import Calendar from '../calendar/locale/id_ID';
@@ -16,6 +16,9 @@ const localeValues: Locale = {
   global: {
     placeholder: 'Silahkan pilih',
     close: 'Tutup',
+    show: 'Tampilkan',
+    hide: 'Sembunyikan',
+    sortable: 'dapat diurutkan',
   },
   Table: {
     filterTitle: 'Menu filter',
@@ -132,9 +135,6 @@ const localeValues: Locale = {
         mismatch: '${label} tidak sesuai dengan pola ${pattern}',
       },
     },
-  },
-  Image: {
-    preview: 'Pratinjau',
   },
   QRCode: {
     expired: 'Kode QR sudah habis masa berlakunya',
