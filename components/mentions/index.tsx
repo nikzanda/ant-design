@@ -22,6 +22,7 @@ import useSize from '../config-provider/hooks/useSize';
 import type { SizeType } from '../config-provider/SizeContext';
 import { FormItemInputContext } from '../form/context';
 import useVariant from '../form/hooks/useVariants';
+import usePopupRender from '../select/usePopupRender';
 import Spin from '../spin';
 import useStyle from './style';
 
@@ -34,8 +35,10 @@ function loadingFilterOption() {
 export type MentionPlacement = 'top' | 'bottom';
 
 export type MentionsOptionProps = NonNullable<RcMentionsProps['options']>[number];
+
 type RcMentionsRef = React.ComponentRef<typeof RcMentions>;
 
+/** @deprecated Please use the `options` prop with `MentionsOptionProps` instead. */
 export interface OptionProps {
   value: string;
   children: React.ReactNode;
@@ -108,6 +111,7 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
     classNames,
     styles,
     size: customSize,
+    popupRender,
     ...restProps
   } = props;
   const [focused, setFocused] = React.useState(false);
@@ -183,7 +187,7 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
     if (notFoundContent !== undefined) {
       return notFoundContent;
     }
-    return renderEmpty?.('Select') || <DefaultRenderEmpty componentName="Select" />;
+    return renderEmpty?.('Mentions') || <DefaultRenderEmpty componentName="Mentions" />;
   }, [notFoundContent, renderEmpty]);
 
   const mentionOptions = React.useMemo<React.ReactNode>(() => {
@@ -240,6 +244,8 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
     },
   );
 
+  const mergedPopupRender = usePopupRender(popupRender);
+
   return (
     <RcMentions
       silent={loading}
@@ -250,6 +256,7 @@ const InternalMentions = React.forwardRef<MentionsRef, MentionProps>((props, ref
       allowClear={mergedAllowClear}
       direction={direction}
       style={mergedStyles.root}
+      popupRender={mergedPopupRender}
       {...restProps}
       filterOption={mentionsfilterOption}
       onFocus={onFocus}

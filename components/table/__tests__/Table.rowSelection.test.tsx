@@ -629,6 +629,38 @@ describe('Table.rowSelection', () => {
       expect(onChange).toHaveBeenCalledWith([0, 2], expect.anything(), { type: 'all' });
     });
 
+    // https://github.com/ant-design/ant-design/issues/58842
+    it('SELECTION_ALL should skip disabled rows on other pages', () => {
+      jest.useFakeTimers();
+      const onChange = jest.fn();
+      const { container } = render(
+        createTable({
+          pagination: { pageSize: 2 },
+          rowSelection: {
+            onChange,
+            getCheckboxProps: (record) => ({ disabled: record.key === 3 }),
+            selections: [Table.SELECTION_ALL],
+          },
+        }),
+      );
+
+      fireEvent.mouseEnter(container.querySelector('.ant-dropdown-trigger')!);
+
+      act(() => {
+        jest.runAllTimers();
+      });
+
+      fireEvent.click(container.querySelector('li.ant-dropdown-menu-item')!);
+      expect(onChange).toHaveBeenCalledWith([0, 1, 2], expect.anything(), { type: 'all' });
+
+      fireEvent.click(container.querySelector('.ant-pagination-item-2')!);
+      expect(
+        container.querySelector<HTMLInputElement>(
+          'tbody tr[data-row-key="3"] input[type="checkbox"]',
+        )?.checked,
+      ).toBe(false);
+    });
+
     it('SELECTION_INVERT', () => {
       jest.useFakeTimers();
       const onChange = jest.fn();
@@ -1705,6 +1737,56 @@ describe('Table.rowSelection', () => {
         ['light', 'bamboo'],
         [{ name: 'light' }, { name: 'bamboo' }],
         { type: 'single' },
+      );
+    });
+
+    it('cache with preserveSelectedRowKeys in select events', () => {
+      const onSelect = jest.fn();
+      const onSelectMultiple = jest.fn();
+      const onSelectAll = jest.fn();
+      const rowSelection = {
+        onSelect,
+        onSelectMultiple,
+        onSelectAll,
+        preserveSelectedRowKeys: true,
+      };
+      const { container, rerender } = render(
+        <Table
+          dataSource={[{ name: 'light' }, { name: 'bamboo' }]}
+          rowSelection={rowSelection}
+          rowKey="name"
+        />,
+      );
+
+      fireEvent.click(container.querySelector('tbody input')!);
+
+      rerender(
+        <Table
+          dataSource={[{ name: 'bamboo' }, { name: 'moon' }]}
+          rowSelection={rowSelection}
+          rowKey="name"
+        />,
+      );
+      fireEvent.click(container.querySelectorAll('tbody input')[0]);
+      expect(onSelect).toHaveBeenLastCalledWith(
+        { name: 'bamboo' },
+        true,
+        [{ name: 'light' }, { name: 'bamboo' }],
+        expect.anything(),
+      );
+
+      fireEvent.click(container.querySelectorAll('tbody input')[1], { shiftKey: true });
+      expect(onSelectMultiple).toHaveBeenCalledWith(
+        true,
+        [{ name: 'light' }, { name: 'bamboo' }, { name: 'moon' }],
+        [{ name: 'moon' }],
+      );
+
+      fireEvent.click(container.querySelector('th input')!);
+      expect(onSelectAll).toHaveBeenCalledWith(
+        false,
+        [{ name: 'light' }],
+        [{ name: 'bamboo' }, { name: 'moon' }],
       );
     });
 

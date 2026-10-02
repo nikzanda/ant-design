@@ -8,9 +8,9 @@ import { getNodeRef, omit, useComposeRef, useControlledState, useEvent } from '@
 import { clsx } from 'clsx';
 
 import { useZIndex } from '../_util/hooks';
-import { useMergeSemantic } from '../_util/hooks/useMergeSemantic';
+import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
 import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
-import { isPlainObject, isPrimitive } from '../_util/is';
+import { isPlainObject, isPrimitive, isString } from '../_util/is';
 import type { AdjustOverflow } from '../_util/placements';
 import getPlacements from '../_util/placements';
 import genPurePanel from '../_util/PurePanel';
@@ -155,17 +155,18 @@ const Dropdown: CompoundedComponent = React.forwardRef<HTMLElement, DropdownProp
     mouseLeaveDelay,
     autoAdjustOverflow,
   };
-  const [mergedClassNames, mergedStyles] = useMergeSemantic(
-    [contextClassNames, classNames],
-    [contextStyles, styles],
-    {
-      props: mergedProps,
-    },
-  );
+  const contextStyleRoot = useSemanticRootStyle(contextStyle);
+  const overlayStyleRoot = useSemanticRootStyle(overlayStyle);
+
+  const [mergedClassNames, mergedStyles] = useMergeSemantic<
+    DropdownSemanticAllType['classNames'],
+    DropdownSemanticAllType['styles'],
+    DropdownProps
+  >([contextClassNames, classNames], [contextStyles, contextStyleRoot, styles, overlayStyleRoot], {
+    props: mergedProps,
+  });
 
   const mergedRootStyles: React.CSSProperties = {
-    ...contextStyle,
-    ...overlayStyle,
     ...mergedStyles.root,
   };
 
@@ -312,9 +313,11 @@ const Dropdown: CompoundedComponent = React.forwardRef<HTMLElement, DropdownProp
     if (mergedPopupRender) {
       overlayNode = mergedPopupRender(overlayNode);
     }
-    overlayNode = React.Children.only(
-      typeof overlayNode === 'string' ? <span>{overlayNode}</span> : overlayNode,
-    );
+    if (isString(overlayNode)) {
+      overlayNode = <span>{overlayNode}</span>;
+    } else if (!React.isValidElement(overlayNode)) {
+      overlayNode = <>{overlayNode}</>;
+    }
     return (
       <OverrideProvider
         prefixCls={`${prefixCls}-menu`}

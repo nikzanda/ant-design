@@ -86,6 +86,10 @@ const localeValues: Locale = {
     expand: 'Өргөтгөх',
     collapse: 'Нурах',
   },
+  Carousel: {
+    prevSlide: 'Өмнөх слайд',
+    nextSlide: 'Дараагийн слайд',
+  },
   Form: {
     optional: '(сонголттой)',
     defaultValidateMessages: {
@@ -127,7 +131,7 @@ const localeValues: Locale = {
       },
       array: {
         len: '${len} ${label} байх ёстой',
-        min: 'Дор хаяж ${мин} ${label}',
+        min: 'Дор хаяж ${min} ${label}',
         max: 'Хамгийн ихдээ ${max} ${label}',
         range: '${label}-н хэмжээ ${min}-${max} хооронд байх ёстой',
       },

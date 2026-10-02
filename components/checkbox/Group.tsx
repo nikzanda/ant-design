@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { omit } from '@rc-component/util';
+import { isNonNullable, omit, useControlledState } from '@rc-component/util';
 import { clsx } from 'clsx';
 
 import type { HTMLAriaDataAttributes } from '../_util/aria-data-attrs';
-import { isNumber } from '../_util/is';
+import { isNumber, isString } from '../_util/is';
 import { ConfigContext } from '../config-provider';
 import useCSSVarCls from '../config-provider/hooks/useCSSVarCls';
 import type { CheckboxChangeEvent } from './Checkbox';
@@ -62,25 +62,22 @@ const CheckboxGroup = React.forwardRef(
     } = props;
     const { getPrefixCls, direction } = React.useContext(ConfigContext);
 
-    const [value, setValue] = React.useState<T[]>(restProps.value || defaultValue || []);
+    const [value, setValue] = useControlledState<T[]>(defaultValue || [], restProps.value);
+    const mergedValue = value || [];
     const [registeredValues, setRegisteredValues] = React.useState<T[]>([]);
 
-    React.useEffect(() => {
-      if ('value' in restProps) {
-        setValue(restProps.value || []);
-      }
-    }, [restProps.value]);
-
-    const memoizedOptions = React.useMemo<CheckboxOptionType<T>[]>(
-      () =>
-        options.map<CheckboxOptionType<T>>((option: any) => {
-          if (typeof option === 'string' || isNumber(option)) {
+    const memoizedOptions = React.useMemo(() => {
+      return options
+        .map((option) => {
+          if (isString(option) || isNumber(option)) {
             return { label: option, value: option };
           }
           return option;
-        }),
-      [options],
-    );
+        })
+        .filter(
+          (item): item is CheckboxOptionType<T> => isNonNullable(item) && isNonNullable(item.value),
+        );
+    }, [options]);
 
     const cancelValue = (val: T) => {
       setRegisteredValues((prevValues) => prevValues.filter((v) => v !== val));
@@ -91,16 +88,14 @@ const CheckboxGroup = React.forwardRef(
     };
 
     const toggleOption: CheckboxGroupContext<T>['toggleOption'] = (option) => {
-      const optionIndex = value.indexOf(option.value);
-      const newValue = [...value];
+      const optionIndex = mergedValue.indexOf(option.value);
+      const newValue = [...mergedValue];
       if (optionIndex === -1) {
         newValue.push(option.value);
       } else {
         newValue.splice(optionIndex, 1);
       }
-      if (!('value' in restProps)) {
-        setValue(newValue);
-      }
+      setValue(newValue);
       onChange?.(
         newValue
           .filter((val) => registeredValues.includes(val))
@@ -120,37 +115,38 @@ const CheckboxGroup = React.forwardRef(
 
     const domProps = omit(restProps, ['value', 'disabled']);
 
-    const childrenNode = options.length
-      ? memoizedOptions.map<React.ReactNode>((option) => (
-          <Checkbox
-            prefixCls={prefixCls}
-            key={option.value.toString()}
-            disabled={'disabled' in option ? option.disabled : restProps.disabled}
-            value={option.value}
-            checked={value.includes(option.value)}
-            onChange={option.onChange}
-            className={clsx(`${groupPrefixCls}-item`, option.className)}
-            style={option.style}
-            title={option.title}
-            id={option.id}
-            required={option.required}
-          >
-            {option.label}
-          </Checkbox>
-        ))
-      : children;
+    const childrenNode =
+      Array.isArray(memoizedOptions) && memoizedOptions.length > 0
+        ? memoizedOptions.map((option) => (
+            <Checkbox
+              prefixCls={prefixCls}
+              key={option.value.toString()}
+              disabled={'disabled' in option ? option.disabled : restProps.disabled}
+              value={option.value}
+              checked={mergedValue.includes(option.value)}
+              onChange={option.onChange}
+              className={clsx(`${groupPrefixCls}-item`, option.className)}
+              style={option.style}
+              title={option.title}
+              id={option.id}
+              required={option.required}
+            >
+              {option.label}
+            </Checkbox>
+          ))
+        : children;
 
     const memoizedContext = React.useMemo<CheckboxGroupContext<any>>(
       () => ({
         toggleOption,
-        value,
+        value: mergedValue,
         disabled: restProps.disabled,
         name: restProps.name,
         // https://github.com/ant-design/ant-design/issues/16376
         registerValue,
         cancelValue,
       }),
-      [toggleOption, value, restProps.disabled, restProps.name, registerValue, cancelValue],
+      [toggleOption, mergedValue, restProps.disabled, restProps.name, registerValue, cancelValue],
     );
 
     const classString = clsx(

@@ -3,6 +3,10 @@ import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
 
 import Upload from '..';
 import type { UploadProps } from '..';
+import {
+  expectSemanticRootStylePriority,
+  semanticRootStylePriority,
+} from '../../../tests/shared/semanticStylePriority';
 import { render } from '../../../tests/utils';
 import ConfigProvider from '../../config-provider';
 
@@ -170,7 +174,8 @@ describe('Upload.Semantic', () => {
 
     const rootElement = container.querySelector('.ant-upload-wrapper');
     expect(rootElement).toBeTruthy();
-    expect(rootElement).toHaveStyle({ backgroundColor: 'rgb(255, 0, 0)', borderWidth: '2px' });
+    expect(rootElement).toHaveStyle({ backgroundColor: 'rgb(255, 0, 0)' });
+    expect(rootElement).toHaveProperty('style.borderWidth', '2px');
 
     const listElement = container.querySelector('.ant-upload-list');
     expect(listElement).toBeTruthy();
@@ -179,6 +184,26 @@ describe('Upload.Semantic', () => {
     const itemElement = container.querySelector('.ant-upload-list-item');
     expect(itemElement).toBeTruthy();
     expect(itemElement).toHaveStyle({ color: 'rgb(0, 0, 255)' });
+  });
+
+  it('should follow trigger style priority', () => {
+    const { container } = render(
+      <ConfigProvider
+        upload={{
+          styles: { trigger: semanticRootStylePriority.contextStyles.root },
+          style: semanticRootStylePriority.contextStyle,
+        }}
+      >
+        <Upload
+          styles={{ trigger: semanticRootStylePriority.styles.root }}
+          style={semanticRootStylePriority.style}
+        >
+          <button type="button">Upload</button>
+        </Upload>
+      </ConfigProvider>,
+    );
+
+    expectSemanticRootStylePriority(container.querySelector('.ant-upload-select'));
   });
 
   it('should use error color for picture placeholder icon in error status', () => {

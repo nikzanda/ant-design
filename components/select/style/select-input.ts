@@ -89,7 +89,7 @@ const genSelectInputVariantStyle = (
 };
 
 const genSelectInputFocusVisibleStyle = (token: SelectToken, outlineColor: string): CSSObject => ({
-  outline: `${unit(token.lineWidth)} ${token.lineType} ${outlineColor}`,
+  outline: `${unit(token.lineWidthFocus)} ${token.lineType} ${outlineColor}`,
   outlineOffset: unit(token.calc(token.lineWidth).mul(-1).equal()),
   transition: [`outline-offset`, `outline`].map((prop) => `${prop} 0s`).join(', '),
 });
@@ -236,7 +236,7 @@ const genSelectInputStyle: GenerateStyle<SelectToken, CSSObject> = (token) => {
         // ==========================================================
         '&-disabled': {
           background: token.colorBgContainerDisabled,
-          color: token.colorTextDisabled,
+          [varName('color')]: token.colorTextDisabled,
           cursor: 'not-allowed',
 
           input: {

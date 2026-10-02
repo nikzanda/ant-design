@@ -262,6 +262,7 @@ Properties for expandable.
 | expandIcon | Customize row expand Icon. Ref [example](https://codesandbox.io/s/fervent-bird-nuzpr) | function(props): ReactNode | - |  |
 | expandRowByClick | Whether to expand row by clicking anywhere in the whole row | boolean | false |  |
 | fixed | Whether the expansion icon is fixed. Optional true `left` `right` | boolean \| string | false | 4.16.0 |
+| forceRender | Force render expanded row content before expansion. In virtual mode, only rows currently mounted by the virtual list are force-rendered; off-screen rows may still be unmounted | boolean | false | 6.6.0 |
 | indentSize | Indent size in pixels of tree data | number | 15 |  |
 | rowExpandable | Enable row can be expandable | (record) => boolean | - |  |
 | showExpandColumn | Show expand column | boolean | true | 4.18.0 |
@@ -295,11 +296,11 @@ Properties for row selection.
 
 ### scroll
 
-| Property | Description | Type | Default |
-| --- | --- | --- | --- |
-| scrollToFirstRowOnChange | Whether to scroll to the top of the table when paging, sorting, filtering changes | boolean | - |
-| x | Set horizontal scrolling, can also be used to specify the width of the scroll area, could be number, percent value, true and ['max-content'](https://developer.mozilla.org/en-US/docs/Web/CSS/width#max-content) | string \| number \| true | - |
-| y | Set vertical scrolling, can also be used to specify the height of the scroll area, could be string or number | string \| number | - |
+| Property | Description | Type | Default | Version | [Global Config](/components/config-provider#component-config) |
+| --- | --- | --- | --- | --- | --- |
+| scrollToFirstRowOnChange | Whether to scroll to the top of the table when paging, sorting, filtering changes | boolean | - | - | 6.3.0 |
+| x | Set horizontal scrolling, can also be used to specify the width of the scroll area, could be number, percent value, true and ['max-content'](https://developer.mozilla.org/en-US/docs/Web/CSS/width#max-content) | string \| number \| true | - | - | 6.3.0 |
+| y | Set vertical scrolling, can also be used to specify the height of the scroll area, could be string or number | string \| number | - | - | 6.3.0 |
 
 ### selection
 

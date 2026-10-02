@@ -35,6 +35,21 @@ export const expectSemanticRootStylePriority = (element: Element | null) => {
     backgroundColor: semanticRootStylePriority.style.backgroundColor,
     marginTop: semanticRootStylePriority.styles.root.marginTop,
     paddingTop: semanticRootStylePriority.contextStyle.paddingTop,
-    borderTopWidth: semanticRootStylePriority.contextStyles.root.borderTopWidth,
   });
+  expect(element).toHaveProperty(
+    'style.borderTopWidth',
+    semanticRootStylePriority.contextStyles.root.borderTopWidth,
+  );
+};
+
+export const expectSemanticRootStyleWithRootStylePriority = (element: Element | null) => {
+  expect(element).toHaveStyle({
+    backgroundColor: semanticRootStylePriority.style.backgroundColor,
+    marginTop: semanticRootStylePriority.styles.root.marginTop,
+    paddingTop: semanticRootStylePriority.contextStyles.root.paddingTop,
+  });
+  expect(element).toHaveProperty(
+    'style.borderTopWidth',
+    semanticRootStylePriority.contextStyles.root.borderTopWidth,
+  );
 };

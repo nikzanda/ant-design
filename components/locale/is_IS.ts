@@ -86,6 +86,10 @@ const localeValues: Locale = {
     expand: 'Stækkaðu',
     collapse: 'Hrun',
   },
+  Carousel: {
+    prevSlide: 'Fyrri skyggna',
+    nextSlide: 'Næsta skyggna',
+  },
   Form: {
     optional: '（Valfrjálst）',
     defaultValidateMessages: {
@@ -121,7 +125,7 @@ const localeValues: Locale = {
       },
       number: {
         len: '${label} verður að vera jafngildi ${len}',
-        min: 'Lágmarksgildi ${label} er ${mín}',
+        min: 'Lágmarksgildi ${label} er ${min}',
         max: 'Hámarksgildi ${label} er ${max}',
         range: '${label} verður að vera á milli ${min}-${max}',
       },

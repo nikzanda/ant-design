@@ -9,6 +9,12 @@ import { genStyleHooks } from '../../theme/internal';
 export interface ComponentToken {
   // Component token here
   /**
+   * @desc 组件圆角
+   * @descEN Border radius of alert
+   * @since 6.6.0
+   */
+  borderRadius: CSSProperties['borderRadius'];
+  /**
    * @desc 默认内间距
    * @descEN Default padding
    */
@@ -45,8 +51,8 @@ export const genBaseStyle: GenerateStyle<AlertToken, CSSObject> = (token) => {
     fontSize,
     fontSizeLG,
     lineHeight,
-    borderRadiusLG: borderRadius,
     motionEaseInOutCirc,
+    borderRadius,
     withDescriptionIconSize,
     colorText,
     colorTextHeading,
@@ -206,6 +212,7 @@ export const genActionStyle: GenerateStyle<AlertToken, CSSObject> = (token) => {
     fontSizeIcon,
     colorIcon,
     colorIconHover,
+    colorTextDisabled,
   } = token;
 
   return {
@@ -232,13 +239,13 @@ export const genActionStyle: GenerateStyle<AlertToken, CSSObject> = (token) => {
             color: colorIconHover,
           },
         },
-      },
-
-      '&-close-text': {
-        color: colorIcon,
-        transition: `color ${motionDurationMid}`,
-        '&:hover': {
-          color: colorIconHover,
+        '&:disabled': {
+          cursor: 'not-allowed',
+          color: colorTextDisabled,
+          [`${iconCls}-close`]: {
+            color: 'inherit',
+            pointerEvents: 'none',
+          },
         },
       },
     },
@@ -248,6 +255,7 @@ export const genActionStyle: GenerateStyle<AlertToken, CSSObject> = (token) => {
 export const prepareComponentToken: GetDefaultToken<'Alert'> = (token) => {
   const paddingHorizontal = 12; // Fixed value here.
   return {
+    borderRadius: token.borderRadiusLG,
     withDescriptionIconSize: token.fontSizeHeading3,
     defaultPadding: `${token.paddingContentVerticalSM}px ${paddingHorizontal}px`,
     withDescriptionPadding: `${token.paddingMD}px ${token.paddingContentHorizontalLG}px`,

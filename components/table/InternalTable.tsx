@@ -5,7 +5,13 @@ import { omit, pickAttrs } from '@rc-component/util';
 import { clsx } from 'clsx';
 
 import { useProxyImperativeHandle } from '../_util/hooks';
-import { useMergeSemantic, useSemanticRootStyle } from '../_util/hooks/useMergeSemantic';
+import {
+  mergeClassNames,
+  mergeStyles,
+  resolveStyleOrClass,
+  useMergeSemantic,
+  useSemanticRootStyle,
+} from '../_util/hooks/useMergeSemantic';
 import type { GenerateSemantic } from '../_util/hooks/useMergeSemantic/semanticType';
 import { isFunction, isNumber, isPlainObject } from '../_util/is';
 import type { Breakpoint } from '../_util/responsiveObserver';
@@ -222,6 +228,8 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     locale,
     showSorterTooltip = { target: 'full-header' },
     virtual,
+    title,
+    showHeader,
   } = props;
 
   const warning = devUseWarning('Table');
@@ -429,7 +437,11 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
       }
     }
 
-    if (scroll && scroll.scrollToFirstRowOnChange !== false && internalRef.body.current) {
+    if (
+      mergedScroll &&
+      mergedScroll.scrollToFirstRowOnChange !== false &&
+      internalRef.body.current
+    ) {
       scrollTo(0, {
         getContainer: () => internalRef.body.current!,
       });
@@ -499,6 +511,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     locale: tableLocale,
     dropdownPrefixCls,
     mergedColumns,
+    baseColumns,
     onFilterChange,
     getPopupContainer: getPopupContainer || getContextPopupContainer,
     rootClassName: clsx(rootClassName, rootCls),
@@ -528,6 +541,15 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     onPaginationChange,
     pagination,
   );
+
+  const paginationClassNames: TablePaginationConfig['classNames'] = (info) =>
+    mergeClassNames(
+      {},
+      mergedClassNames.pagination,
+      resolveStyleOrClass(mergedPagination.classNames, info),
+    );
+  const paginationStyles: TablePaginationConfig['styles'] = (info) =>
+    mergeStyles(resolveStyleOrClass(mergedPagination.styles, info), mergedStyles.pagination);
 
   changeEventInfo.pagination =
     pagination === false ? {} : getPaginationParam(mergedPagination, pagination);
@@ -628,8 +650,8 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
     const renderPagination = (placement: 'start' | 'end' | 'center' = 'end') => (
       <Pagination
         {...mergedPagination}
-        classNames={mergedClassNames.pagination}
-        styles={mergedStyles.pagination}
+        classNames={paginationClassNames}
+        styles={paginationStyles}
         className={clsx(
           `${prefixCls}-pagination`,
           `${prefixCls}-pagination-${placement}`,
@@ -746,6 +768,7 @@ const InternalTable = <RecordType extends AnyObject = AnyObject>(
                 [`${prefixCls}-small`]: mergedSize === 'small',
                 [`${prefixCls}-bordered`]: bordered,
                 [`${prefixCls}-empty`]: rawData.length === 0,
+                [`${prefixCls}-no-header`]: !title && showHeader === false,
               },
               cssVarCls,
               rootCls,

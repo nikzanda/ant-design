@@ -1294,7 +1294,6 @@ exports[`renders components/form/demo/control-hooks.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 >
                   Select a option and change input text above
                 </div>
@@ -1966,7 +1965,6 @@ Array [
                 >
                   <div
                     class="ant-select-placeholder"
-                    style="visibility:visible"
                   />
                   <input
                     aria-autocomplete="list"
@@ -2044,7 +2042,6 @@ Array [
                 >
                   <div
                     class="ant-select-placeholder"
-                    style="visibility:visible"
                   />
                   <input
                     aria-autocomplete="list"
@@ -2122,7 +2119,6 @@ Array [
                 >
                   <div
                     class="ant-select-placeholder"
-                    style="visibility:visible"
                   />
                   <input
                     aria-autocomplete="list"
@@ -2282,7 +2278,7 @@ Array [
                   class="ant-picker-range-separator"
                 >
                   <span
-                    aria-label="to"
+                    aria-hidden="true"
                     class="ant-picker-separator"
                   >
                     <span
@@ -2526,6 +2522,7 @@ Array [
                         type="file"
                       />
                       <button
+                        disabled=""
                         style="color:inherit;cursor:inherit;border:0;background:none"
                         type="button"
                       >
@@ -2688,10 +2685,11 @@ Array [
                 class="ant-color-picker-trigger css-var-test-id ant-color-picker-css-var ant-color-picker-trigger-disabled"
               >
                 <div
+                  aria-disabled="true"
                   aria-label="Clear color"
-                  class="ant-color-picker-clear"
+                  class="ant-color-picker-clear ant-color-picker-clear-disabled"
                   role="button"
-                  tabindex="0"
+                  tabindex="-1"
                 />
               </div>
             </div>
@@ -7774,8 +7772,10 @@ exports[`renders components/form/demo/register.tsx correctly 1`] = `
                   </svg>
                 </span>
               </div>
-              <div
+              <button
+                aria-label="Clear"
                 class="ant-select-clear"
+                type="button"
               >
                 <span
                   aria-label="close-circle"
@@ -7797,7 +7797,7 @@ exports[`renders components/form/demo/register.tsx correctly 1`] = `
                     />
                   </svg>
                 </span>
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -8826,7 +8826,6 @@ exports[`renders components/form/demo/size.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -8903,7 +8902,6 @@ exports[`renders components/form/demo/size.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -8980,7 +8978,6 @@ exports[`renders components/form/demo/size.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -9830,7 +9827,7 @@ exports[`renders components/form/demo/time-related-controls.tsx correctly 1`] = 
                 class="ant-picker-range-separator"
               >
                 <span
-                  aria-label="to"
+                  aria-hidden="true"
                   class="ant-picker-separator"
                 >
                   <span
@@ -9948,7 +9945,7 @@ exports[`renders components/form/demo/time-related-controls.tsx correctly 1`] = 
                 class="ant-picker-range-separator"
               >
                 <span
-                  aria-label="to"
+                  aria-hidden="true"
                   class="ant-picker-separator"
                 >
                   <span
@@ -10494,7 +10491,6 @@ exports[`renders components/form/demo/validate-other.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 >
                   Please select a country
                 </div>
@@ -10579,7 +10575,6 @@ exports[`renders components/form/demo/validate-other.tsx correctly 1`] = `
                 >
                   <div
                     class="ant-select-placeholder"
-                    style="visibility:visible"
                   >
                     Please select favourite colors
                   </div>
@@ -11997,7 +11992,6 @@ exports[`renders components/form/demo/validate-scroll-to-field.tsx correctly 1`]
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -12770,7 +12764,7 @@ exports[`renders components/form/demo/validate-static.tsx correctly 1`] = `
                 class="ant-picker-range-separator"
               >
                 <span
-                  aria-label="to"
+                  aria-hidden="true"
                   class="ant-picker-separator"
                 >
                   <span
@@ -12957,8 +12951,10 @@ exports[`renders components/form/demo/validate-static.tsx correctly 1`] = `
                   </span>
                 </span>
               </div>
-              <div
+              <button
+                aria-label="Clear"
                 class="ant-select-clear"
+                type="button"
               >
                 <span
                   aria-label="close-circle"
@@ -12980,7 +12976,7 @@ exports[`renders components/form/demo/validate-static.tsx correctly 1`] = `
                     />
                   </svg>
                 </span>
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -13020,7 +13016,6 @@ exports[`renders components/form/demo/validate-static.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 >
                   I'm Cascader
                 </div>
@@ -13123,7 +13118,6 @@ exports[`renders components/form/demo/validate-static.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 >
                   I'm TreeSelect
                 </div>
@@ -14497,7 +14491,7 @@ exports[`renders components/form/demo/variant.tsx correctly 1`] = `
                   </div>
                 </label>
                 <label
-                  class="ant-segmented-item ant-segmented-item-selected"
+                  class="ant-segmented-item ant-segmented-item-selected ant-segmented-item-selected-text"
                 >
                   <input
                     checked=""
@@ -14801,7 +14795,6 @@ exports[`renders components/form/demo/variant.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -14880,7 +14873,6 @@ exports[`renders components/form/demo/variant.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -14959,7 +14951,6 @@ exports[`renders components/form/demo/variant.tsx correctly 1`] = `
               >
                 <div
                   class="ant-select-placeholder"
-                  style="visibility:visible"
                 />
                 <input
                   aria-autocomplete="list"
@@ -15123,7 +15114,7 @@ exports[`renders components/form/demo/variant.tsx correctly 1`] = `
                 class="ant-picker-range-separator"
               >
                 <span
-                  aria-label="to"
+                  aria-hidden="true"
                   class="ant-picker-separator"
                 >
                   <span
